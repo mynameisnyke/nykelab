@@ -1,8 +1,9 @@
 <template>
   <AppNav />
   <div class="grid h-screen grid-cols-12 gap-5 mx-8 place-items-center">
+    <MediaFrame :media="verticalMedia" />
     <!-- Vertical -->
-
+    <!-- 
     <div
       id="image-container"
       class="flex flex-col gap-2 col-span-4 col-start-5"
@@ -13,7 +14,7 @@
         srcset=""
         class="object-cover max-h-[900px]"
       />
-      <!-- Image Label -->
+      Image Label
       <div id="meta" class="flex flex-col">
         <span
           id="img title"
@@ -24,7 +25,7 @@
           >2020 - Views</span
         >
       </div>
-    </div>
+    </div> -->
 
     <!-- Horizontal -->
     <!-- <div
@@ -54,6 +55,22 @@
 
 <script setup lang="ts">
 import AppNav from "../components/AppNav.vue";
+import MediaFrame from "../components/ui/MediaFrame.vue";
+import { Media } from "../types/media";
+
+const verticalMedia: Media = {
+  src: "https://storage.googleapis.com/nykelab-photos-source/vertical/day/westminster-2020/DSC09231.jpg",
+  fileType: "image/jpg",
+  orientation: "vertical",
+  id: "vertical-test",
+};
+
+const landsacpeMedia: Media = {
+  src: "https://storage.googleapis.com/nykelab-photos-source/horizontal/day/_7M33919-2-HDR.jpg",
+  fileType: "image/jpg",
+  orientation: "landscape",
+  id: "landscape-test",
+};
 </script>
 
 <style></style>
