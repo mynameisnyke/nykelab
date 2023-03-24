@@ -1,7 +1,7 @@
 <template>
   <nav>
     <div
-      class="flex flex-row justify-between items-center gap-2 lg:px-8 lg:py-4"
+      class="flex flex-row justify-between items-center gap-2 lg:px-8 lg:py-4 w-full fixed"
     >
       <!-- Dark Mode Toggle -->
       <Switch id="darkModeSwitch" @click="toggleDark()" />
@@ -9,38 +9,38 @@
       <ul class="flex flex-row items-start gap-4">
         <li>
           <router-link
-            class="text-gray-400 font-medium text-lg"
+            class="text-gray-400 font-medium text-lg hover:text-gray-600 hover:dark:text-gray-100 transition-colors"
             to="/"
-            active-class="active text-gray-800"
+            active-class="active text-purple-300"
           >
-            <span>Home</span>
+            Home
           </router-link>
         </li>
         <li>
           <router-link
             class="text-gray-400 font-medium text-lg hover:text-gray-600 hover:dark:text-gray-100 transition-colors"
             to="/Blog"
-            active-class="active text-gray-800"
+            active-class="active text-purple-300"
           >
-            <span>Blog</span>
+            Blog
           </router-link>
         </li>
         <li>
           <router-link
             class="text-gray-400 font-medium text-lg hover:text-gray-600 hover:dark:text-gray-100 transition-colors"
             to="/Gallery"
-            active-class="active text-gray-800"
+            active-class="active text-purple-300"
           >
-            <span>Gallery</span>
+            Gallery
           </router-link>
         </li>
         <li>
           <router-link
             class="text-gray-400 font-medium text-lg hover:text-gray-600 hover:dark:text-gray-100 transition-colors"
             to="/About"
-            active-class="active text-gray-800"
+            active-class="active text-purple-300"
           >
-            <span>About</span>
+            About
           </router-link>
         </li>
       </ul>

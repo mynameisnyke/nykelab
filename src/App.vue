@@ -1,8 +1,11 @@
 <template>
-  <router-view class="dark:bg-black" />
+  <div class="dark:bg-black transition-colors">
+    <router-view class="" />
+  </div>
 </template>
 
-<script>
+<script lang="ts">
+import AppNav from "./components/AppNav.vue";
 export default {};
 </script>
 
