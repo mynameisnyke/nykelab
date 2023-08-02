@@ -1,12 +1,15 @@
 <template>
-  <div class="dark:bg-black transition-colors">
-    <router-view class="" />
-  </div>
+  <main class="transition-colors min-h-screen dark:bg-black">
+    <router-view />
+  </main>
 </template>
 
 <script lang="ts">
-import AppNav from "./components/AppNav.vue";
 export default {};
 </script>
 
-<style></style>
+<style>
+body {
+  min-height: 100vh;
+}
+</style>

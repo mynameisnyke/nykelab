@@ -1,55 +1,7 @@
 <template>
   <AppNav />
-  <div class="grid h-screen grid-cols-12 gap-5 mx-8 place-items-center">
-    <MediaFrame :media="verticalMedia" />
-    <!-- Vertical -->
-    <!-- 
-    <div
-      id="image-container"
-      class="flex flex-col gap-2 col-span-4 col-start-5"
-    >
-      <img
-        src="https://storage.googleapis.com/nykelab-photos-source/vertical/day/westminster-2020/DSC09231.jpg"
-        alt=""
-        srcset=""
-        class="object-cover max-h-[900px]"
-      />
-      Image Label
-      <div id="meta" class="flex flex-col">
-        <span
-          id="img title"
-          class="text-lg font-semibold text-gray-800 dark:text-gray-50 leading-none"
-          >Westminster Dog Show, New York</span
-        >
-        <span class="text-md text-gray-400 text-sm leading-none"
-          >2020 - Views</span
-        >
-      </div>
-    </div> -->
-
-    <!-- Horizontal -->
-    <!-- <div
-      id="image-container"
-      class="flex flex-col gap-2 col-span-8 col-start-3 xl:col-span-8 xl:col-start-3 2xl:col-span-6 2xl:col-start-4"
-    >
-      <img
-        src="https://storage.googleapis.com/nykelab-photos-source/horizontal/day/_7M33919-2-HDR.jpg"
-        alt=""
-        srcset=""
-        class="aspect-auto"
-      />
-      Image Label
-      <div id="meta" class="flex flex-col">
-        <span
-          id="img title"
-          class="text-lg font-semibold text-gray-800 dark:text-gray-50 leading-none"
-          >Westminster Dog Show, New York</span
-        >
-        <span class="text-md text-gray-400 text-sm leading-none"
-          >2020 - Views</span
-        >
-      </div>
-    </div> -->
+  <div class="grid grid-cols-12 gap-5 w-full h-screen place-items-center">
+    <MediaFrame :media="landsacpeMedia" :fadeIn="true" />
   </div>
 </template>
 
@@ -57,12 +9,20 @@
 import AppNav from "../components/AppNav.vue";
 import MediaFrame from "../components/ui/MediaFrame.vue";
 import { Media } from "../types/media";
+import { ref } from "vue";
 
 const verticalMedia: Media = {
   src: "https://storage.googleapis.com/nykelab-photos-source/vertical/day/westminster-2020/DSC09231.jpg",
   fileType: "image/jpg",
+  name: "Westminister 2021, New York",
   orientation: "vertical",
   id: "vertical-test",
+};
+const verticalMedia2: Media = {
+  src: "https://storage.googleapis.com/nykelab-photos-source/vertical/day/Brooklyn/7M300332.jpg",
+  fileType: "image/jpg",
+  orientation: "vertical",
+  id: "vertical-test-2",
 };
 
 const landsacpeMedia: Media = {
@@ -70,7 +30,33 @@ const landsacpeMedia: Media = {
   fileType: "image/jpg",
   orientation: "landscape",
   id: "landscape-test",
+  name: "Papago Park, Arizona",
+  dateCreated: "12/1/2023",
 };
+const landsacpeMedia2: Media = {
+  src: "https://storage.googleapis.com/nykelab-photos-source/horizontal/dark/DSC05587.jpg",
+  fileType: "image/jpg",
+  orientation: "landscape",
+  id: "landscape-test-2",
+  name: "Papago Park, Arizona",
+  dateCreated: "12/1/2023",
+};
+const landsacpeMedia3: Media = {
+  src: "https://storage.googleapis.com/avi-proxies/C0009-720p.mp4",
+  fileType: "video/mp4",
+  orientation: "landscape",
+  id: "landscape-test-3",
+  name: "Downtwon Brooklyn, New York",
+  dateCreated: "12/1/2023",
+};
+
+const horizontalMedia: Media[] = [landsacpeMedia, landsacpeMedia2];
+
+const onMediaChange = (media: Media) => {
+  console.log("Current media changed:", media);
+};
+
+let maxHeight = ref("500px");
 </script>
 
 <style></style>
