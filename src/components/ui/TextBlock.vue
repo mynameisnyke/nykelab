@@ -11,7 +11,7 @@ const props = defineProps({
   text: String,
 });
 
-const { formattedText } = useFormattedText(props.text);
+const { formattedText } = useFormattedText(props.text!);
 </script>
 
 <style>

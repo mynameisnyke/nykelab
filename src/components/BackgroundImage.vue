@@ -1,59 +1,43 @@
+<!-- BackgroundImage.vue -->
 <template>
-  <div class="background">
+  <div class="background flex min-h-screen min-w-full">
     <img
       v-if="mediaType === 'image' && mediaUrl"
       :src="mediaUrl"
       :alt="altText"
       class="background-media"
+      :class="{ loaded: imageLoaded }"
+      @load="emitMediaLoaded"
     />
-    <video
-      v-if="mediaType === 'video' && mediaUrl"
-      :src="mediaUrl"
-      class="background-media"
-      autoplay
-      loop
-      muted
-    ></video>
-    <slot></slot>
-    <!-- Slot for content on top of the background image or video -->
   </div>
+  <slot></slot>
 </template>
 
 <script setup>
-import { defineProps } from "vue";
+import { defineProps, defineEmits, ref } from "vue";
 
 const props = defineProps({
-  mediaType: {
-    type: String,
-    required: true,
-    validator: (value) => ["image", "video"].includes(value),
-  },
-  mediaUrl: {
-    type: String,
-    required: true,
-  },
+  mediaType: String,
+  mediaUrl: String,
   altText: String,
 });
+
+const emit = defineEmits(["media-loaded"]);
+const imageLoaded = ref(false); // Initialize as not visible
+
+const emitMediaLoaded = () => {
+  imageLoaded.value = true; // Make media visible when loaded
+  emit("media-loaded");
+};
 </script>
 
 <style>
-.background {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
+.background-media {
+  transition: opacity 1s ease-in-out;
+  opacity: 0;
 }
 
-.background-media {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0; /* Media is behind the overlay */
+.background-media.loaded {
+  opacity: 1;
 }
 </style>

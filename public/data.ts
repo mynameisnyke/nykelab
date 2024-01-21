@@ -159,6 +159,7 @@ export const tetonsPortrait = [
       "Tanque Verde Unified District, AZ\n32 deg 12' 26.26\" N, 110 deg 43' 40.18\" W",
     id: "test1",
     orientation: "portrait",
+    fullScreen: false,
   },
   {
     src: "https://storage.googleapis.com/nykelab-dev/teton/portrait/DSC00462.jpg",
@@ -167,5 +168,6 @@ export const tetonsPortrait = [
       "Tanque Verde Unified District, AZ\nTanque Verde Unified District, AZ\n32 deg 12' 26.26\" N, 110 deg 43' 40.18\" W",
     id: "test0",
     orientation: "portrait",
+    fullScreen: false,
   },
 ];

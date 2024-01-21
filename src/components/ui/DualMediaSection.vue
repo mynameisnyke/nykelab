@@ -1,13 +1,16 @@
+<!-- DualMediaSectin.vue -->
 <template>
   <section class="dual-media-section">
-    <div class="media-wrapper">
-      <MediaDisplay
+    <div class="media-wrapper max-w-[85%]">
+      <MediaSection
         v-for="(mediaItem, index) in mediaItems"
         :key="index"
         :mediaType="mediaItem.mediaType"
         :source="mediaItem.src"
         :isFullScreen="mediaItem.fullScreen"
         :caption="mediaItem.caption"
+        :isVertical="true"
+        :enableFade="true"
       />
     </div>
   </section>
@@ -15,7 +18,7 @@
 
 <script setup lang="ts">
 import { defineProps } from "vue";
-import MediaDisplay from "./MediaDisplay.vue"; // Assuming this is the name of your single media component
+import MediaSection from "./MediaSection.vue";
 
 const props = defineProps({
   mediaItems: {
@@ -29,8 +32,6 @@ const props = defineProps({
 <style>
 .dual-media-section {
   display: flex;
-  justify-content: center;
-  align-items: center;
   height: 100vh; /* Set the height to viewport height */
   overflow: hidden;
 }
@@ -40,7 +41,6 @@ const props = defineProps({
   grid-template-columns: repeat(2, 1fr);
   gap: 16px; /* Adjust the gap between items */
   width: 100%; /* Ensure the wrapper takes full width */
-  max-width: 1230px; /* Your maximum width constraint */
   margin: 0 auto; /* Center the wrapper if it's not full width */
 }
 

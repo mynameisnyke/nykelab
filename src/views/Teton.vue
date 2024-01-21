@@ -6,14 +6,16 @@
     :mediaType="grand_teton[0].type"
     :isFullScreen="true"
     :source="grand_teton[0].src"
+    :enableFade="false"
+    class="mb-40"
   >
-    <template> <CaptionDisplay caption="blah" /></template>
   </media-section>
   <media-section
     :mediaType="grand_teton[1].type"
     :source="grand_teton[3].src"
     :isFullScreen="false"
-    class="mb-3"
+    class="mb-40"
+    :enableFade="true"
   />
   <media-section
     :mediaType="grand_teton[1].type"
@@ -21,6 +23,8 @@
     :isFullScreen="false"
     :isVertical="true"
     :extendBeyondViewport="true"
+    :enableFade="true"
+    class="mb-40"
   />
   <DualMediaSection :mediaItems="tetonsPortrait" />
 </template>

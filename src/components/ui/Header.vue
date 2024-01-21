@@ -1,6 +1,6 @@
 <template>
   <header
-    class="w-full h-10 px-8 pt-2.5 pb-1.5 flex justify-between items-center z-10"
+    class="w-full h-10 px-8 pt-2.5 pb-1.5 flex justify-between items-center z-20"
   >
     <!-- Left section with the SVG -->
     <div class="flex items-center justify-center">
@@ -16,10 +16,15 @@
     <div class="flex items-center justify-end">
       <router-link
         :to="isAboutPage ? '/' : '/about'"
-        tag="div"
-        class="text-center text-white text-xs font-normal font-['Helvetica'] tracking-tight"
+        custom
+        v-slot="{ navigate }"
       >
-        <span>{{ isAboutPage ? "Home" : "About" }}</span>
+        <div
+          class="text-center text-white text-xs font-normal font-['Helvetica'] tracking-tight"
+          @click="navigate"
+        >
+          <span>{{ isAboutPage ? "Home" : "About" }}</span>
+        </div>
       </router-link>
     </div>
   </header>

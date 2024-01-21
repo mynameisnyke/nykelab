@@ -59,6 +59,11 @@
           :src="source"
           alt="Media content"
           class="max-w-[85%] h-auto object-contain mx-auto"
+          :class="[
+            'media-class',
+            { 'fade-visible': enableFade && mediaVisible },
+          ]"
+          @load="mediaVisible = true"
         />
         <video
           v-if="mediaType === 'video'"
@@ -77,24 +82,27 @@
   </section>
 </template>
 
-<script setup lang="">
-import { defineProps, computed } from "vue";
+<script setup lang="ts">
+import { defineProps, computed, ref } from "vue";
 
 const props = defineProps({
   mediaType: {
     type: String,
     required: true,
-    validator: (value) => ["image", "video"].includes(value),
+    validator: (value: string) => ["image", "video"].includes(value),
   },
   source: {
     type: String,
     required: true,
   },
+  enableFade: Boolean,
   caption: String,
   isFullScreen: Boolean,
   isVertical: Boolean,
   extendBeyondViewport: Boolean,
 });
+
+const mediaVisible = ref(false); // Initialize visibility as false
 
 const sectionClasses = computed(() => ({
   relative: true,
@@ -124,5 +132,14 @@ const verticalMediaClasses = computed(() => ({
   color: white;
   text-align: center;
   padding: 1rem;
+}
+
+.media-class {
+  transition: opacity 1.2s ease-in-out;
+  opacity: 0;
+}
+
+.media-class.fade-visible {
+  opacity: 1;
 }
 </style>
