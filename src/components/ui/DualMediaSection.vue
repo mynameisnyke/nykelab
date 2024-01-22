@@ -1,7 +1,7 @@
 <!-- DualMediaSectin.vue -->
 <template>
   <section class="dual-media-section">
-    <div class="media-wrapper max-w-[85%]">
+    <div class="media-wrapper max-w-[85%] md:max-w-[1230px]">
       <MediaSection
         v-for="(mediaItem, index) in mediaItems"
         :key="index"

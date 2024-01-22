@@ -1,4 +1,4 @@
-import { Media } from "../src/types/media";
+import { IMedia, Media } from "../src/types/media";
 
 export const teton = [
   {
@@ -32,6 +32,37 @@ export const teton = [
     type: "image",
     src: "https://storage.googleapis.com/nykelab-dev/DSC00438.jpg",
     displayStyle: "centered",
+  },
+];
+
+export const teton_media: IMedia[] = [
+  {
+    id: "1",
+    fileType: "video",
+    status: "done",
+    src: "https://storage.googleapis.com/nykelab-dev/sony-tenton.mp4",
+    orientation: "landscpe",
+  },
+  {
+    id: "2",
+    fileType: "video",
+    status: "done",
+    src: "https://storage.googleapis.com/nykelab-dev/sony-tenton.mp4",
+    orientation: "landscpe",
+  },
+  {
+    id: "3",
+    fileType: "image",
+    status: "done",
+    src: "https://storage.googleapis.com/nykelab-dev/teton/portrait/DSC00496.jpg",
+    orientation: "portrait",
+  },
+  {
+    id: "4",
+    fileType: "image",
+    status: "done",
+    src: "https://storage.googleapis.com/nykelab-dev/DSC00444.jpg",
+    orientation: "landscape",
   },
 ];
 
@@ -151,19 +182,21 @@ export const arizona = [
   },
 ];
 
-export const tetonsPortrait = [
+export const tetonsPortrait: Media[] = [
   {
-    src: "https://storage.googleapis.com/nykelab-dev/teton/portrait/DSC00458.jpg",
+    src: "https://storage.googleapis.com/nykelab-dev/teton/portrait/DSC00462.jpg",
     mediaType: "image",
+    fileType: "image",
     caption:
-      "Tanque Verde Unified District, AZ\n32 deg 12' 26.26\" N, 110 deg 43' 40.18\" W",
-    id: "test1",
+      "Tanque Verde Unified District, AZ\nTanque Verde Unified District, AZ\n32 deg 12' 26.26\" N, 110 deg 43' 40.18\" W",
+    id: "test0",
     orientation: "portrait",
     fullScreen: false,
   },
   {
     src: "https://storage.googleapis.com/nykelab-dev/teton/portrait/DSC00462.jpg",
     mediaType: "image",
+    fileType: "image",
     caption:
       "Tanque Verde Unified District, AZ\nTanque Verde Unified District, AZ\n32 deg 12' 26.26\" N, 110 deg 43' 40.18\" W",
     id: "test0",

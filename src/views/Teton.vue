@@ -2,39 +2,27 @@
   <transition name="fade">
     <BottomNav :class="footerClass" v-if="footerVisible" class="fixed-bottom" />
   </transition>
-  <media-section
-    :mediaType="grand_teton[0].type"
-    :isFullScreen="true"
-    :source="grand_teton[0].src"
-    :enableFade="false"
-    class="mb-40"
-  >
-  </media-section>
-  <media-section
-    :mediaType="grand_teton[1].type"
-    :source="grand_teton[3].src"
-    :isFullScreen="false"
-    class="mb-40"
-    :enableFade="true"
-  />
-  <media-section
-    :mediaType="grand_teton[1].type"
-    :source="grand_teton[5].src"
-    :isFullScreen="false"
-    :isVertical="true"
-    :extendBeyondViewport="true"
-    :enableFade="true"
-    class="mb-40"
-  />
-  <DualMediaSection :mediaItems="tetonsPortrait" />
+  <!-- Full -->
+  <MediaSection :media="media" :enableFade="true" :isFullScreen="true" />
+  <!-- Extended -->
+  <MediaSection :media="centered_media" :enableFade="true" />
+  <!-- Centered -->
+  <MediaSection :media="extended_media" :enableFade="true" />
+
+  <!-- <DualMediaSection :mediaItems="tetonsPortrait" /> -->
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import BottomNav from "../components/ui/BottomNav.vue";
-import { grand_teton, tetonsPortrait } from "../../public/data";
-import CaptionDisplay from "../components/ui/CaptionDisplay.vue";
+import { tetonsPortrait, teton_media } from "../../public/data";
+import MediaSection from "../components/ui/MediaSection.vue";
 import DualMediaSection from "../components/ui/DualMediaSection.vue";
+import { Media } from "../models/media";
+
+const media = new Media(teton_media[0]);
+const centered_media = new Media(teton_media[3]);
+const extended_media = new Media(teton_media[2]);
 
 const footerVisible = ref(true); // this will control the visibility
 

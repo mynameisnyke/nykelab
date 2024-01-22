@@ -1,82 +1,20 @@
 <!-- MediaSection.vue -->
 <template>
-  <section :class="sectionClasses" ref="mediaSection">
+  <section :class="sectionClasses" ref="mediaSection" class="md:mb-40 2xl:mb-0">
     <!-- Fullscreen media -->
-    <div v-if="isFullScreen" class="w-screen h-screen">
-      <img
-        v-if="mediaType === 'image'"
-        :src="source"
-        alt="Media content"
-        class="object-cover fade-effect"
-        :class="{ 'fade-effect': enableFade }"
-      />
-      <video
-        v-if="mediaType === 'video'"
-        :src="source"
-        class="w-full h-full min-w-full min-h-full object-cover"
-        :class="{ 'fade-effect': enableFade }"
-        autoplay
-        loop
-        muted
-      />
-    </div>
+    <template v-if="isFullScreen">
+      <FullScreenMedia :media="media" :enableFade="enableFade" />
+    </template>
 
-    <!-- Centered vertical media -->
-    <div
-      v-else-if="isVertical && !extendBeyondViewport"
-      class="flex justify-center items-center h-screen"
-    >
-      <img
-        v-if="mediaType === 'image'"
-        :src="source"
-        alt="Media content"
-        class="max-w-[85%] h-auto object-contain mx-auto fade-effect"
-        :class="{ 'fade-effect': enableFade }"
-      />
-      <video
-        v-if="mediaType === 'video'"
-        :src="source"
-        class="max-w-[85%] h-auto object-contain mx-auto fade-effect"
-        :class="{ 'fade-effect': enableFade }"
-        autoplay
-        loop
-        muted
-      />
-    </div>
+    <!-- Centered media -->
+    <template v-if="!isFullScreen && !isExtended">
+      <CenteredMedia :media="media" :enableFade="enableFade" />
+    </template>
 
     <!-- Extended vertical media -->
-    <div
-      v-else-if="isVertical && extendBeyondViewport"
-      :class="verticalMediaClasses"
-    >
-      <img
-        v-if="mediaType === 'image'"
-        :src="source"
-        alt="Media content"
-        class="max-w-[85%] object-contain mx-auto fade-effect"
-        :class="{ 'fade-effect': enableFade }"
-      />
-    </div>
-
-    <!-- Centered media with vertical centering -->
-    <div v-else class="flex justify-center items-center h-screen">
-      <img
-        v-if="mediaType === 'image'"
-        :src="source"
-        alt="Media content"
-        class="max-w-[85%] h-auto object-contain mx-auto fade-effect"
-        :class="{ 'fade-effect': enableFade }"
-      />
-      <video
-        v-if="mediaType === 'video'"
-        :src="source"
-        class="max-w-[85%] h-auto object-contain mx-auto fade-effect"
-        :class="{ 'fade-effect': enableFade }"
-        autoplay
-        loop
-        muted
-      />
-    </div>
+    <template v-if="isExtended">
+      <ExtendedMedia :media="media" :enableFade="enableFade" />
+    </template>
     <!-- Caption -->
     <div v-if="caption" class="caption">{{ caption }}</div>
   </section>
@@ -84,29 +22,41 @@
 
 <script setup lang="ts">
 import { defineProps, computed, ref, onMounted, onUnmounted } from "vue";
+import FullScreenMedia from "../ui/FullScreenMedia.vue";
+import ExtendedMedia from "../ui/ExtendedMedia.vue";
+import CenteredMedia from "./CenteredMedia.vue";
 
 const props = defineProps({
-  mediaType: String,
-  source: String,
+  media: Object,
   enableFade: Boolean,
   caption: String,
-  isFullScreen: Boolean,
-  isVertical: Boolean,
+  isFullScreen: {
+    type: Boolean,
+    default: false,
+  },
+  isVertical: {
+    type: Boolean,
+    default: false,
+  },
   extendBeyondViewport: Boolean,
+  isExtended: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const mediaSection = ref(null);
 let observer;
 
-const onMediaLoad = () => {
-  if (props.enableFade) {
-    setupIntersectionObserver();
-  } else {
-    // If fading is not enabled, show the media immediately
-    const mediaElements = mediaSection.value.querySelectorAll(".media-class");
-    mediaElements.forEach((el) => el.classList.add("visible"));
-  }
-};
+// const onMediaLoad = () => {
+//   if (props.enableFade) {
+//     setupIntersectionObserver();
+//   } else {
+//     // If fading is not enabled, show the media immediately
+//     const mediaElements = mediaSection.value.querySelectorAll(".media-class");
+//     mediaElements.forEach((el) => el.classList.add("visible"));
+//   }
+// };
 
 const setupIntersectionObserver = () => {
   observer = new IntersectionObserver(
@@ -140,19 +90,9 @@ onUnmounted(() => {
 
 const sectionClasses = computed(() => ({
   relative: true,
-  "overflow-hidden": !props.isFullScreen && !props.extendBeyondViewport,
-  "h-screen":
-    props.isFullScreen || (!props.isVertical && !props.extendBeyondViewport),
-  "min-h-screen":
-    !props.isFullScreen && (props.isVertical || props.extendBeyondViewport),
-}));
-
-const verticalMediaClasses = computed(() => ({
-  flex: props.extendBeyondViewport,
-  "justify-center": props.extendBeyondViewport,
-  "items-start": props.extendBeyondViewport,
-  "min-h-screen": props.extendBeyondViewport,
-  "h-auto": !props.extendBeyondViewport,
+  "overflow-hidden": !props.isFullScreen || !props.extendBeyondViewport,
+  "h-screen": props.isFullScreen && !props.extendBeyondViewport,
+  "min-h-screen": !props.isFullScreen && (props.isVertical || props.isExtended),
 }));
 </script>
 

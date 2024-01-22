@@ -1,19 +1,25 @@
-export interface Media {
-  name?: string;
-  fileType: string;
+// Media Type
+
+export interface IMedia {
   id: string;
-  galleries?: [string];
-  dateCreated?: string;
+  name?: string;
+  caption?: string;
+  location?: string;
+  fileType: string;
+  city?: string;
+  country?: string;
+  labels?: string[];
+  dominantColors?: DominantColorsAnnotation;
+  dateAdded?: Date;
+  dateCreated?: Date;
+  status: string;
+  isFullscreen?: boolean;
   orientation: string;
   src: string;
-  caption?: string;
-  credit?: string;
-  // Array of keyword descriptions of the media
-  labels: [string];
-  landmarkAnnotation?: LandmarkAnnotation
+  landmarkAnnotation?: LandmarkAnnotation;
 }
 
-interface LandmarkAnnotation {
+export interface LandmarkAnnotation {
   description: string;
   location: Location;
 }
@@ -25,4 +31,21 @@ interface Location {
 interface LatLng {
   latitude: number;
   longitude: number;
+}
+
+interface Color {
+  red: number;
+  green: number;
+  blue: number;
+  alpha: number;
+}
+
+interface ColorInfo {
+  color: Color;
+  score: number;
+  pixelFraction: number;
+}
+
+export interface DominantColorsAnnotation {
+  colors: ColorInfo[];
 }

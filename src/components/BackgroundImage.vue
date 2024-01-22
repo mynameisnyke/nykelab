@@ -5,7 +5,7 @@
       v-if="mediaType === 'image' && mediaUrl"
       :src="mediaUrl"
       :alt="altText"
-      class="background-media"
+      class="background-media object-cover"
       :class="{ loaded: imageLoaded }"
       @load="emitMediaLoaded"
     />
@@ -13,7 +13,7 @@
   <slot></slot>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { defineProps, defineEmits, ref } from "vue";
 
 const props = defineProps({
