@@ -1,33 +1,30 @@
 <!-- FullScreenMedia.vue -->
 <template>
-  <div class="min-h-screen w-full">
-    <template v-if="media.fileType === 'image'">
-      <img
-        :src="media.src"
-        alt="Media content"
-        class="object-cover"
-        :class="{ 'fade-effect': enableFade }"
-        ref="mediaElement"
+  <section class="fullscreen-media">
+    <MediaDisplay
+      id="1"
+      :media="media"
+      :enableFade="enableFade"
+      :isFullscreen="true"
+    />
+    <template v-if="!mobile">
+      <MediaCaption
+        class="absolute right-8 bottom-6"
+        :media="media"
+        :enableFade="enableFade"
+        maxWidth="max-w-[600px]"
+        textAlign="text-right"
       />
     </template>
-    <template v-else-if="media.fileType === 'video'">
-      <video
-        :src="media.src"
-        class="object-cover h-screen w-full"
-        autoplay
-        loop
-        muted
-        :class="{ 'fade-effect': enableFade }"
-        ref="mediaElement"
-      />
-    </template>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from "vue";
+import {  ref, inject } from "vue";
 import { Media } from "../../models/media";
-import { useFade } from "../../composables/useFade";
+import { useSrcSetter } from "../../composables/useSrcSetter";
+import MediaDisplay from "./MediaDisplay.vue";
+import MediaCaption from "./MediaCaption.vue";
 
 const props = defineProps({
   media: {
@@ -40,18 +37,23 @@ const props = defineProps({
   },
 });
 
-console.log(props.enableFade);
+// Inject device type
+const mobile: boolean = inject("mobile")!;
 
-const { elementRef: mediaElement } = useFade(props.enableFade);
+console.log(mobile);
+
+// Determin appropriate src material by device type
+const source = useSrcSetter(props.media, mobile);
 </script>
 
 <style scoped>
-.fade-effect {
-  opacity: 0;
-  transition: opacity 1.2s ease-in-out;
-}
-
-.fade-effect.visible {
-  opacity: 1;
+.fullscreen-media {
+  height: 100vh; /* Ensure the section takes up the full height of the viewport */
+  min-height: 100vh; /* Ensure the section takes up the full height of the viewport */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
 }
 </style>

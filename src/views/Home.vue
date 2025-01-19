@@ -1,16 +1,18 @@
 <template>
-  <BottomNav :class="footerClass" v-if="footerVisible" class="fixed-bottom" />
+    <BottomNav :class="footerClass" v-if="footerVisible" class="fixed-bottom" />
   <CenteredContent :isVisible="true">
-    <IcicleChart :data="mediaData" :enableFade="true" :size="chartSize" />
+    <IcicleChart ref="icicleChart" :data="mediaData" :enableFade="enableFade" :size="chartSize" />
   </CenteredContent>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useFooterVisibility } from "../composables/useFooterVisibility";
 import BottomNav from "../components/ui/BottomNav.vue";
 import IcicleChart from "../components/IcicleChart.vue";
 import CenteredContent from "../components/ui/CenteredContent.vue";
+import Spinner from "../components/ui/Spinner.vue";
+
 const mediaData = {
   name: "Media",
   children: [
@@ -46,8 +48,12 @@ const mediaData = {
     },
   ],
 };
+
 const chartSize = computed(() => (window.innerWidth < 640 ? 350 : 500));
 const { footerVisible, toggleVisibility, footerClass } = useFooterVisibility();
+const enableFade = ref(false); // Add this line to control the fade
+
+
 </script>
 
 <style>

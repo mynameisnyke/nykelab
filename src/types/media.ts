@@ -5,18 +5,48 @@ export interface IMedia {
   name?: string;
   caption?: string;
   location?: string;
-  fileType: string;
+  fileType: MediaType;
   city?: string;
   country?: string;
   labels?: string[];
   dominantColors?: DominantColorsAnnotation;
   dateAdded?: Date;
   dateCreated?: Date;
-  status: string;
+  status?: string;
   isFullscreen?: boolean;
-  orientation: string;
-  src: string;
+  orientation: OrientationType;
   landmarkAnnotation?: LandmarkAnnotation;
+
+  // URLs for different media types
+  videoUrls?: VideoUrls; // URLs for videos
+  imageUrls?: ImageUrls; // URLs for images
+}
+
+export enum MediaType {
+  Video = "video",
+  Image = "image",
+  Audio = "audio",
+  Unknown = "unknown",
+}
+
+export enum OrientationType {
+  Landscape = "landscape",
+  Portrait = "portrait",
+  Unknown = "unknown",
+}
+
+// URLs for videos (customize the keys as needed)
+export interface VideoUrls {
+  webm?: string;
+  h264?: string;
+}
+
+// URLs for images (customize the keys as needed)
+export interface ImageUrls {
+  webpFull?: string;
+  webpSmall?: string;
+  jpegFull?: string;
+  jpegSmall?: string;
 }
 
 export interface LandmarkAnnotation {

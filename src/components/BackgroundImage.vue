@@ -5,16 +5,17 @@
       v-if="mediaType === 'image' && mediaUrl"
       :src="mediaUrl"
       :alt="altText"
-      class="background-media object-cover"
-      :class="{ loaded: imageLoaded }"
+      class="object-cover"
       @load="emitMediaLoaded"
+      ref="mediaElement"
     />
   </div>
   <slot></slot>
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits, ref } from "vue";
+import {  ref } from "vue";
+import { useGsapFade } from "../composables/useGsapFade";
 
 const props = defineProps({
   mediaType: String,
@@ -29,15 +30,8 @@ const emitMediaLoaded = () => {
   imageLoaded.value = true; // Make media visible when loaded
   emit("media-loaded");
 };
+
+const mediaElement = ref<HTMLElement | null>(null);
+
+useGsapFade(mediaElement, true);
 </script>
-
-<style>
-.background-media {
-  transition: opacity 1s ease-in-out;
-  opacity: 0;
-}
-
-.background-media.loaded {
-  opacity: 1;
-}
-</style>

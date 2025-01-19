@@ -7,18 +7,11 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, computed } from "vue";
+import {  computed } from "vue";
 
 const props = defineProps({
   caption: String,
 });
-
-const splitCaption = computed(() => {
-  return props.caption ? props.caption.split("\n") : ["", ""];
-});
-
-const title = computed(() => splitCaption.value[0]);
-const coordinates = computed(() => splitCaption.value[1]);
 </script>
 
 <style scoped>

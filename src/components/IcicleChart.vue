@@ -1,5 +1,5 @@
 <template>
-  <div ref="icicleChart" class="icicle-chart opacity-0"></div>
+  <div ref="icicleChart" id="icicleChart" :class="['icicle-chart', { 'opacity-0': enableFade }]"></div>
 </template>
 
 <script lang="ts">
@@ -20,86 +20,96 @@ export default {
   mounted() {
     this.createIcicleChart(this.$props.size);
     if (this.enableFade) {
-      // TODO FIX HARDCODED DELAY
-      // Delay the fade effect by one second
       this.$nextTick(() => {
         setTimeout(() => {
-          this.$refs.icicleChart.classList.add("visible");
-        }, 1);
+          (this.$refs.icicleChart as HTMLElement).classList.add("visible");
+        }, 1000);
       });
+    } else {
+      (this.$refs.icicleChart as HTMLElement).classList.add("visible");
     }
   },
   methods: {
-    handleLabelClick(label) {
-      // Use Vue router to navigate
-      this.$router.push(`/gallery/${label}`);
+    handleLabelClick(label: string) {
+      this.$router.push(`/gallery/${label.toLowerCase()}`);
     },
-    createIcicleChart(size) {
+    createIcicleChart(size: number) {
       const svg = d3
-        .select(this.$refs.icicleChart)
+        .select(this.$refs.icicleChart as HTMLElement)
         .append("svg")
         .attr("width", size)
         .attr("height", size);
 
-      // Create a root node from the data
       const root = d3
         .hierarchy(this.data)
-        .sum((d) => d.size) // Define how to calculate the size of each node
-        .sort((a, b) => b.value - a.value);
+        .sum((d: any) => d.size)
+        .sort((a, b) => (b.value || 0) - (a.value || 0));
 
-      // Create an icicle layout
-      const icicle = d3.partition().size([size, size]).padding(1)(root);
+      const icicle = d3.partition<typeof this.data>().size([size, size]).padding(1)(root);
 
-      // Add rectangles for each node
+      const colorScale = d3.scaleSequential(d3.interpolateViridis)
+        .domain([0, d3.max(icicle.descendants(), d => d.value) || 0]);
+
       const rects = svg
         .selectAll("rect")
         .data(icicle.descendants())
         .enter()
         .append("rect")
-        .attr("x", (d) => d.x0)
-        .attr("y", (d) => d.y0)
-        .attr("width", (d) => Math.max(1, d.x1 - d.x0)) // Ensure a minimum width
-        .attr("height", (d) => d.y1 - d.y0)
-        .attr("fill", "none") // Initial fill color
-        .attr("stroke", "#fff") // Stroke color
-        .attr("stroke-width", "1"); // Increased stroke width for a bolder look
+        .attr("x", (d: any) => d.x0)
+        .attr("y", (d: any) => d.y0)
+        .attr("width", (d: any) => Math.max(1, d.x1 - d.x0))
+        .attr("height", (d: any) => d.y1 - d.y0)
+        .attr("fill", (d: any) => colorScale(d.value || 0))
+        .attr("stroke", "#000")
+        .attr("stroke-width", "1")
+        .attr("opacity", 0.8);
 
-      // Hover effects
       rects
-        .on("mouseover", function (event) {
-          d3.select(event.currentTarget) // Ensure correct element selection
+        .on("mouseover", function (event, d: any) {
+          d3.select(this)
             .transition()
-            .duration(10000) // Slow transition duration for a noticeable effect
-            .ease(d3.easeCubicInOut) // Smooth easing function
-            .attr("fill", "rgba(64, 224, 208, 0.7)"); // Teal with slight opacity
-        })
-        .on("mouseout", function (event) {
-          d3.select(event.currentTarget)
+            .duration(300)
+            .attr("opacity", 1)
+            .attr("stroke-width", "2")
+            .attr("stroke", "#fff");
+
+          // Pulsating animation
+          d3.select(this)
             .transition()
-            .duration(10000) // Consistent duration for fade out
-            .attr("fill", "none");
+            .duration(500)
+            .attr("transform", "scale(1.05)")
+            .transition()
+            .duration(500)
+            .attr("transform", "scale(1)")
         })
-        .on("click", (event, d) => {
+        .on("mouseout", function (event, d: any) {
+          d3.select(this)
+            .interrupt() // Stop the pulsating animation
+            .transition()
+            .duration(300)
+            .attr("opacity", 0.8)
+            .attr("stroke-width", "1")
+            .attr("stroke", "#000")
+            .attr("transform", "scale(1)");
+        })
+        .on("click", (event, d: any) => {
           this.handleLabelClick(d.data.name);
         });
 
-      // Select the SVG container and disable pointer events
-      d3.select(this.$refs.icicleChart).style("pointer-events", "none");
-
-      // Enable pointer events on the child rectangles
+      d3.select(this.$refs.icicleChart as HTMLElement).style("pointer-events", "none");
       svg.selectAll("rect").style("pointer-events", "all");
 
-      // Add labels (optional, can be customized as needed)
       svg
         .selectAll("text")
         .data(icicle.descendants())
         .enter()
         .append("text")
-        .attr("x", (d) => d.x0 + 8) // Adjust label positions as needed
-        .attr("y", (d) => (d.y0 + d.y1) / 2)
-        .text((d) => d.data.name)
+        .attr("x", (d: any) => d.x0 + 5)
+        .attr("y", (d: any) => (d.y0 + d.y1) / 2)
+        .text((d: any) => d.data.name)
         .attr("font-size", "10px")
-        .attr("fill", "white");
+        .attr("fill", "#fff")
+        .attr("pointer-events", "none");
     },
   },
 };
@@ -108,9 +118,14 @@ export default {
 <style scoped>
 .icicle-chart {
   transition: opacity 1.2s ease-in-out;
+  background-color: #000;
 }
 
 .icicle-chart.visible {
   opacity: 1;
+}
+
+.opacity-0 {
+  opacity: 0;
 }
 </style>

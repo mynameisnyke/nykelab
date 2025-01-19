@@ -1,14 +1,10 @@
 <template>
-  <transition name="fade">
-    <BottomNav :class="footerClass" v-if="footerVisible" class="fixed-bottom" />
-  </transition>
-  <!-- Full -->
-  <MediaSection :media="media" :enableFade="true" :isFullScreen="true" />
+  <BottomNav :isVisible="footerVisible" :navItems="navItems" class="fixed-bottom" />
+  <FullScreenMedia :media="media" :enableFade="true" />
   <!-- Extended -->
   <MediaSection :media="centered_media" :enableFade="true" />
   <!-- Centered -->
   <MediaSection :media="extended_media" :enableFade="true" />
-
   <!-- <DualMediaSection :mediaItems="tetonsPortrait" /> -->
 </template>
 
@@ -19,12 +15,19 @@ import { tetonsPortrait, teton_media } from "../../public/data";
 import MediaSection from "../components/ui/MediaSection.vue";
 import DualMediaSection from "../components/ui/DualMediaSection.vue";
 import { Media } from "../models/media";
+import FullScreenMedia from "../components/ui/FullScreenMedia.vue";
 
 const media = new Media(teton_media[0]);
 const centered_media = new Media(teton_media[3]);
 const extended_media = new Media(teton_media[2]);
 
 const footerVisible = ref(true); // this will control the visibility
+
+const navItems = ref([
+  { number: "1", label: "Home", link: "/" },
+  { number: "2", label: "Bogota", link: "/teton" },
+  { number: "3", label: "Ecuador", link: "/ecuador" },
+]);
 
 const headerVisible = ref(true); // this will control the header visibility
 

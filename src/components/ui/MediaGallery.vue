@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import MediaSection from "./MediaSection.vue";
 import DualMediaSection from "./DualMediaSection.vue";
-import { defineProps, ref, onMounted } from "vue";
+import {  ref, onMounted } from "vue";
 import { Media } from "../../models/media";
 
 const props = defineProps({

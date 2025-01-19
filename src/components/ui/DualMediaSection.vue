@@ -1,46 +1,41 @@
 <!-- DualMediaSectin.vue -->
 <template>
-  <section class="dual-media-section">
-    <div class="media-wrapper max-w-[85%] md:max-w-[1230px]">
-      <MediaSection
+  <section class="flex min-h-screen overflow-hidden">
+    <div class="media-wrapper max-w-[1285px]">
+      <MediaDisplay
         v-for="(mediaItem, index) in mediaItems"
         :key="index"
-        :mediaType="mediaItem.mediaType"
-        :source="mediaItem.src"
-        :isFullScreen="mediaItem.fullScreen"
-        :caption="mediaItem.caption"
-        :isVertical="true"
-        :enableFade="true"
+        :media="mediaItem"
+        :enableFade="enableFade"
+        objectFit="contain"
+        mode="dual"
       />
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from "vue";
-import MediaSection from "./MediaSection.vue";
+import MediaDisplay from "./MediaDisplay.vue";
+import { Media } from "../../models/media";
 
 const props = defineProps({
   mediaItems: {
-    type: Array,
+    type: Array as () => Media[],
     required: true,
     default: () => [],
+  },
+  enableFade: {
+    type: Boolean,
+    default: false,
   },
 });
 </script>
 
 <style>
-.dual-media-section {
-  display: flex;
-  height: 100vh; /* Set the height to viewport height */
-  overflow: hidden;
-}
-
 .media-wrapper {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px; /* Adjust the gap between items */
-  width: 100%; /* Ensure the wrapper takes full width */
   margin: 0 auto; /* Center the wrapper if it's not full width */
 }
 

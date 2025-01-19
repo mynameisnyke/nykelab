@@ -1,23 +1,39 @@
 <template>
-  <div class="h-24 p-8 justify-between items-start inline-flex z-10">
-    <div
-      class="justify-start items-start gap-1 flex overflow-x-auto no-scrollbar"
-    >
-      <router-link exact to="/" tag="div" class="router-link-hovered">
-        <FooterItem number="1" label="Home" />
-      </router-link>
-      <router-link exact to="/arizona" class="router-link-hovered" tag="div">
-        <FooterItem number="3" label="Arizona" />
-      </router-link>
-      <router-link exact to="/teton" tag="div" class="router-link-hovered">
-        <FooterItem number="2" label="Wyoming" />
-      </router-link>
+  <transition name="fade">
+    <div v-if="isVisible" class="h-24 p-8 justify-between items-start inline-flex z-20" ref="bottomNavRef">
+      <div class="justify-start items-start gap-1 flex overflow-x-auto no-scrollbar">
+        <router-link v-for="(item, index) in navItems" :key="index" :to="item.link" class="router-link-hovered" tag="div">
+          <FooterItem :number="item.number" :label="item.label" />
+        </router-link>
+      </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script setup lang="ts">
+import { ref, PropType } from "vue";
 import FooterItem from "./FooterItem.vue";
+import { useScrollFade } from "../../composables/useGsapScrollFade";
+
+interface NavItem {
+  number: string;
+  label: string;
+  link: string;
+}
+
+const props = defineProps({
+  isVisible: {
+    type: Boolean,
+    default: true,
+  },
+  navItems: {
+    type: Array as PropType<NavItem[]>,
+    required: true,
+  },
+});
+
+const bottomNavRef = ref<HTMLElement | null>(null);
+useScrollFade(bottomNavRef);
 </script>
 
 <style>

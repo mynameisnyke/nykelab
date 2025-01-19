@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
   propid: String,
@@ -19,6 +19,11 @@ onMounted(() => {
   });
   const ele = document.querySelector("#" + props.propid!);
   observer.observe(ele!);
+
+  // Cleanup observer on unmount
+  onUnmounted(() => {
+    observer.disconnect();
+  });
 });
 </script>
 

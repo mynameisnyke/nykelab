@@ -22,16 +22,29 @@
   </main>
 </template>
 
-<script lang="ts">
-export default {};
+<script setup lang="ts">
+import UAParser from "ua-parser-js";
+import { provide } from "vue";
+// Create a new instance of the parser
+const parser = new UAParser();
+// Parse the user-agent string
+const userAgentInfo: UAParser.IResult = parser.getResult();
+
+// Determine if device is mobile or not, and set a global property to referene
+switch (userAgentInfo.device.type) {
+  case "mobile":
+    provide("mobile", true);
+    break;
+  default:
+    provide("mobile", false);
+    break;
+}
 </script>
 
 <style>
 body,
 html {
-  min-height: 100vh;
   background-color: black;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
   max-width: 100%; /* Ensure content doesn't exceed viewport width */
 }
 

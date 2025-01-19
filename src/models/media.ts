@@ -3,26 +3,33 @@ import {
   IMedia,
   LandmarkAnnotation,
   DominantColorsAnnotation,
+  VideoUrls,
+  ImageUrls,
+  MediaType,
+  OrientationType,
 } from "../types/media";
-
 export class Media implements IMedia {
-  id: string;
+  id: string = '';
   name?: string;
   caption?: string;
   location?: string;
-  fileType: string;
+  fileType: MediaType = MediaType.Unknown;
   city?: string;
   country?: string;
   labels?: string[];
   dominantColors?: DominantColorsAnnotation;
   dateAdded?: Date;
   dateCreated?: Date;
-  status: string;
+  status: string = '';
   galleries?: string[];
-  orientation: string;
-  src: string;
-  isVertical: boolean;
+  orientation: OrientationType = OrientationType.Unknown;
+  src: string = '';
+  isVertical: boolean = false;
   landmarkAnnotation?: LandmarkAnnotation;
+
+  // URLs for different media types
+  videoUrls?: VideoUrls; // URLs for videos
+  imageUrls?: ImageUrls; // URLs for images
 
   constructor(data: Partial<IMedia>) {
     Object.assign(this, data);

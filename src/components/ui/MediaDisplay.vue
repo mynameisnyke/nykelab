@@ -1,145 +1,140 @@
 <!-- MediaDisplay.vue -->
 <template>
-  <section :class="sectionClasses">
-    <template v-if="isFullScreen">
-      <!-- Fullscreen media -->
+  <div
+    :class="[
+      { 'cursor-pointer': canExpand },
+      computedMaxWidthClass,
+      computedMaxHeightClass,
+    ]"
+    @click="toggleExpand"
+    ref="mediaElement"
+  >
+    <template v-if="media.fileType === MediaType.Image">
       <img
-        v-if="mediaType === 'image'"
-        :src="source"
-        alt="Media content"
-        class="w-screen h-screen object-cover"
+        :src="media.src"
+        :class="[computedObjectFitClass, `w-full h-full`]"
+        :alt="media.name"
       />
+    </template>
+    <template v-else-if="media.fileType === MediaType.Video">
       <video
-        v-if="mediaType === 'video'"
-        :src="source"
-        class="w-screen h-screen object-cover"
+        :src="media.src"
+        :class="[computedObjectFitClass, `w-full h-full`]"
         autoplay
         loop
         muted
       />
     </template>
-
-    <template v-else-if="isVertical && !extendBeyondViewport">
-      <!-- Centered vertical media -->
-      <div class="flex justify-center items-center h-screen">
-        <img
-          v-if="mediaType === 'image'"
-          :src="source"
-          alt="Media content"
-          class="max-w-[85%] h-auto object-contain mx-auto"
-        />
-        <video
-          v-if="mediaType === 'video'"
-          :src="source"
-          class="max-w-[85%] h-auto object-contain mx-auto"
-          autoplay
-          loop
-          muted
-        />
-      </div>
-    </template>
-
-    <template v-else-if="isVertical && extendBeyondViewport">
-      <!-- Extended vertical media -->
-      <div :class="verticalMediaClasses">
-        <img
-          v-if="mediaType === 'image'"
-          :src="source"
-          alt="Media content"
-          class="max-w-[85%] object-contain mx-auto"
-        />
-      </div>
-    </template>
-
-    <template v-else>
-      <!-- Centered media with vertical centering -->
-      <div class="flex justify-center items-center h-screen">
-        <img
-          v-if="mediaType === 'image'"
-          :src="source"
-          alt="Media content"
-          class="max-w-[85%] h-auto object-contain mx-auto"
-          :class="[
-            'media-class',
-            { 'fade-visible': enableFade && mediaVisible },
-          ]"
-          @load="mediaVisible = true"
-        />
-        <video
-          v-if="mediaType === 'video'"
-          :src="source"
-          class="max-w-[85%] h-auto object-contain mx-auto"
-          autoplay
-          loop
-          muted
-        />
-      </div>
-    </template>
-
-    <template v-if="caption">
-      <div class="caption">{{ caption }}</div>
-    </template>
-  </section>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps, computed, ref } from "vue";
+import { ref, reactive, inject, computed } from "vue";
+import { Media } from "../../models/media";
+import { MediaType } from "@/types/media";
+import { useGsapFade } from "../../composables/useGsapFade";
+import { useSrcSetter } from "../../composables/useSrcSetter";
 
+// Prop setup
 const props = defineProps({
-  mediaType: {
-    type: String,
-    required: true,
-    validator: (value: string) => ["image", "video"].includes(value),
-  },
-  source: {
-    type: String,
+  // The media object for this display
+  media: {
+    type: Object as () => Media,
     required: true,
   },
-  enableFade: Boolean,
-  caption: String,
-  isFullScreen: Boolean,
-  isVertical: Boolean,
-  extendBeyondViewport: Boolean,
+  // Toggle GSAP fade in animation
+  enableFade: {
+    type: Boolean,
+    default: false,
+  },
+  // Toggle the ability to expand on click
+  canExpand: {
+    type: Boolean,
+    default: false,
+  },
+  // What type of section will this media be rendered in
+  width: {
+    type: String,
+    default: "w-auto",
+  },
+  // What type of section will this media be rendered in
+  maxHeight: {
+    type: Number,
+    default: null,
+  },
+  // What type of section will this media be rendered in
+  objectFit: {
+    type: String,
+    default: "cover",
+  },
+  isFullscreen: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const mediaVisible = ref(false); // Initialize visibility as false
+// Check configuration props
+const computedMaxWidthClass = computed(() => {
+  // Check if fullscreen
+  if (props.isFullscreen) {
+    return `w-full`;
+  }
+  return props.width ? props.width : `w-auto`;
+});
+const computedMaxHeightClass = computed(() => {
+  // Check if fullscreen
+  if (props.isFullscreen) {
+    return `h-full`;
+  }
+  return props.maxHeight ? `h-[${props.maxHeight}px]` : "h-auto";
+});
+const computedObjectFitClass = computed(() => {
+  switch (props.objectFit) {
+    case "cover":
+      return "object-cover";
+    case "contain":
+      return "object-contain";
+    case "fill":
+      return "object-fill";
+    case "none":
+      return "object-none";
+    case "scale-down":
+      return "object-scale-down";
+    default:
+      return "object-cover";
+  }
+});
 
-const sectionClasses = computed(() => ({
-  relative: true,
-  "overflow-hidden": !props.isFullScreen && !props.extendBeyondViewport,
-  "h-screen":
-    props.isFullScreen || (!props.isVertical && !props.extendBeyondViewport),
-  "min-h-screen":
-    !props.isFullScreen && (props.isVertical || props.extendBeyondViewport),
-}));
+// Inject device type
+const mobile: boolean = inject("mobile")!;
 
-const verticalMediaClasses = computed(() => ({
-  flex: props.extendBeyondViewport,
-  "justify-center": props.extendBeyondViewport,
-  "items-start": props.extendBeyondViewport,
-  "min-h-screen": props.extendBeyondViewport,
-  "h-auto": !props.extendBeyondViewport,
-}));
+// Determin appropriate src material by device type
+const source = useSrcSetter(props.media, mobile);
+
+// Setup the expanded logic
+const state = reactive({
+  isExpanded: false,
+});
+
+const toggleExpand = () => {
+  if (props.canExpand) {
+    state.isExpanded = !state.isExpanded;
+  }
+};
+
+// Setup the fading logic
+const mediaElement = ref<HTMLElement | null>(null);
+useGsapFade(mediaElement, props.enableFade);
+
+console.log(props.media);
 </script>
 
-<style>
-.caption {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  text-align: center;
-  padding: 1rem;
+<style scoped>
+.w-full {
+  width: 100%;
 }
 
-.media-class {
-  transition: opacity 1.2s ease-in-out;
-  opacity: 0;
-}
-
-.media-class.fade-visible {
-  opacity: 1;
+.h-full {
+  height: 100%;
 }
 </style>

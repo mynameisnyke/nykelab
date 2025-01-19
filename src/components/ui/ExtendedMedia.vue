@@ -1,20 +1,21 @@
 <!-- ExtendedMedia.vue -->
 <template>
-  <div class="flex justify-center items-start min-h-screen h-auto">
+  <div class="flex justify-center min-h-screen h-auto">
     <img
       v-if="media.fileType === 'image'"
-      :src="media.src"
+      :src="source.updatedSrc.value"
       alt="Media content"
-      class="max-w-[85%] mx-auto object-contain"
-      :class="{ 'fade-effect': enableFade }"
+      class="max-w-[85%] object-contain"
+      ref="mediaElement"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from "vue";
+import {  ref, inject } from "vue";
 import { Media } from "../../models/media";
-import { useFade } from "../../composables/useFade";
+import { useGsapFade } from "../../composables/useGsapFade";
+import { useSrcSetter } from "../../composables/useSrcSetter";
 
 const props = defineProps({
   media: {
@@ -27,16 +28,13 @@ const props = defineProps({
   },
 });
 
-const { elementRef } = useFade(props.enableFade);
+// Inject device type
+const mobile: boolean = inject("mobile")!;
+
+// Determin appropriate src material by device type
+const source = useSrcSetter(props.media, mobile);
+
+const mediaElement = ref<HTMLElement | null>(null);
+
+useGsapFade(mediaElement, props.enableFade);
 </script>
-
-<style scoped>
-.fade-effect {
-  opacity: 0;
-  transition: opacity 1.2s ease-in-out;
-}
-
-.fade-effect.visible {
-  opacity: 1;
-}
-</style>

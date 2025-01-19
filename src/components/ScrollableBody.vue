@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from "vue";
+import { ref,  } from "vue";
 import MediaSection from "@/components/ui/MediaSection.vue";
 import MediaRow from "@/components/ui/MediaRow.vue";
 import { Media } from "../types/media";
