@@ -11,18 +11,19 @@
   >
     <template v-if="media.fileType === MediaType.Image">
       <img
-        :src="media.src"
+        :src="source.updatedSrc.value"
         :class="[computedObjectFitClass, `w-full h-full`]"
         :alt="media.name"
       />
     </template>
     <template v-else-if="media.fileType === MediaType.Video">
       <video
-        :src="media.src"
+        :src="source.updatedSrc.value"
         :class="[computedObjectFitClass, `w-full h-full`]"
         autoplay
         loop
         muted
+        playsinline
       />
     </template>
   </div>
