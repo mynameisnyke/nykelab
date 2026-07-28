@@ -40,60 +40,28 @@ const navigationItems = [
   { label: 'Favorites', icon: 'star', route: '/favorites', number: '3', link: '/favorites' }
 ];
 
-// Improved media data structure with more intuitive categories
+// Media data structure — kept to two rings (category, subcategory)
+// so the sunburst stays legible at a compact size.
 const mediaData = {
   name: "Media",
   children: [
     {
       name: "Photos",
       children: [
-        {
-          name: "Nature",
-          children: [
-            { name: "Landscapes", size: 15 },
-            { name: "Wildlife", size: 12 },
-            { name: "Plants", size: 8 }
-          ]
-        },
-        {
-          name: "People",
-          children: [
-            { name: "Portraits", size: 10 },
-            { name: "Groups", size: 8 },
-            { name: "Events", size: 12 }
-          ]
-        },
-        {
-          name: "Urban",
-          children: [
-            { name: "Architecture", size: 14 },
-            { name: "Street", size: 10 },
-            { name: "Night", size: 6 }
-          ]
-        }
-      ]
+        { name: "Nature", size: 15 },
+        { name: "People", size: 12 },
+        { name: "Urban", size: 10 },
+      ],
     },
     {
       name: "Videos",
       children: [
-        {
-          name: "Travel",
-          children: [
-            { name: "Cities", size: 8 },
-            { name: "Wilderness", size: 6 }
-          ]
-        },
-        {
-          name: "Family",
-          size: 15
-        },
-        {
-          name: "Pets",
-          size: 10
-        }
-      ]
+        { name: "Travel", size: 8 },
+        { name: "Family", size: 15 },
+        { name: "Pets", size: 10 },
+      ],
     },
-  ]
+  ],
 };
 
 const currentPath = ref<string[]>([]);
@@ -118,24 +86,23 @@ const navigateToLevel = (index: number) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* Center vertically */
+  justify-content: center;
   min-height: 100vh;
   background: #000000;
   color: #fff;
-  padding: 0; /* Remove padding to allow full centering */
+  padding: 2rem 1rem;
 }
 
 .chart-wrapper {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 900px;
+  max-width: 360px;
 }
 
 .breadcrumb-container {
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -143,36 +110,27 @@ const navigateToLevel = (index: number) => {
 }
 
 .breadcrumb {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0.75rem 1.5rem;
-  border-radius: 30px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .breadcrumb span {
   cursor: pointer;
-  margin: 0 0.5rem;
-  color: #00B894; /* Using the mint accent color */
-  font-weight: 500;
-  transition: all 0.2s ease;
+  font-family: "Arial", sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.2s ease;
 }
 
 .breadcrumb span:hover {
-  color: #fff;
-  transform: translateY(-1px);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .breadcrumb span.active {
-  color: #6C5CE7; /* Using the purple accent color */
-  font-weight: 600;
-}
-
-@media (max-width: 640px) {
-  .breadcrumb {
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-  }
+  color: rgba(255, 255, 255, 0.9);
 }
 </style>
