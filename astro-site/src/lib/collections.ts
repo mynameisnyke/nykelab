@@ -88,3 +88,41 @@ export async function getCollectionPage(slug: string): Promise<CollectionPage | 
     next,
   };
 }
+
+// ---- Home visualization ---------------------------------------------------------
+
+export interface PreviewPool {
+  images: import("./voyages").PreviewImage[];
+  /** Indices into `images`, grouped by subject, so sample voyages get fitting covers. */
+  nature: number[];
+  city: number[];
+}
+
+/** Published photos used as hover previews on the home page. */
+export async function getPreviewPool(): Promise<PreviewPool> {
+  const { results } = await db()
+    .prepare(
+      `SELECT m.* FROM media m JOIN collections c ON c.slug = m.collection
+        WHERE m.published = 1 AND c.published = 1 AND m.type = 'image'
+        ORDER BY c.position, m.position, m.created_at LIMIT 60`,
+    )
+    .all<MediaRow>();
+  const pool: PreviewPool = { images: [], nature: [], city: [] };
+  for (const row of results) {
+    const m = withWidths(toApiMedia(row));
+    const srcset = m.urls.variants
+      ? m.urls.variants.map((v) => `${v.url} ${v.width}w`).join(", ")
+      : m.urls.small
+        ? `${m.urls.small} ${m.smallWidth}w, ${m.urls.main} ${m.mainWidth}w`
+        : undefined;
+    const i = pool.images.push({
+      src: m.urls.small ?? m.urls.main,
+      srcset,
+      w: m.width,
+      h: m.height,
+      alt: m.place || m.caption.split("\n")[0] || "",
+    }) - 1;
+    (/westminster|new-york|city/.test(m.collection) ? pool.city : pool.nature).push(i);
+  }
+  return pool;
+}

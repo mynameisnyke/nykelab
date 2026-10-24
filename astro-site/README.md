@@ -47,6 +47,14 @@ Code fences accept a filename: ` ```ts title="worker/index.ts" `. In `.mdx`, use
 | Post page, CodeBlock, pull quote | `src/pages/journal/[slug].astro` (`.prose` styles) |
 | Story page: Hero, FullBleed, GalleryRow, InsetFeature, NextChapter, ChapterNav | `src/pages/[slug].astro`, `src/components/ChapterNav.astro`, `MediaItem.astro` |
 
+## Home: the archive as a map (prototype)
+
+`/` is a metadata-driven home: **Where** (three.js globe: voyages as stems, a bloom of photographs, arcs in date order), **When** (d3: date across, time of day down, so golden hour shows up on its own; drag across dates to filter), **How** (d3: focal length × aperture bubbles; click to filter). All three, the voyage list and the preview card share one store (`src/scripts/home/store.ts`), so hovering or filtering in one view updates the others. `/#when` and `/#how` deep-link a view. The list is real, crawlable links and keyboard accessible; without WebGL the 2D views are used.
+
+- **The data is SAMPLE data** (`buildSample()` in `src/lib/voyages.ts`; the page says so). Real values come from EXIF at upload (capture time, GPS, focal length, aperture, ISO, shutter, lens) plus a place name; the rest of the code already works on that `Voyage` / `Shot` shape. Photos uploaded before originals were kept have no EXIF (the old pipeline stripped it) and need re-uploading or manual values.
+- Privacy plan for real data: strip EXIF from public images, round public coordinates to roughly city level, keep exact values admin-only.
+- Weight: the home page script is ~735 kB raw / ~190 kB gzip (three + d3 + land outline) and loads only on `/`. Next step if needed: dynamic-import three only for the Where view.
+
 ## Uploads and image sizes
 
 - **Any file size.** The admin cuts a file into 16 MiB chunks and sends each as its own request (`POST /api/admin/uploads` → `PUT …/parts/:n` → `POST …/complete`); the Worker forwards them to an R2 multipart upload. No chunk is near the Worker body limit, so photos (≤200 MB) and videos (≤2 GB) both work. True browser→R2 presigned uploads would also need an R2 API token and bucket CORS; this needs neither.

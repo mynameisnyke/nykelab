@@ -25,7 +25,6 @@ export default defineConfig({
   adapter: cloudflare({ prerenderEnvironment: "node" }),
   integrations: [mdx(), sitemap(), vue()],
   vite: { plugins: [tailwindcss()] },
-  redirects: { "/": "/journal" },
   markdown: {
     shikiConfig: {
       themes: { dark: "github-dark-default", light: "github-light-default" },
