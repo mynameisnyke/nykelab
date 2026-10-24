@@ -1,14 +1,8 @@
 ---
-// Figma: ChapterNav. Same destinations as the menu's top level; voyages live only in the menu.
-const items = [
-  { label: "Home", href: "/" },
-  { label: "Places", href: "/places" },
-  { label: "Years", href: "/years" },
-  { label: "Journal", href: "/journal" },
-  { label: "About", href: "/about" },
-];
-const here = Astro.url.pathname.replace(/\/$/, "") || "/";
-const isActive = (href: string) => (href === "/" ? here === "/" : here === href || here.startsWith(`${href}/`));
+// Figma: ChapterNav. Same destinations as the menu's top level (src/lib/nav.ts); voyages live only in the menu.
+import { NAV_ITEMS, isHere } from "../lib/nav";
+const items = NAV_ITEMS;
+const isActive = (href: string) => isHere(href, Astro.url.pathname);
 ---
 
 <nav class="chapter-nav" aria-label="Site">

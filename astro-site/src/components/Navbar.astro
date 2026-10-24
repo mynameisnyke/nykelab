@@ -3,6 +3,7 @@
 // The overlay here is the list + footer only; the preview image and sunburst
 // from the Figma menu come with the photo pages.
 import Logo from "./Logo.astro";
+import { NAV_ITEMS, isHere } from "../lib/nav";
 interface Props {
   /** "media" = sits over a photo (white icons/wordmark in both themes). */
   surface?: "page" | "media";
@@ -10,19 +11,12 @@ interface Props {
   collections?: { slug: string; title: string }[];
 }
 const { surface = "page", collections } = Astro.props;
-// Prerendered pages (the journal) can't read D1 at build time: they start with Home only and the
-// script below fills in the collections from /api/collections when the menu first opens.
+// Prerendered pages (the journal) can't read D1 at build time: their voyages group starts empty
+// and the script below fills it from /api/collections when the menu first opens.
 const fill = collections === undefined;
-const chapters = [
-  { label: "Home", href: "/" },
-  ...(collections ?? []).map((c) => ({ label: c.title, href: `/${c.slug}` })),
-];
+const voyages = (collections ?? []).map((c) => ({ label: c.title, href: `/${c.slug}` }));
 const here = Astro.url.pathname;
 const footer = [
-  { label: "About", href: "/about" },
-  { label: "Places", href: "/places" },
-  { label: "Years", href: "/years" },
-  { label: "Journal", href: "/journal" },
   // No Instagram URL yet: an entry without an href is not rendered.
   { label: "Instagram", href: "" },
   { label: "Email", href: "mailto:nyke@nykelab.nyc" },
@@ -60,49 +54,46 @@ const footer = [
       </svg>
     </button>
   </div>
-  <nav class="menu-list" aria-label="Chapters">
-    <ol data-fill={fill ? "" : undefined}>
+  <nav class="menu-list" aria-label="Site">
+    <ol>
       {
-        chapters.map((c, i) => (
+        NAV_ITEMS.map((c, i) => (
           <li>
             <span class="num">{i}</span>
-            <a href={c.href} data-astro-reload={c.href === "/" ? "" : undefined}>{c.label}</a>
+            <a href={c.href} data-astro-reload={c.href === "/" ? "" : undefined} aria-current={isHere(c.href, here) ? "page" : undefined}>
+              {c.label}
+            </a>
           </li>
         ))
       }
     </ol>
   </nav>
+  <nav class="menu-voyages" aria-label="Voyages" data-fill={fill ? "" : undefined} hidden={!fill && voyages.length === 0}>
+    <span class="eyebrow-ui">Voyages</span>
+    {voyages.map((v) => <a href={v.href} aria-current={isHere(v.href, here) ? "page" : undefined}>{v.label}</a>)}
+  </nav>
   <nav class="menu-footer" aria-label="Site links">
-    {
-      footer.map((f) => (
-        <a href={f.href} aria-current={f.href !== "#" && (here === f.href || here.startsWith(f.href + "/")) ? "page" : undefined}>
-          {f.label}
-        </a>
-      ))
-    }
+    {footer.map((f) => <a href={f.href}>{f.label}</a>)}
   </nav>
 </div>
 
 <script>
   document.addEventListener("click", async (e) => {
     if (!(e.target as Element).closest("[data-menu-open]")) return;
-    const list = document.querySelector<HTMLOListElement>("ol[data-fill]");
-    const home = list?.firstElementChild;
-    if (!list || !home) return;
-    list.removeAttribute("data-fill");
+    const group = document.querySelector<HTMLElement>("nav[data-fill]");
+    if (!group) return;
+    group.removeAttribute("data-fill");
     try {
       const { collections } = (await (await fetch("/api/collections")).json()) as { collections: { slug: string; title: string }[] };
-      collections.forEach((c, i) => {
-        const li = home.cloneNode(true) as HTMLLIElement; // clones keep the scoped-style attributes
-        li.querySelector(".num")!.textContent = String(i + 1);
-        const a = li.querySelector("a")!;
-        a.removeAttribute("data-astro-reload");
+      collections.forEach((c) => {
+        const a = document.createElement("a");
         a.href = `/${c.slug}`;
         a.textContent = c.title;
-        list.appendChild(li);
+        group.appendChild(a);
       });
+      group.hidden = collections.length === 0;
     } catch {
-      /* the menu still works with Home and the footer links */
+      /* the menu still works without the voyages */
     }
   });
 </script>
@@ -206,8 +197,34 @@ const footer = [
     transition: opacity 0.2s ease;
   }
   .menu-list a:hover,
-  .menu-list a:focus-visible {
+  .menu-list a:focus-visible,
+  .menu-list a[aria-current] {
     opacity: 1;
+  }
+  .menu-voyages {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 12px 24px;
+    padding: 0 var(--margin) 32px;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .menu-voyages[hidden] {
+    display: none;
+  }
+  .menu-voyages .eyebrow-ui {
+    color: var(--text-caption);
+  }
+  .menu-voyages :global(a) {
+    color: var(--text-secondary);
+  }
+  .menu-voyages :global(a):hover,
+  .menu-voyages :global(a[aria-current]) {
+    color: var(--text-primary);
   }
   .menu-footer {
     display: flex;
@@ -223,8 +240,7 @@ const footer = [
   .menu-footer a {
     color: var(--text-secondary);
   }
-  .menu-footer a:hover,
-  .menu-footer a[aria-current] {
+  .menu-footer a:hover {
     color: var(--text-primary);
   }
 
@@ -248,8 +264,9 @@ const footer = [
       font-size: 40px;
       line-height: 52px;
     }
-    .menu-footer {
-      gap: 20px;
+    .menu-footer,
+    .menu-voyages {
+      gap: 12px 20px;
       font-size: 12px;
     }
   }
