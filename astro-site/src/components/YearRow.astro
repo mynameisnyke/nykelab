@@ -1,5 +1,6 @@
 ---
 // Figma: YearRow — numeral, contact strip, computed stats, photographs per month.
+import MonthBars from "./MonthBars.astro";
 import type { PreviewImage, Voyage, YearSummary } from "../lib/voyages";
 
 interface Props {
@@ -9,7 +10,6 @@ interface Props {
   max: number; // largest monthly count across all years, so bars are comparable
 }
 const { y, voyages, images, max } = Astro.props;
-const MONTHS = "JFMAMJJASOND";
 const n = (k: number, one: string, many: string) => `${k} ${k === 1 ? one : many}`;
 ---
 
@@ -23,17 +23,7 @@ const n = (k: number, one: string, many: string) => `${k} ${k === 1 ? one : many
     <div class="strip">
       {y.photos.map((i) => images[i] && <img src={images[i].src} srcset={images[i].srcset} sizes="(max-width: 767px) 25vw, 140px" alt="" loading="lazy" decoding="async" />)}
     </div>
-    <p class="axis">Photographs per month</p>
-    <div class="bars" role="img" aria-label={`Photographs per month in ${y.year}`}>
-      {
-        y.monthCounts.map((c, m) => (
-          <div class="col">
-            <span class:list={["bar", { zero: c === 0 }]} style={`--h:${c / max};${c ? `--c:${voyages[y.monthVoyage[m]!].color}` : ""}`}></span>
-            <span class="m">{MONTHS[m]}</span>
-          </div>
-        ))
-      }
-    </div>
+    <MonthBars counts={y.monthCounts} voyageByMonth={y.monthVoyage} voyages={voyages} max={max} year={y.year} label />
   </div>
 </a>
 
@@ -82,46 +72,6 @@ const n = (k: number, one: string, many: string) => `${k} ${k === 1 ? one : many
     object-fit: cover;
     background: var(--bg-surface);
   }
-  .axis {
-    margin: 20px 0 0;
-    font-family: var(--font-ui);
-    font-weight: 500;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-caption);
-  }
-  .bars {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    margin-top: 12px;
-  }
-  .col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
-    height: 120px;
-  }
-  .bar {
-    width: 40px;
-    height: calc(var(--h) * 96px);
-    min-height: 2px;
-    background: var(--c, var(--text-caption));
-    opacity: 0.9;
-  }
-  .bar.zero {
-    opacity: 0.35;
-  }
-  .m {
-    font-family: var(--font-ui);
-    font-weight: 500;
-    font-size: 10px;
-    line-height: 12px;
-    letter-spacing: 0.1em;
-    color: var(--text-caption);
-  }
 
   /* dim the others, like the Figma hover state */
   :global(.years:has(.row:hover, .row:focus-visible)) .row:not(:hover, :focus-visible) {
@@ -154,13 +104,6 @@ const n = (k: number, one: string, many: string) => `${k} ${k === 1 ? one : many
     }
     .strip img {
       aspect-ratio: 85 / 110;
-    }
-    .col {
-      height: 76px;
-    }
-    .bar {
-      width: 18px;
-      height: calc(var(--h) * 56px);
     }
   }
 </style>

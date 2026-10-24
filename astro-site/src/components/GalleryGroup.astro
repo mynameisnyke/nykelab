@@ -1,0 +1,87 @@
+---
+// One voyage's photographs inside a Place/Year gallery: GroupHeader + a row of portrait tiles,
+// each captioned with its metadata line.
+import GroupHeader from "./GroupHeader.astro";
+import { metaLine, type PreviewImage, type Shot, type Voyage } from "../lib/voyages";
+
+interface Props {
+  voyage: Voyage;
+  count: number;
+  shots: Shot[];
+  images: PreviewImage[];
+}
+const { voyage, count, shots, images } = Astro.props;
+---
+
+<section class="group">
+  <GroupHeader voyage={voyage} count={count} />
+  <div class={`row n${shots.length}`}>
+    {
+      shots.map((s) => {
+        const im = images[s.img];
+        return (
+          <figure class="reveal">
+            <div class="ph">
+              <img src={im.src} srcset={im.srcset} sizes={`(max-width: 767px) 100vw, ${Math.round(1312 / shots.length)}px`} alt={im.alt || voyage.title} loading="lazy" decoding="async" />
+            </div>
+            <figcaption class="caption">{metaLine(s)}</figcaption>
+          </figure>
+        );
+      })
+    }
+  </div>
+</section>
+
+<style>
+  .group {
+    padding: var(--section-gap) var(--margin) 0;
+  }
+  .row {
+    display: grid;
+    gap: var(--gutter);
+    padding-top: 32px;
+    align-items: start;
+  }
+  .row.n1 {
+    grid-template-columns: minmax(0, 644px);
+  }
+  .row.n2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .row.n3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  figure {
+    margin: 0;
+  }
+  .ph {
+    background: var(--bg-surface);
+    overflow: hidden;
+    aspect-ratio: 5 / 7;
+  }
+  .row.n2 .ph,
+  .row.n1 .ph {
+    aspect-ratio: 2 / 3;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  figcaption {
+    margin-top: var(--caption-gap);
+  }
+  @media (max-width: 767px) {
+    .row.n1,
+    .row.n2,
+    .row.n3 {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      padding-top: 24px;
+    }
+    .row .ph {
+      aspect-ratio: 2 / 3;
+    }
+  }
+</style>

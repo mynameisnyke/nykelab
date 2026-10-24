@@ -338,3 +338,32 @@ export function fmtSpan(start: number, end: number): string {
 
 const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
 export const words = (n: number) => WORDS[n] ?? String(n);
+
+// ---- galleries -----------------------------------------------------------------------
+
+const isPortrait = (im: PreviewImage | undefined) => !!im && im.h > im.w;
+
+/** A landscape image for full-bleed heroes (falls back to whatever exists). */
+export function heroImage(images: PreviewImage[], preferred: number): number {
+  if (images[preferred] && !isPortrait(images[preferred])) return preferred;
+  const i = images.findIndex((im) => !isPortrait(im));
+  return i >= 0 ? i : preferred;
+}
+
+/** Up to `n` shots from a voyage with distinct photographs, portraits first (rows are portrait tiles). */
+export function pickPhotos(shots: Shot[], images: PreviewImage[], voyage: number, n: number): Shot[] {
+  const mine = shots.filter((s) => s.v === voyage).sort((a, b) => a.t - b.t);
+  const seen = new Set<number>();
+  const out: Shot[] = [];
+  for (const wantPortrait of [true, false])
+    for (const s of mine) {
+      if (out.length >= n) break;
+      if (seen.has(s.img) || !images[s.img] || isPortrait(images[s.img]) !== wantPortrait) continue;
+      seen.add(s.img);
+      out.push(s);
+    }
+  return out.sort((a, b) => a.t - b.t);
+}
+
+/** "Oct 4, 2025 · 5:43 am · 50mm f/8" — the metadata line under a photograph. */
+export const metaLine = (s: Shot) => `${fmtDate(s.t)} · ${fmtHour(s.hour)} · ${s.focal}mm f/${s.f}`;

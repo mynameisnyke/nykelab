@@ -1,0 +1,101 @@
+---
+// Year gallery (Figma: GALLERIES / Year). The year is a huge numeral over the cover.
+// PROTOTYPE: built from the sample voyage metadata, like /years.
+import Base from "../../layouts/Base.astro";
+import Navbar from "../../components/Navbar.astro";
+import GalleryHero from "../../components/GalleryHero.astro";
+import MetaStrip from "../../components/MetaStrip.astro";
+import MonthBars from "../../components/MonthBars.astro";
+import GalleryGroup from "../../components/GalleryGroup.astro";
+import NextBlock from "../../components/NextBlock.astro";
+import { loadSample } from "../../lib/sample-home";
+import { deriveYears, goldenShare, heroImage, pickPhotos } from "../../lib/voyages";
+
+export const prerender = false;
+
+const { year: param = "" } = Astro.params;
+const { nav, data } = await loadSample();
+const { voyages, shots, images } = data;
+const years = deriveYears(voyages, shots, images.length);
+const at = years.findIndex((y) => String(y.year) === param);
+const y = years[at];
+if (!y) Astro.response.status = 404;
+else Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
+
+const inYear = y ? shots.filter((s) => new Date(s.t).getUTCFullYear() === y.year) : [];
+const max = Math.max(...years.flatMap((v) => v.monthCounts));
+const order = y ? [...y.voyages].sort((a, b) => voyages[b].start - voyages[a].start) : [];
+const n = (k: number, one: string, many: string) => `${k} ${k === 1 ? one : many}`;
+const facts = y
+  ? [
+      { label: "Photographs", value: String(y.count) },
+      { label: "Voyages", value: String(y.voyages.length) },
+      { label: "Countries", value: String(y.countries.length) },
+      { label: "Most often", value: y.top ? `${y.top.focal}mm f/${y.top.f}` : "—" },
+      { label: "Golden hour", value: `${Math.round(goldenShare(inYear) * 100)}%` },
+    ]
+  : [];
+const groups = order.map((vi, k) => {
+  const mine = inYear.filter((s) => s.v === vi);
+  return { voyage: voyages[vi], count: mine.length, shots: pickPhotos(inYear, images, vi, k % 2 === 1 ? 2 : 3) };
+});
+const next = y && years.length > 1 ? years[(at + 1) % years.length] : undefined;
+const hero = y ? images[heroImage(images, y.photos[0] ?? 0)] : undefined;
+---
+
+<Base title={y ? `${y.year} — nykelab` : "Not found — nykelab"} description={y ? `${y.year}: ${y.count} photographs from ${n(y.voyages.length, "voyage", "voyages")}.` : "Nothing here."} image={hero?.src}>
+  <Navbar surface="media" collections={nav} />
+  {
+    !y ? (
+      <main class="empty">
+        <p class="eyebrow">Nothing here.</p>
+        <a class="eyebrow" href="/years">← Years</a>
+      </main>
+    ) : (
+      <main>
+        <GalleryHero title={String(y.year)} numeral subtitle={`${y.count} photographs · ${n(y.voyages.length, "voyage", "voyages")} · ${n(y.countries.length, "country", "countries")}`} crumb={{ label: "Years", href: "/years" }} image={hero} />
+        <section class="facts"><MetaStrip facts={facts} /></section>
+        <section class="months"><MonthBars counts={y.monthCounts} voyageByMonth={y.monthVoyage} voyages={voyages} max={max} year={y.year} bw={56} label /></section>
+        {groups.map((g) => <GalleryGroup {...g} images={images} />)}
+        {next && <div class="next-wrap"><NextBlock eyebrow="Next year" title={String(next.year)} meta={`${next.count} photographs · ${n(next.voyages.length, "voyage", "voyages")}`} href={`/years/${next.year}`} image={images[next.photos[0]]} /></div>}
+      </main>
+    )
+  }
+</Base>
+
+<script>
+  import { initPhotos } from "../../scripts/photos";
+  document.addEventListener("astro:page-load", initPhotos);
+</script>
+
+<style>
+  .facts {
+    padding: 96px var(--margin) 0;
+  }
+  .months {
+    padding: 48px var(--margin) 0;
+  }
+  .next-wrap {
+    padding-top: var(--section-gap);
+    padding-bottom: 120px;
+  }
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 100vh;
+  }
+  @media (max-width: 767px) {
+    .facts {
+      padding-top: 48px;
+    }
+    .months {
+      padding-top: 32px;
+    }
+    .next-wrap {
+      padding-bottom: 40px;
+    }
+  }
+</style>
