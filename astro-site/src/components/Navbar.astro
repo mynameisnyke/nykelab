@@ -2,6 +2,7 @@
 // Figma: Navbar (Surface=Page) + MenuOverlay (footer carries the JOURNAL link).
 // The overlay here is the list + footer only; the preview image and sunburst
 // from the Figma menu come with the photo pages.
+import Logo from "./Logo.astro";
 interface Props {
   /** "media" = sits over a photo (white icons/wordmark in both themes). */
   surface?: "page" | "media";
@@ -9,15 +10,12 @@ interface Props {
   collections?: { slug: string; title: string }[];
 }
 const { surface = "page", collections } = Astro.props;
+// Prerendered pages (the journal) can't read D1 at build time: they start with Home only and the
+// script below fills in the collections from /api/collections when the menu first opens.
+const fill = collections === undefined;
 const chapters = [
   { label: "Home", href: "/" },
-  ...(collections ?? [
-    { slug: "westminster", title: "Westminster" },
-    { slug: "grand-tetons", title: "Grand Tetons" },
-    { slug: "yellowstone", title: "Yellowstone" },
-    { slug: "new-york", title: "New York" },
-  ]).map((c) => ({ label: c.title, href: `/${c.slug}` })),
-  { label: "World", href: "/world" },
+  ...(collections ?? []).map((c) => ({ label: c.title, href: `/${c.slug}` })),
 ];
 const here = Astro.url.pathname;
 const footer = [
@@ -25,9 +23,10 @@ const footer = [
   { label: "Places", href: "/places" },
   { label: "Years", href: "/years" },
   { label: "Journal", href: "/journal" },
-  { label: "Instagram", href: "#" },
-  { label: "Email", href: "#" },
-];
+  // No Instagram URL yet: an entry without an href is not rendered.
+  { label: "Instagram", href: "" },
+  { label: "Email", href: "mailto:nyke@nykelab.nyc" },
+].filter((f) => f.href);
 ---
 
 <header class:list={["navbar", { media: surface === "media" }]}>
@@ -37,7 +36,7 @@ const footer = [
       <path d="M18 2.5v4M16 4.5h4"></path>
     </svg>
   </button>
-  <a class="wordmark" href="/" data-astro-reload aria-label="NYKELAB home">NYKELAB</a>
+  <a class="wordmark" href="/" data-astro-reload aria-label="NYKELAB home"><Logo /></a>
   <button class="icon-btn" type="button" data-menu-open aria-label="Open menu" aria-expanded="false" aria-controls="menu">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
       <path d="M4 8h16M4 12h16M4 16h16"></path>
@@ -53,7 +52,7 @@ const footer = [
         <path d="M18 2.5v4M16 4.5h4"></path>
       </svg>
     </button>
-    <span class="wordmark">NYKELAB</span>
+    <span class="wordmark"><Logo /></span>
     <button class="close" type="button" data-menu-close aria-label="Close menu">
       <span class="eyebrow-ui">Close</span>
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
@@ -62,7 +61,7 @@ const footer = [
     </button>
   </div>
   <nav class="menu-list" aria-label="Chapters">
-    <ol>
+    <ol data-fill={fill ? "" : undefined}>
       {
         chapters.map((c, i) => (
           <li>
@@ -83,6 +82,30 @@ const footer = [
     }
   </nav>
 </div>
+
+<script>
+  document.addEventListener("click", async (e) => {
+    if (!(e.target as Element).closest("[data-menu-open]")) return;
+    const list = document.querySelector<HTMLOListElement>("ol[data-fill]");
+    const home = list?.firstElementChild;
+    if (!list || !home) return;
+    list.removeAttribute("data-fill");
+    try {
+      const { collections } = (await (await fetch("/api/collections")).json()) as { collections: { slug: string; title: string }[] };
+      collections.forEach((c, i) => {
+        const li = home.cloneNode(true) as HTMLLIElement; // clones keep the scoped-style attributes
+        li.querySelector(".num")!.textContent = String(i + 1);
+        const a = li.querySelector("a")!;
+        a.removeAttribute("data-astro-reload");
+        a.href = `/${c.slug}`;
+        a.textContent = c.title;
+        list.appendChild(li);
+      });
+    } catch {
+      /* the menu still works with Home and the footer links */
+    }
+  });
+</script>
 
 <style>
   .navbar,
@@ -124,11 +147,7 @@ const footer = [
     height: 32px;
   }
   .wordmark {
-    font-family: var(--font-ui);
-    font-weight: 600;
-    font-size: 32px;
-    line-height: 39px;
-    letter-spacing: 0.01em;
+    display: inline-flex;
     color: var(--text-primary);
   }
   .eyebrow-ui {
@@ -210,10 +229,6 @@ const footer = [
   }
 
   @media (max-width: 767px) {
-    .wordmark {
-      font-size: 16px;
-      line-height: 19px;
-    }
     .icon-btn {
       width: 24px;
       height: 24px;

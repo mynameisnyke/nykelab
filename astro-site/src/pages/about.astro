@@ -13,30 +13,92 @@ Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, sta
 
 const nav = await getNav();
 const bio =
-  "Photographer and developer in New York. A decade in digital media: photographs published, applications built. All photos and videos are owned and captured by Nyke Harewood.";
+  "Engineer in New York. Ten years in IT and infrastructure, from post-production and newsrooms to AI, building the systems that let people get on with their work. I take photographs on the side.";
+
+// Public, short version of the resume. Numbers and client names stay out of the public page.
+const work = [
+  {
+    years: "2026 –",
+    where: "Hex",
+    role: "IT Systems Engineer",
+    note: "The one IT engineer at a data company. Identity and access as code, and a help desk where AI agents propose changes and a person approves each one.",
+  },
+  {
+    years: "2024 – 2025",
+    where: "Dotdash Meredith",
+    role: "Senior Engineering Manager",
+    note: "Led the team behind IT infrastructure, identity and cloud storage for 40+ brands, including a multi-petabyte move to the cloud.",
+  },
+  {
+    years: "2017 – 2024",
+    where: "Insider",
+    role: "Infrastructure Administrator to Senior IT Solutions Manager",
+    note: "Built the Okta directory driven by HR data and automated nearly all of the employee lifecycle for 1,000+ people in the US, UK and Singapore.",
+  },
+  {
+    years: "2015 – 2017",
+    where: "Final Frame",
+    role: "IT Systems Administrator",
+    note: "Ran IT for a post-production facility: storage, networks and the machines editors work on.",
+  },
+];
+const stack = ["Okta", "Terraform", "AWS", "Google Cloud", "Cloudflare", "TypeScript", "Python", "Go", "Claude Code", "MCP"];
 ---
 
 <Base title="About — nykelab" description={bio}>
   <Navbar surface="media" collections={nav} />
   <main>
-    <Image class="photo" src={photo} alt="" widths={[800, 1440, 2400]} sizes="100vw" loading="eager" fetchpriority="high" />
-    <div class="dim"></div>
-    <div class="scrim"></div>
-    <div class="copy">
-      <h1>Nyke Harewood</h1>
-      <p class="bio">{bio}</p>
-      <div class="links">
-        <Pill label="GitHub" href="https://github.com/mynameisnyke" surface="media" external />
-        <Pill label="LinkedIn" href="https://www.linkedin.com/in/nyke-harewood/" surface="media" external />
-        <Pill label="Email" href="mailto:nyke@nykelab.nyc" surface="media" />
+    <section class="hero">
+      <Image class="photo" src={photo} alt="" widths={[800, 1440, 2400]} sizes="100vw" loading="eager" fetchpriority="high" />
+      <div class="dim"></div>
+      <div class="scrim"></div>
+      <div class="copy">
+        <h1>Nyke Harewood</h1>
+        <p class="bio">{bio}</p>
+        <div class="links">
+          <Pill label="Experience ↓" href="#work" surface="media" />
+          <Pill label="GitHub" href="https://github.com/mynameisnyke" surface="media" external />
+          <Pill label="LinkedIn" href="https://www.linkedin.com/in/nyke-harewood/" surface="media" external />
+          <Pill label="Email" href="mailto:nyke@nykelab.nyc" surface="media" />
+        </div>
       </div>
-    </div>
+    </section>
+
+    <section class="work" id="work" aria-labelledby="work-h">
+      <p class="eyebrow" id="work-h">Work</p>
+      <ol class="jobs">
+        {
+          work.map((j) => (
+            <li class="job">
+              <span class="years eyebrow">{j.years}</span>
+              <div class="what">
+                <h2>{j.where}</h2>
+                <p class="role eyebrow">{j.role}</p>
+                <p class="note">{j.note}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="stack">{stack.join(" · ")}</p>
+    </section>
+
+    <section class="hobby" aria-labelledby="hobby-h">
+      <p class="eyebrow" id="hobby-h">Photography</p>
+      <p class="lede">The hobby that took over my weekends and my passport: cities, trips, dog shows and comic cons.</p>
+      <div class="links">
+        <Pill label="Places" href="/places" />
+        <Pill label="Years" href="/years" />
+        <Pill label="Journal" href="/journal" />
+      </div>
+      <p class="credit caption">All photos and videos are owned and captured by Nyke Harewood.</p>
+    </section>
   </main>
   <ChapterNav />
 </Base>
 
 <style>
-  main {
+  .hero {
     position: relative;
     height: 100vh;
     height: 100svh;
@@ -92,7 +154,92 @@ const bio =
     gap: 12px;
     margin-top: 0;
   }
+  .work,
+  .hobby {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: var(--section-gap) var(--margin) 0;
+  }
+  .hobby {
+    padding-bottom: 160px;
+  }
+  .work > p,
+  .hobby > p {
+    margin: 0;
+  }
+  .jobs {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .job {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    column-gap: 48px;
+    padding: 40px 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .years {
+    padding-top: 10px;
+  }
+  .what {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: var(--column);
+  }
+  .what h2 {
+    margin: 0;
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 40px;
+    letter-spacing: -0.01em;
+  }
+  .what p {
+    margin: 0;
+  }
+  .note {
+    color: var(--text-secondary);
+  }
+  .stack {
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 20px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+  .lede {
+    max-width: var(--column);
+    font-family: var(--font-title);
+    font-size: 32px;
+    line-height: 42px;
+    letter-spacing: -0.01em;
+  }
+  .hobby .links {
+    margin-top: 0;
+  }
+
   @media (max-width: 767px) {
+    .job {
+      grid-template-columns: 1fr;
+      row-gap: 8px;
+      padding: 28px 0;
+    }
+    .years {
+      padding-top: 0;
+    }
+    .what h2 {
+      font-size: 26px;
+      line-height: 32px;
+    }
+    .lede {
+      font-size: 24px;
+      line-height: 32px;
+    }
     h1 {
       font-size: 40px;
       line-height: 46px;

@@ -1,0 +1,58 @@
+---
+// nykelab logo: NYKE in the title serif with the Y drawn as a tick, then LAB in a pill.
+// Sized by font-size, colored by currentColor. The tick is straight, even-weight strokes by
+// design: a lettering gesture, not a swoosh.
+const tick = "M3 11 9.5 17.5 21 3.5M9.5 17.5V24";
+---
+
+<span class="logo" role="img" aria-label="NYKELAB">
+  <span class="nyke" aria-hidden="true">N<svg class="yt" viewBox="1.5 2 21 23.5"><path d={tick}></path></svg>KE</span>
+  <span class="lab" aria-hidden="true">LAB</span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    font-size: 32px;
+    line-height: 1;
+    color: currentColor;
+  }
+  .nyke {
+    display: inline-flex;
+    align-items: baseline;
+    font-family: var(--font-title);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .yt {
+    height: 0.88em;
+    width: 0.79em;
+    margin: 0 0.015em;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.4;
+  }
+  .lab {
+    padding: 0.26em 0.62em 0.22em 0.74em;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 0.32em;
+    letter-spacing: 0.12em;
+    line-height: 1;
+  }
+  /* Phones: smaller word, but LAB keeps a readable size (about 10px). */
+  @media (max-width: 767px) {
+    .logo {
+      font-size: 26px;
+    }
+    .lab {
+      font-size: 0.38em;
+    }
+  }
+</style>

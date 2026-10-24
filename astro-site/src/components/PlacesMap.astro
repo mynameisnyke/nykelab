@@ -56,8 +56,12 @@ const pos = (p: Place, v: (typeof VIEWS)[keyof typeof VIEWS]) => ({
 </div>
 
 <style>
+  /* Must out-rank `svg {}` below, or the sprite sheet becomes a viewport-sized click blocker. */
   .defs {
     position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
   }
   .map {
     position: relative;

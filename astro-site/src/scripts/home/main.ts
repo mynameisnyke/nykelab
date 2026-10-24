@@ -169,10 +169,11 @@ export function initHome(): () => void {
     const present = voyages.filter((_, i) => vis.some((x) => x.v === i));
     const s = vis.length ? summarize(present, vis) : summarize(voyages, shots);
     const line = (t: string) => `<span>${t}</span>`;
+    const countries = `${s.countries} ${s.countries === 1 ? "country" : "countries"}`;
     stats.innerHTML =
       vis.length === shots.length
-        ? line(`${s.photos} photographs · ${s.voyages} voyages`) + line(`${s.countries} countries · ${s.from}–${s.to}`)
-        : line(`${vis.length} of ${shots.length} photographs`) + line(`${s.countries} countries · ${s.from}–${s.to}`);
+        ? line(`${s.photos} photographs · ${s.voyages} voyages`) + line(`${countries} · ${s.from}–${s.to}`)
+        : line(`${vis.length} of ${shots.length} photographs`) + line(`${countries} · ${s.from}–${s.to}`);
     renderPreview();
     renderInsight();
   }

@@ -187,7 +187,8 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
     text-transform: uppercase;
     color: var(--text-caption);
   }
-  .stats span {
+  /* :global because main.ts rewrites these spans, and the rewritten ones carry no scope attribute */
+  .stats :global(span) {
     display: block;
   }
 
