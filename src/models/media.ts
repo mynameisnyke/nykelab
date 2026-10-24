@@ -10,6 +10,8 @@ import {
 } from "../types/media";
 export class Media implements IMedia {
   id: string = '';
+  collection?: string;
+  posterUrl?: string;
   name?: string;
   caption?: string;
   location?: string;

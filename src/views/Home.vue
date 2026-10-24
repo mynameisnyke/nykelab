@@ -1,9 +1,10 @@
 <template>
   <div class="home-container">
     <div class="chart-wrapper">
-      <MediaSunburst 
-        :data="mediaData" 
-        @navigate="handleNavigation" 
+      <MediaSunburst
+        v-if="mediaData"
+        :data="mediaData"
+        @navigate="handleNavigation"
         :enableFade="enableFade"
       />
     </div>
@@ -21,48 +22,36 @@
       </div>
     </div>
     
-    <BottomNav :class="footerClass" v-if="footerVisible" class="fixed-bottom" :navItems="navigationItems" />
+    <BottomNav :class="footerClass" v-if="footerVisible" class="fixed-bottom" :navItems="navItems" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 import { useFooterVisibility } from "../composables/useFooterVisibility";
+import { useCollections } from "../composables/useCollections";
 import BottomNav from "../components/ui/BottomNav.vue";
-import CenteredContent from "../components/ui/CenteredContent.vue";
 import MediaSunburst from "../components/MediaSunburst.vue";
 
-// Define navigation items for the bottom nav
-const navigationItems = [
-  { label: 'Home', icon: 'home', route: '/', number: '0', link: '/' },
-  { label: 'Images', icon: 'image', route: '/gallery/images', number: '1', link: '/gallery/images' },
-  { label: 'Videos', icon: 'video', route: '/gallery/videos', number: '2', link: '/gallery/videos' },
-  { label: 'Favorites', icon: 'star', route: '/favorites', number: '3', link: '/favorites' }
-];
+const router = useRouter();
+const { collections, navItems } = useCollections();
 
-// Media data structure — kept to two rings (category, subcategory)
-// so the sunburst stays legible at a compact size.
-const mediaData = {
-  name: "Media",
-  children: [
-    {
-      name: "Photos",
-      children: [
-        { name: "Nature", size: 15 },
-        { name: "People", size: 12 },
-        { name: "Urban", size: 10 },
-      ],
-    },
-    {
-      name: "Videos",
-      children: [
-        { name: "Travel", size: 8 },
-        { name: "Family", size: 15 },
-        { name: "Pets", size: 10 },
-      ],
-    },
-  ],
-};
+// Two rings (type -> collection), sized by how much is in each collection.
+// Hidden until there is something published to show.
+const mediaData = computed(() => {
+  const ring = (key: "images" | "videos") =>
+    collections.value
+      .filter((c) => c[key] > 0)
+      .map((c) => ({ name: c.title, size: c[key] }));
+  const photos = ring("images");
+  const videos = ring("videos");
+  const children = [
+    ...(photos.length ? [{ name: "Photos", children: photos }] : []),
+    ...(videos.length ? [{ name: "Videos", children: videos }] : []),
+  ];
+  return children.length ? { name: "Media", children } : null;
+});
 
 const currentPath = ref<string[]>([]);
 const enableFade = ref(false);
@@ -70,14 +59,15 @@ const { footerVisible, toggleVisibility, footerClass } = useFooterVisibility();
 
 const handleNavigation = (path: string[]) => {
   currentPath.value = path;
-  // You could also navigate to a different route here if needed
-  console.log(`Navigated to: ${path.join(' > ')}`);
+  // A click on an outer-ring arc is a collection: go there.
+  if (path.length === 2) {
+    const target = collections.value.find((c) => c.title === path[1]);
+    if (target) router.push(`/${target.slug}`);
+  }
 };
 
 const navigateToLevel = (index: number) => {
   currentPath.value = currentPath.value.slice(0, index + 1);
-  // You could also navigate to a different route here if needed
-  console.log(`Navigated to level: ${currentPath.value.join(' > ')}`);
 };
 </script>
 
