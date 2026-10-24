@@ -1,0 +1,69 @@
+---
+// One photo or video from the media table. Sizes come from the DB so the
+// browser reserves space (no layout shift) and can pick the small variant.
+import type { Photo } from "../lib/collections";
+
+interface Props {
+  media: Photo;
+  sizes: string;
+  eager?: boolean;
+  fit?: "cover" | "natural";
+  class?: string;
+}
+const { media: m, sizes, eager = false, fit = "natural", class: className } = Astro.props;
+const alt = m.place || m.caption.split("\n")[0] || "";
+const hasSize = m.width > 0 && m.height > 0;
+---
+
+{
+  m.type === "video" ? (
+    <video
+      class:list={["media", fit, className]}
+      src={m.urls.main}
+      poster={m.urls.poster}
+      width={hasSize ? m.width : undefined}
+      height={hasSize ? m.height : undefined}
+      autoplay
+      loop
+      muted
+      playsinline
+      preload={eager ? "auto" : "metadata"}
+      aria-label={alt || undefined}
+      data-media
+      data-id={m.id}
+      data-collection={m.collection}
+    />
+  ) : (
+    <img
+      class:list={["media", fit, className]}
+      src={m.urls.main}
+      srcset={m.urls.small ? `${m.urls.small} ${m.smallWidth}w, ${m.urls.main} ${m.mainWidth}w` : undefined}
+      sizes={sizes}
+      width={hasSize ? m.width : undefined}
+      height={hasSize ? m.height : undefined}
+      alt={alt}
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
+      fetchpriority={eager ? "high" : undefined}
+      data-media
+      data-id={m.id}
+      data-collection={m.collection}
+    />
+  )
+}
+
+<style>
+  .media {
+    display: block;
+    max-width: 100%;
+  }
+  .media.natural {
+    width: 100%;
+    height: auto;
+  }
+  .media.cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>

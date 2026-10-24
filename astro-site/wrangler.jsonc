@@ -1,0 +1,23 @@
+{
+  // Prototype: one Worker = Hono API (shared with ../worker/src) + Astro pages.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nykelab-astro",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // Serve /journal (not /journal/) so links and canonical URLs match without a redirect.
+  "assets": { "binding": "ASSETS", "html_handling": "drop-trailing-slash" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "nykelab",
+      "migrations_dir": "../worker/migrations"
+    }
+  ],
+  "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "nykelab-media" }],
+  "analytics_engine_datasets": [{ "binding": "EVENTS", "dataset": "nykelab_events" }],
+  "vars": {
+    // Local only. Production needs ACCESS_TEAM_DOMAIN / ACCESS_AUD (see ../README.md).
+    "ENVIRONMENT": "development"
+  }
+}

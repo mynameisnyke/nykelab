@@ -40,6 +40,10 @@
   --margin: 64px;
   --gutter: 24px;
   --nav-height: 64px;
+  --inset: 48px;
+  --section-gap: 128px;
+  --row-gap: 96px;
+  --caption-gap: 10px;
   --column: 680px;
 
   /* Type */
@@ -68,6 +72,9 @@
     --margin: 16px;
     --gutter: 16px;
     --nav-height: 64px;
+    --inset: 16px;
+    --section-gap: 80px;
+    --row-gap: 64px;
   }
 }
 
@@ -173,4 +180,13 @@ img {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Photo pages: items fade in/out as they scroll into view (only when JS is on). */
+.js .reveal {
+  opacity: 0;
+  transition: opacity 1.2s ease-in-out;
+}
+.js .reveal.in {
+  opacity: 1;
 }

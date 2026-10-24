@@ -1,4 +1,5 @@
 import { defineConfig } from "astro/config";
+import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 
@@ -15,8 +16,11 @@ const codeHeader = {
   },
 };
 
+// Static by default (Journal is prerendered); pages that read D1 opt out with
+// `export const prerender = false`.
 export default defineConfig({
   site: "https://nykelab.nyc",
+  adapter: cloudflare({ prerenderEnvironment: "node" }),
   integrations: [mdx(), sitemap()],
   redirects: { "/": "/journal" },
   markdown: {

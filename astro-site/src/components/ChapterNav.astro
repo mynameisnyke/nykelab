@@ -1,0 +1,66 @@
+---
+// Figma: ChapterNav (Surface=Media). Pinned to the bottom of photo pages.
+export interface ChapterItem {
+  label: string;
+  href: string;
+}
+interface Props {
+  items: ChapterItem[];
+  active: number;
+}
+const { items, active } = Astro.props;
+---
+
+<nav class="chapter-nav" aria-label="Chapters">
+  {
+    items.map((it, i) => (
+      <a href={it.href} class:list={{ active: i === active }} aria-current={i === active ? "page" : undefined}>
+        <span class="n">{i}</span>
+        <span>{it.label}</span>
+      </a>
+    ))
+  }
+</nav>
+
+<style>
+  .chapter-nav {
+    position: fixed;
+    left: var(--inset);
+    right: var(--inset);
+    bottom: 32px;
+    z-index: 20;
+    display: flex;
+    gap: 22px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 13px;
+    line-height: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    mix-blend-mode: difference; /* legible over any photo */
+  }
+  .chapter-nav::-webkit-scrollbar {
+    display: none;
+  }
+  a {
+    display: inline-flex;
+    gap: 8px;
+    flex: none;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+  }
+  a:hover,
+  a.active {
+    opacity: 1;
+  }
+  @media (max-width: 767px) {
+    .chapter-nav {
+      gap: 16px;
+      font-size: 11px;
+      bottom: 20px;
+    }
+  }
+</style>

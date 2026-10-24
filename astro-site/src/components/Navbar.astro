@@ -2,12 +2,21 @@
 // Figma: Navbar (Surface=Page) + MenuOverlay (footer carries the JOURNAL link).
 // The overlay here is the list + footer only; the preview image and sunburst
 // from the Figma menu come with the photo pages.
+interface Props {
+  /** "media" = sits over a photo (white icons/wordmark in both themes). */
+  surface?: "page" | "media";
+  /** Collections from the database; the static list below is only a fallback. */
+  collections?: { slug: string; title: string }[];
+}
+const { surface = "page", collections } = Astro.props;
 const chapters = [
   { label: "Home", href: "/" },
-  { label: "Westminster", href: "/westminster" },
-  { label: "Grand Tetons", href: "/grand-tetons" },
-  { label: "Yellowstone", href: "/yellowstone" },
-  { label: "New York", href: "/new-york" },
+  ...(collections ?? [
+    { slug: "westminster", title: "Westminster" },
+    { slug: "grand-tetons", title: "Grand Tetons" },
+    { slug: "yellowstone", title: "Yellowstone" },
+    { slug: "new-york", title: "New York" },
+  ]).map((c) => ({ label: c.title, href: `/${c.slug}` })),
   { label: "World", href: "/world" },
 ];
 const footer = [
@@ -18,7 +27,7 @@ const footer = [
 ];
 ---
 
-<header class="navbar" transition:persist="navbar">
+<header class:list={["navbar", { media: surface === "media" }]}>
   <button class="icon-btn" type="button" data-theme-toggle aria-label="Toggle light / dark theme">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M19.5 14.2A8 8 0 0 1 9.8 4.5a8 8 0 1 0 9.7 9.7Z"></path>
@@ -85,6 +94,10 @@ const footer = [
     position: absolute;
     inset: 0 0 auto 0;
     z-index: 10;
+  }
+  .navbar.media {
+    --icon-primary: #fff;
+    --text-primary: #fff;
   }
   .navbar > :last-child,
   .menu-bar > :last-child {

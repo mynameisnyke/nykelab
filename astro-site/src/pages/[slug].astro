@@ -1,0 +1,302 @@
+---
+// Photo collection page (e.g. /grand-tetons). Rendered on request from D1 so
+// edits in /admin appear without a rebuild. Static routes (/journal, …) win
+// over this catch-all, and unknown slugs 404.
+import Base from "../layouts/Base.astro";
+import Navbar from "../components/Navbar.astro";
+import ChapterNav from "../components/ChapterNav.astro";
+import MediaItem from "../components/MediaItem.astro";
+import { getCollectionPage, getNav, type Photo } from "../lib/collections";
+
+export const prerender = false;
+
+const { slug = "" } = Astro.params;
+const page = await getCollectionPage(slug);
+if (!page) Astro.response.status = 404;
+else Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
+
+const nav = page ? await getNav() : [];
+const media = page?.media ?? [];
+const heroIdx = Math.max(0, media.findIndex((m) => m.orientation !== "portrait"));
+const hero = media[heroIdx];
+
+// Layout rhythm: landscapes alternate full-bleed / inset; runs of portraits
+// become 1–3-up rows.
+type Block = { kind: "single"; style: "full" | "inset"; m: Photo } | { kind: "row"; ms: Photo[] };
+const blocks: Block[] = [];
+let landscapes = 0;
+const rest = media.filter((_, i) => i !== heroIdx);
+for (let i = 0; i < rest.length; ) {
+  const m = rest[i];
+  if (m.orientation === "portrait") {
+    const run: Photo[] = [];
+    while (i < rest.length && rest[i].orientation === "portrait" && run.length < 3) run.push(rest[i++]);
+    blocks.push({ kind: "row", ms: run });
+  } else {
+    blocks.push({ kind: "single", style: landscapes++ % 2 === 0 ? "full" : "inset", m });
+    i++;
+  }
+}
+
+const chapterItems = [
+  { label: "Home", href: "/" },
+  ...nav.map((n) => ({ label: n.title, href: `/${n.slug}` })),
+  { label: "World", href: "/world" },
+];
+const activeChapter = nav.findIndex((n) => n.slug === slug) + 1;
+const nextNumber = page?.next ? nav.findIndex((n) => n.slug === page.next!.slug) + 1 : 0;
+
+const count = (page?.images ?? 0) + (page?.videos ?? 0);
+const subtitle = page
+  ? [page.title, `${count} ${count === 1 ? "photograph" : "photographs"}`].join(" · ")
+  : "";
+const lines = (s: string) => s.split("\n").filter(Boolean);
+---
+
+<Base
+  title={page ? `${page.title} — nykelab` : "Not found — nykelab"}
+  description={page ? `${page.title}: ${count} photographs by Nyke Harewood.` : "Nothing here."}
+  image={hero?.urls.main}>
+  <Navbar surface="media" collections={nav} />
+
+  {
+    !page || !hero ? (
+      <main class="empty">
+        <p class="eyebrow">{page ? "Nothing here yet." : "Nothing here."}</p>
+        <a class="eyebrow" href="/journal">Journal →</a>
+      </main>
+    ) : (
+      <main>
+        <section class="hero">
+          <MediaItem media={hero} eager fit="cover" sizes="100vw" />
+          <div class="scrim top"></div>
+          <div class="scrim bottom"></div>
+          <div class="hero-text">
+            <h1>{page.title}</h1>
+            <p class="caption">{subtitle}</p>
+          </div>
+          <span class="caption scroll">Scroll</span>
+        </section>
+
+        {blocks.map((b) =>
+          b.kind === "single" && b.style === "full" ? (
+            <section class="full">
+              <MediaItem media={b.m} fit="cover" sizes="100vw" class="reveal" />
+              <div class="scrim bottom"></div>
+              {b.m.caption && <p class="caption on-media reveal">{lines(b.m.caption).join(" · ")}</p>}
+            </section>
+          ) : b.kind === "single" ? (
+            <section class="inset">
+              <figure class="reveal">
+                <MediaItem media={b.m} sizes="(max-width: 767px) 100vw, 1312px" />
+                {b.m.caption && <figcaption class="caption">{lines(b.m.caption).join(" · ")}</figcaption>}
+              </figure>
+            </section>
+          ) : (
+            <section class:list={["row", `n${b.ms.length}`]}>
+              {b.ms.map((m) => (
+                <figure class="reveal">
+                  <MediaItem media={m} sizes={`(max-width: 767px) 100vw, ${Math.round(1312 / b.ms.length)}px`} />
+                  {m.caption && <figcaption class="caption">{lines(m.caption).join(" · ")}</figcaption>}
+                </figure>
+              ))}
+            </section>
+          ),
+        )}
+
+        {
+          page.next && (
+            <a class="next" href={`/${page.next.slug}`}>
+              <div class="next-text">
+                <p class="eyebrow">Next chapter</p>
+                <h2>{`${nextNumber}  ${page.next.title}`}</h2>
+              </div>
+              {page.next.cover && (
+                <div class="peek">
+                  <MediaItem media={page.next.cover} fit="cover" sizes="(max-width: 767px) 100vw, 620px" />
+                </div>
+              )}
+            </a>
+          )
+        }
+      </main>
+      <ChapterNav items={chapterItems} active={activeChapter} />
+    )
+  }
+</Base>
+
+<script>
+  import { initPhotos } from "../scripts/photos";
+  document.addEventListener("astro:page-load", initPhotos);
+</script>
+
+<style>
+  main {
+    padding-bottom: 96px;
+  }
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 100vh;
+  }
+
+  /* Scrims: Figma paint styles Scrim/Top Soft, Scrim/Bottom Strong */
+  .scrim {
+    position: absolute;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+  }
+  .scrim.top {
+    top: 0;
+    height: 200px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
+  }
+  .scrim.bottom {
+    bottom: 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  }
+
+  .hero,
+  .full {
+    position: relative;
+    height: 100vh;
+    height: 100svh;
+    min-height: 480px;
+    overflow: hidden;
+  }
+  .hero-text {
+    position: absolute;
+    left: var(--inset);
+    right: var(--inset);
+    bottom: 128px;
+    color: #fff;
+  }
+  h1,
+  h2 {
+    margin: 0;
+    font-family: var(--font-title);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  h1 {
+    font-size: 64px;
+    line-height: 72px;
+  }
+  .hero-text .caption {
+    margin: 16px 0 0;
+    color: #e6e6e6;
+  }
+  .scroll {
+    position: absolute;
+    right: var(--inset);
+    bottom: 48px;
+    color: #e6e6e6;
+  }
+  .caption.on-media {
+    position: absolute;
+    right: 32px;
+    bottom: 24px;
+    max-width: 600px;
+    margin: 0;
+    text-align: right;
+    color: #e6e6e6;
+  }
+
+  .inset {
+    padding: var(--section-gap) var(--margin);
+  }
+  .inset figure {
+    max-width: 1312px;
+    margin-inline: auto;
+  }
+  figure {
+    margin: 0;
+  }
+  figcaption {
+    margin-top: var(--caption-gap);
+  }
+
+  .row {
+    display: grid;
+    gap: var(--gutter);
+    padding: var(--row-gap) var(--margin);
+    align-items: start;
+    max-width: calc(1312px + 2 * var(--margin));
+    margin-inline: auto;
+  }
+  .row.n1 {
+    grid-template-columns: minmax(0, 420px);
+    justify-content: center;
+  }
+  .row.n2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .row.n3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .next {
+    display: grid;
+    grid-template-columns: 1fr 620px;
+    align-items: center;
+    gap: var(--gutter);
+    min-height: 620px;
+    padding: 0 var(--margin) 80px;
+  }
+  .next-text {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .next-text p {
+    margin: 0;
+  }
+  h2 {
+    font-size: 64px;
+    line-height: 72px;
+    white-space: pre;
+  }
+  .peek {
+    aspect-ratio: 620 / 400;
+    overflow: hidden;
+  }
+
+  @media (max-width: 767px) {
+    h1 {
+      font-size: 40px;
+      line-height: 46px;
+    }
+    .hero-text {
+      bottom: 100px;
+    }
+    .scroll {
+      display: none;
+    }
+    .caption.on-media {
+      right: 16px;
+      bottom: 16px;
+      max-width: calc(100% - 32px);
+    }
+    .row.n1,
+    .row.n2,
+    .row.n3 {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .next {
+      grid-template-columns: 1fr;
+      min-height: 0;
+      padding-top: 40px;
+    }
+    h2 {
+      font-size: 40px;
+      line-height: 46px;
+    }
+  }
+</style>
