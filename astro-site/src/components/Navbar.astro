@@ -37,7 +37,7 @@ const footer = [
       <path d="M18 2.5v4M16 4.5h4"></path>
     </svg>
   </button>
-  <a class="wordmark" href="/" aria-label="NYKELAB home">NYKELAB</a>
+  <a class="wordmark" href="/" data-astro-reload aria-label="NYKELAB home">NYKELAB</a>
   <button class="icon-btn" type="button" data-menu-open aria-label="Open menu" aria-expanded="false" aria-controls="menu">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
       <path d="M4 8h16M4 12h16M4 16h16"></path>
@@ -67,7 +67,7 @@ const footer = [
         chapters.map((c, i) => (
           <li>
             <span class="num">{i}</span>
-            <a href={c.href}>{c.label}</a>
+            <a href={c.href} data-astro-reload={c.href === "/" ? "" : undefined}>{c.label}</a>
           </li>
         ))
       }

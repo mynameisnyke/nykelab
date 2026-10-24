@@ -14,7 +14,7 @@ const { items, active } = Astro.props;
 <nav class="chapter-nav" aria-label="Chapters">
   {
     items.map((it, i) => (
-      <a href={it.href} class:list={{ active: i === active }} aria-current={i === active ? "page" : undefined}>
+      <a href={it.href} data-astro-reload={it.href === "/" ? "" : undefined} class:list={{ active: i === active }} aria-current={i === active ? "page" : undefined}>
         <span class="n">{i}</span>
         <span>{it.label}</span>
       </a>

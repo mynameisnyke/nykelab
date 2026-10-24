@@ -11,7 +11,7 @@ Prototype of the site in Astro, built from the Figma file ("Nyke Lab 2.0"). Ever
 cd astro-site
 npm install
 npm run seed     # once: fills LOCAL D1 + R2 with the Figma photos (.wrangler/state, never production)
-npm run dev      # http://localhost:4321/journal  and  /grand-tetons
+npm run dev      # http://localhost:4322/journal  and  /grand-tetons
 npm run build    # → dist/client (static) + dist/server (Worker)
 npm run check    # type + content-schema check
 npx wrangler dev --persist-to .wrangler/state   # run the production build locally (after build)

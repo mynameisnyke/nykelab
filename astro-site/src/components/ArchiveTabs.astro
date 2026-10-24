@@ -12,7 +12,7 @@ const tabs = [
 ---
 
 <nav class="tabs" aria-label="Archive">
-  {tabs.map((t) => <a href={t.href} class:list={{ on: t.id === active }} aria-current={t.id === active ? "page" : undefined}>{t.label}</a>)}
+  {tabs.map((t) => <a href={t.href} data-astro-reload={t.href === "/" ? "" : undefined} class:list={{ on: t.id === active }} aria-current={t.id === active ? "page" : undefined}>{t.label}</a>)}
 </nav>
 
 <style>
