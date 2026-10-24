@@ -38,12 +38,6 @@ for (let i = 0; i < rest.length; ) {
   }
 }
 
-const chapterItems = [
-  { label: "Home", href: "/" },
-  ...nav.map((n) => ({ label: n.title, href: `/${n.slug}` })),
-  { label: "World", href: "/world" },
-];
-const activeChapter = nav.findIndex((n) => n.slug === slug) + 1;
 const nextNumber = page?.next ? nav.findIndex((n) => n.slug === page.next!.slug) + 1 : 0;
 
 const count = (page?.images ?? 0) + (page?.videos ?? 0);
@@ -120,7 +114,7 @@ const lines = (s: string) => s.split("\n").filter(Boolean);
           )
         }
       </main>
-      <ChapterNav items={chapterItems} active={activeChapter} />
+      <ChapterNav />
     )
   }
 </Base>

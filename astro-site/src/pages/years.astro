@@ -15,7 +15,6 @@ const { nav, data } = await loadSample();
 const { voyages, shots, images } = data;
 const years = deriveYears(voyages, shots, images.length);
 const max = Math.max(...years.flatMap((y) => y.monthCounts));
-const chapters = [{ label: "Home", href: "/" }, ...nav.map((n) => ({ label: n.title, href: `/${n.slug}` })), { label: "World", href: "/world" }];
 ---
 
 <Base title="Years — nykelab" description={`${shots.length} photographs across ${years.length} years.`}>
@@ -26,7 +25,7 @@ const chapters = [{ label: "Home", href: "/" }, ...nav.map((n) => ({ label: n.ti
       {years.map((y) => <YearRow y={y} voyages={voyages} images={images} max={max} />)}
     </section>
   </main>
-  <ChapterNav items={chapters} active={-1} />
+  <ChapterNav />
 </Base>
 
 <style>

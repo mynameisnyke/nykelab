@@ -3,6 +3,7 @@
 // PROTOTYPE: built from the sample voyage metadata, like /years.
 import Base from "../../layouts/Base.astro";
 import Navbar from "../../components/Navbar.astro";
+import ChapterNav from "../../components/ChapterNav.astro";
 import GalleryHero from "../../components/GalleryHero.astro";
 import MetaStrip from "../../components/MetaStrip.astro";
 import MonthBars from "../../components/MonthBars.astro";
@@ -61,6 +62,7 @@ const hero = y ? images[heroImage(images, y.photos[0] ?? 0)] : undefined;
       </main>
     )
   }
+  <ChapterNav />
 </Base>
 
 <script>
@@ -95,7 +97,7 @@ const hero = y ? images[heroImage(images, y.photos[0] ?? 0)] : undefined;
       padding-top: 32px;
     }
     .next-wrap {
-      padding-bottom: 40px;
+      padding-bottom: 72px;
     }
   }
 </style>

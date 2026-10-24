@@ -12,11 +12,6 @@ export const prerender = false;
 Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
 
 const nav = await getNav();
-const chapters = [
-  { label: "Home", href: "/" },
-  ...nav.map((n) => ({ label: n.title, href: `/${n.slug}` })),
-  { label: "World", href: "/world" },
-];
 const bio =
   "Photographer and developer in New York. A decade in digital media: photographs published, applications built. All photos and videos are owned and captured by Nyke Harewood.";
 ---
@@ -37,7 +32,7 @@ const bio =
       </div>
     </div>
   </main>
-  <ChapterNav items={chapters} active={-1} />
+  <ChapterNav />
 </Base>
 
 <style>

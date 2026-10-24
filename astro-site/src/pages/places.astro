@@ -22,7 +22,6 @@ const countries = [...new Set(places.map((p) => p.country))];
 const years = shots.map((s) => new Date(s.t).getUTCFullYear());
 const from = Math.min(...years);
 const to = Math.max(...years);
-const chapters = [{ label: "Home", href: "/" }, ...nav.map((n) => ({ label: n.title, href: `/${n.slug}` })), { label: "World", href: "/world" }];
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 ---
 
@@ -46,7 +45,7 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
     <p class="totals">{shots.length} photographs · {places.length} places · {countries.length} countries</p>
   </main>
-  <ChapterNav items={chapters} active={-1} />
+  <ChapterNav />
 </Base>
 
 <script>

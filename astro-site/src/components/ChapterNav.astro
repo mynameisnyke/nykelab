@@ -1,22 +1,21 @@
 ---
-// Figma: ChapterNav (Surface=Media). Pinned to the bottom of photo pages.
-export interface ChapterItem {
-  label: string;
-  href: string;
-}
-interface Props {
-  items: ChapterItem[];
-  active: number;
-}
-const { items, active } = Astro.props;
+// Figma: ChapterNav. Same destinations as the menu's top level; voyages live only in the menu.
+const items = [
+  { label: "Home", href: "/" },
+  { label: "Places", href: "/places" },
+  { label: "Years", href: "/years" },
+  { label: "Journal", href: "/journal" },
+  { label: "About", href: "/about" },
+];
+const here = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isActive = (href: string) => (href === "/" ? here === "/" : here === href || here.startsWith(`${href}/`));
 ---
 
-<nav class="chapter-nav" aria-label="Chapters">
+<nav class="chapter-nav" aria-label="Site">
   {
-    items.map((it, i) => (
-      <a href={it.href} data-astro-reload={it.href === "/" ? "" : undefined} class:list={{ active: i === active }} aria-current={i === active ? "page" : undefined}>
-        <span class="n">{i}</span>
-        <span>{it.label}</span>
+    items.map((it) => (
+      <a href={it.href} data-astro-reload={it.href === "/" ? "" : undefined} class:list={{ active: isActive(it.href) }} aria-current={isActive(it.href) ? "page" : undefined}>
+        {it.label}
       </a>
     ))
   }

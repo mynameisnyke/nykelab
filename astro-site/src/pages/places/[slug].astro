@@ -3,6 +3,7 @@
 // PROTOTYPE: built from the sample voyage metadata, like /places.
 import Base from "../../layouts/Base.astro";
 import Navbar from "../../components/Navbar.astro";
+import ChapterNav from "../../components/ChapterNav.astro";
 import GalleryHero from "../../components/GalleryHero.astro";
 import MetaStrip from "../../components/MetaStrip.astro";
 import GalleryGroup from "../../components/GalleryGroup.astro";
@@ -55,6 +56,7 @@ const hero = place ? images[heroImage(images, place.cover)] : undefined;
       </main>
     )
   }
+  <ChapterNav />
 </Base>
 
 <script>
@@ -83,7 +85,7 @@ const hero = place ? images[heroImage(images, place.cover)] : undefined;
       padding-top: 48px;
     }
     .next-wrap {
-      padding-bottom: 40px;
+      padding-bottom: 72px;
     }
   }
 </style>
