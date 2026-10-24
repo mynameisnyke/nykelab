@@ -1,6 +1,6 @@
 ---
 // Figma: GroupHeader — voyage sub-heading inside a Place or Year gallery.
-import { fmtMonthYear, type Voyage } from "../lib/voyages";
+import { fmtMonthYear, fmtN, type Voyage } from "../lib/voyages";
 
 interface Props {
   voyage: Voyage;
@@ -12,7 +12,7 @@ const { voyage: v, count } = Astro.props;
 <header class="group">
   <span class="dot" style={`--c:${v.color}`}></span>
   <h2>{v.title}</h2>
-  <span class="meta">{fmtMonthYear(v.start)} · {count} photographs</span>
+  <span class="meta">{fmtMonthYear(v.start)} · {fmtN(count)} photographs</span>
   {v.available && <a class="open eyebrow" href={`/${v.slug}`}>Open voyage →</a>}
 </header>
 

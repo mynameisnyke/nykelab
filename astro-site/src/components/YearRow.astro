@@ -1,7 +1,7 @@
 ---
 // Figma: YearRow — numeral, contact strip, computed stats, photographs per month.
 import MonthBars from "./MonthBars.astro";
-import type { PreviewImage, Voyage, YearSummary } from "../lib/voyages";
+import { fmtN, type PreviewImage, type Voyage, type YearSummary } from "../lib/voyages";
 
 interface Props {
   y: YearSummary;
@@ -16,7 +16,7 @@ const n = (k: number, one: string, many: string) => `${k} ${k === 1 ? one : many
 <a class="row" href={`/years/${y.year}`}>
   <div class="id">
     <span class="year">{y.year}</span>
-    <p class="stats">{y.count} photographs · {n(y.voyages.length, "voyage", "voyages")} · {n(y.countries.length, "country", "countries")}</p>
+    <p class="stats">{fmtN(y.count)} photographs · {n(y.voyages.length, "voyage", "voyages")} · {n(y.countries.length, "country", "countries")}</p>
     {y.top && <p class="stats">Most often {y.top.focal}mm f/{y.top.f}</p>}
   </div>
   <div class="data">

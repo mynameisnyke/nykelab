@@ -56,15 +56,28 @@ Code fences accept a filename: ` ```ts title="worker/index.ts" `. In `.mdx`, use
 | Post page, CodeBlock, pull quote | `src/pages/journal/[slug].astro` (`.prose` styles) |
 | Story page: Hero, FullBleed, GalleryRow, InsetFeature, NextChapter, ChapterNav | `src/pages/[slug].astro`, `src/components/ChapterNav.astro`, `MediaItem.astro` |
 
-## Home: the archive as a map (prototype)
+## Home: the archive as a map
 
 `/` is a metadata-driven home: **Where** (three.js globe: voyages as stems, a bloom of photographs, arcs in date order), **When** (d3: date across, time of day down, so golden hour shows up on its own; drag across dates to filter), **How** (d3: focal length × aperture bubbles; click to filter). All three, the voyage list and the preview card share one store (`src/scripts/home/store.ts`), so hovering or filtering in one view updates the others. `/#when` and `/#how` deep-link a view. The list is real, crawlable links and keyboard accessible; without WebGL the 2D views are used.
 
-- **The data is SAMPLE data** (`buildSample()` in `src/lib/voyages.ts`; the page says so). Real values come from EXIF at upload (capture time, GPS, focal length, aperture, ISO, shutter, lens) plus a place name; the rest of the code already works on that `Voyage` / `Shot` shape. Photos uploaded before originals were kept have no EXIF (the old pipeline stripped it) and need re-uploading or manual values.
+- **The data is your Lightroom catalog.** `npm run catalog -- <photos.csv>` turns the Lightroom CSV into `src/data/catalog.json` (what the pages read) and `docs/catalog-report.md` (every decision it made). See "Catalog pipeline" below. The photographs themselves are not uploaded yet, so voyage covers and previews borrow from the few uploaded photos.
 - Privacy plan for real data: strip EXIF from public images, round public coordinates to roughly city level, keep exact values admin-only.
 - Weight: the home page script is ~735 kB raw / ~190 kB gzip (three + d3 + land outline) and loads only on `/`. Next step if needed: dynamic-import three only for the Where view.
 
-## Archive: Places and Years (prototype)
+## Catalog pipeline (Lightroom CSV to the site)
+
+```bash
+npm run catalog -- /Volumes/Whiskey/photos-3plus-or-picked.csv   # rerun whenever the CSV changes
+```
+
+- **Which collections form which voyage, and where it is:** `scripts/catalog/voyages.mjs` (hand-curated; `approx: true` marks a stand-in coordinate; `kind: "event"` keeps Westminster and NYCC on the home list and Years but off the Places map; Teen Wolf is a panel inside NYCC 2022). Collections not listed are reported, not imported.
+- **One row per photograph:** de-duplicated by `lr_id` (a photo in Cartagena and Cartagena Finals counts once), rejects dropped. "Finals" collections mix trips, so a photo dated outside its voyage's main date cluster moves to the voyage whose dates contain it.
+- **Location is the voyage's place**, city level, never a photograph's GPS (GPS only refines `approx` places, rounded to 0.1 degree). `utc_offset` is ignored: the cameras stamped it wrong.
+- **Clock correction:** the A7 III clock is about 12 hours off. For each (voyage, camera, date) group with at least 12 photos that reads at least 80% night by the wall clock and at most 10% night once flipped, the hour is flipped, **same calendar date**. A doubtful day follows a flipped day of the same camera on the same voyage. Override per voyage or group in `scripts/catalog/clock-overrides.json` (`0` = leave, `12` = flip). The report lists every flip and every day left alone. Check dates against brightness before trusting the day-level result.
+- **Camera settings are bucketed** (focal lengths to 15 bins, apertures to third-stop values) so the How view reads as bubbles, not noise.
+- **Transport:** the home page ships the shots as compact arrays (`packHome` / `unpackHome` in `src/lib/voyages.ts`), about 47 kB gzipped for 6,678 photographs.
+
+## Archive: Places and Years
 
 `/places` and `/years` (Figma: ARCHIVE · PLACES & YEARS) are generated from the same Voyage/Shot metadata as the home page; nothing about them is written by hand.
 

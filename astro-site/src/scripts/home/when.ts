@@ -71,7 +71,7 @@ export function createWhen(host: HTMLElement, store: Store) {
     // Year axis
     d3.timeYear.range(x.domain()[0], x.domain()[1]).forEach((yr) => {
       const px = x(yr);
-      if (px < 0 || px > w) return;
+      if (px < 0 || px > w - 36) return;
       g.append("line").attr("x1", px).attr("x2", px).attr("y1", 0).attr("y2", h).style("stroke", "var(--border-subtle)");
       g.append("text").call(label).attr("x", px + 6).attr("y", h + 18).text(yr.getUTCFullYear());
     });
@@ -95,7 +95,10 @@ export function createWhen(host: HTMLElement, store: Store) {
       .join("circle")
       .attr("cx", (s) => x(new Date(s.t)))
       .attr("cy", (s) => y(s.hour))
-      .attr("fill", (s) => voyages[s.v].color);
+      .attr("fill", (s) => voyages[s.v].color)
+      .style("stroke-width", 1.5)
+      .style("pointer-events", "none");
+    shown = { o: [], r: [], s: [] }; // fresh circles: nothing is painted yet
 
     quad = d3
       .quadtree<{ x: number; y: number; i: number }>()
@@ -148,16 +151,26 @@ export function createWhen(host: HTMLElement, store: Store) {
     programmatic = false;
   }
 
+  // With thousands of dots, rewriting every attribute on every hover is far too slow: remember what each dot
+  // currently shows and only touch the DOM for the ones that change.
+  let shown: { o: number[]; r: number[]; s: boolean[] } = { o: [], r: [], s: [] };
+
   function update() {
     if (!dots) return;
     const active = store.activeV();
     const hot = store.state.hoverShot;
-    dots
-      .attr("r", (_, i) => (i === hot ? 6.5 : 3.4))
-      .attr("fill-opacity", (s) => (!store.visible(s) ? 0.07 : active !== null && s.v !== active ? 0.28 : 0.95))
-      .style("stroke", (_, i) => (i === hot ? "var(--text-primary)" : "none"))
-      .style("stroke-width", 1.5)
-      .style("pointer-events", "none");
+    const nodes = dots.nodes();
+    if (shown.o.length !== nodes.length) shown = { o: new Array(nodes.length).fill(NaN), r: new Array(nodes.length).fill(NaN), s: new Array(nodes.length).fill(false) };
+    for (let i = 0; i < nodes.length; i++) {
+      const sh = shots[i];
+      const o = !store.visible(sh) ? 0.07 : active !== null && sh.v !== active ? 0.28 : 0.95;
+      const r = i === hot ? 6.5 : 3.4;
+      const st = i === hot;
+      const el = nodes[i];
+      if (shown.o[i] !== o) ((shown.o[i] = o), el.setAttribute("fill-opacity", String(o)));
+      if (shown.r[i] !== r) ((shown.r[i] = r), el.setAttribute("r", String(r)));
+      if (shown.s[i] !== st) ((shown.s[i] = st), (el.style.stroke = st ? "var(--text-primary)" : "none"));
+    }
   }
 
   const ro = new ResizeObserver(draw);

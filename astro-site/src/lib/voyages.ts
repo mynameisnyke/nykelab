@@ -1,13 +1,16 @@
-// Metadata model for the home visualization + a SAMPLE data generator.
+// Metadata model for the home visualization, Places and Years.
 //
-// Real data will come from EXIF read at upload (DateTimeOriginal, GPS, focal length,
-// aperture, ISO, shutter, lens). Until existing photos are re-uploaded with originals
-// there is none, so `buildSample()` invents plausible values to design against.
-// Everything below `buildSample` is data-source agnostic and works on real rows too.
+// The data comes from the Lightroom catalog: `npm run catalog` turns the exported CSV into
+// src/data/catalog.json, and src/lib/catalog.ts loads it into the shapes below. Everything in
+// this file is data-source agnostic.
+
+export type Theme = "nature" | "city";
+export type VoyageKind = "trip" | "home" | "event";
 
 export interface Voyage {
   slug: string;
   title: string;
+  kind: VoyageKind;
   place: string; // "Grand Teton National Park, Wyoming"
   /** The Place this voyage belongs to (several voyages can share one: Tetons + Yellowstone → Wyoming). */
   placeSlug: string;
@@ -29,7 +32,8 @@ export interface Shot {
   id: string;
   v: number; // index into Voyage[]
   t: number; // capture time, epoch ms
-  hour: number; // local solar hour of day, 0–24
+  hour: number; // local SOLAR hour of day, 0–24 (sun maths: golden hour, the When chart)
+  clock: number; // local wall-clock hour of day, 0–24, after clock correction (what captions show)
   lat: number;
   lon: number;
   focal: number; // mm
@@ -84,6 +88,8 @@ export function latLonToVec(lat: number, lon: number, r = 1): [number, number, n
   return [r * Math.cos(phi) * Math.sin(lam), r * Math.sin(phi), r * Math.cos(phi) * Math.cos(lam)];
 }
 
+/** 6,678 */
+export const fmtN = (n: number) => n.toLocaleString("en-US");
 export const fmtDate = (t: number) =>
   new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 export const fmtMonthYear = (t: number) =>
@@ -96,112 +102,42 @@ export const fmtHour = (h: number) => {
   return `${hh % 12 === 0 ? 12 : hh % 12}:${String(mm).padStart(2, "0")} ${ap}`;
 };
 
-// ---- SAMPLE generator -----------------------------------------------------------
+// ---- compact transport (home page JSON) -----------------------------------------------------
 
-function mulberry32(a: number) {
-  return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+/** [voyage, minutes since epoch, solar hour x100, clock hour x100, focal, f, iso, shutter, lens index, image index] */
+export type ShotRow = [number, number, number, number, number, number, number, string, number, number];
+export interface PackedHome {
+  voyages: Voyage[];
+  images: PreviewImage[];
+  lenses: string[];
+  rows: ShotRow[];
+  sample: boolean;
 }
 
-type Theme = "nature" | "city";
-interface Seed {
-  slug: string;
-  title: string;
-  placeSlug: string;
-  placeName: string;
-  place: string;
-  country: string;
-  lat: number;
-  lon: number;
-  start: string; // ISO date
-  days: number;
-  count: number;
-  theme: Theme;
+export function packHome(d: HomeData, lenses: string[]): PackedHome {
+  const rows = d.shots.map((s): ShotRow => [s.v, Math.round(s.t / 60000), Math.round(s.hour * 100), Math.round(s.clock * 100), s.focal, s.f, s.iso, s.shutter, lenses.indexOf(s.lens), s.img]);
+  return { voyages: d.voyages, images: d.images, lenses, rows, sample: d.sample };
 }
 
-// Real places; made-up trips. Colors read on both the dark and the light theme.
-const SEEDS: Seed[] = [
-  { slug: "westminster", placeSlug: "new-york", placeName: "New York", title: "Westminster", place: "Madison Square Garden, New York", country: "United States", lat: 40.7505, lon: -73.9934, start: "2025-02-10", days: 3, count: 22, theme: "city" },
-  { slug: "grand-tetons", placeSlug: "wyoming", placeName: "Wyoming", title: "Grand Tetons", place: "Grand Teton National Park, Wyoming", country: "United States", lat: 43.79, lon: -110.68, start: "2025-10-04", days: 9, count: 34, theme: "nature" },
-  { slug: "yellowstone", placeSlug: "wyoming", placeName: "Wyoming", title: "Yellowstone", place: "Yellowstone National Park, Wyoming", country: "United States", lat: 44.46, lon: -110.83, start: "2025-09-14", days: 6, count: 26, theme: "nature" },
-  { slug: "new-york", placeSlug: "new-york", placeName: "New York", title: "New York", place: "Long Island City, New York", country: "United States", lat: 40.7447, lon: -73.9485, start: "2024-12-02", days: 20, count: 30, theme: "city" },
-  { slug: "arizona", placeSlug: "arizona", placeName: "Arizona", title: "Arizona", place: "Page, Arizona", country: "United States", lat: 36.914, lon: -111.456, start: "2024-03-21", days: 5, count: 18, theme: "nature" },
-  { slug: "iceland", placeSlug: "iceland", placeName: "Iceland", title: "Iceland", place: "Snæfellsnes, Iceland", country: "Iceland", lat: 64.85, lon: -23.0, start: "2024-08-12", days: 8, count: 24, theme: "nature" },
-  { slug: "kyoto", placeSlug: "kyoto", placeName: "Kyoto", title: "Kyoto", place: "Kyoto, Japan", country: "Japan", lat: 35.01, lon: 135.77, start: "2023-11-14", days: 7, count: 20, theme: "city" },
-  { slug: "lofoten", placeSlug: "lofoten", placeName: "Lofoten", title: "Lofoten", place: "Lofoten, Norway", country: "Norway", lat: 68.2, lon: 13.6, start: "2023-01-20", days: 6, count: 16, theme: "nature" },
-];
-
-const COLORS = ["#d9a05b", "#5fa8d3", "#d9776a", "#7fbf7b", "#a98be0", "#d6c35a", "#4fbfae", "#d98bb0"];
-
-const LENSES = [
-  { name: "24–70 f/2.8", focals: [24, 28, 35, 50, 70], aps: [2.8, 4, 5.6, 8, 11] },
-  { name: "70–200 f/2.8", focals: [70, 100, 135, 200], aps: [2.8, 4, 5.6, 8] },
-  { name: "16–35 f/4", focals: [16, 20, 24, 35], aps: [4, 5.6, 8, 11, 16] },
-  { name: "100–400 f/5.6", focals: [150, 200, 300, 400], aps: [5.6, 8, 11] },
-];
-const SHUTTERS = ["1/4000", "1/2000", "1/1000", "1/500", "1/250", "1/125", "1/60", "1/30", "1/15", "1s"];
-
-export function buildSample(imageCount: number, coverFor: (theme: Theme, i: number) => number): { voyages: Voyage[]; shots: Shot[] } {
-  const rnd = mulberry32(20261024);
-  const pick = <T,>(a: T[]) => a[Math.floor(rnd() * a.length)];
-  const voyages: Voyage[] = [];
-  const shots: Shot[] = [];
-
-  SEEDS.forEach((s, vi) => {
-    const start = Date.parse(s.start + "T00:00:00Z");
-    voyages.push({
-      slug: s.slug,
-      title: s.title,
-      placeSlug: s.placeSlug,
-      placeName: s.placeName,
-      place: s.place,
-      country: s.country,
-      lat: s.lat,
-      lon: s.lon,
-      color: COLORS[vi % COLORS.length],
-      start,
-      end: start + (s.days - 1) * 86400000,
-      count: s.count,
-      available: false,
-      cover: coverFor(s.theme, vi),
-    });
-    for (let i = 0; i < s.count; i++) {
-      const day = Math.floor(rnd() * s.days);
-      const t0 = start + day * 86400000;
-      const { rise, set } = sunTimes(s.lat, t0);
-      // Photographers cluster around golden hour; the rest scatters through the day.
-      const r = rnd();
-      let hour: number;
-      if (r < 0.34) hour = rise + (rnd() - 0.35) * 1.8;
-      else if (r < 0.74) hour = set + (rnd() - 0.65) * 1.8;
-      else hour = rise + 2 + rnd() * (set - rise - 3);
-      hour = Math.min(23.9, Math.max(0, hour));
-      const lens = rnd() < 0.5 ? LENSES[1] : rnd() < 0.6 ? LENSES[0] : rnd() < 0.5 ? LENSES[2] : LENSES[3];
-      const focal = pick(lens.focals);
-      const f = pick(lens.aps);
-      const jitter = () => (rnd() - 0.5) * (s.theme === "city" ? 0.05 : 0.5);
-      shots.push({
-        id: `${s.slug}-${i}`,
-        v: vi,
-        t: t0 + Math.round(hour * 3600000),
-        hour,
-        lat: s.lat + jitter(),
-        lon: s.lon + jitter(),
-        focal,
-        f,
-        iso: pick([100, 100, 100, 200, 400, 800, 1600, 3200]),
-        shutter: pick(SHUTTERS),
-        lens: lens.name,
-        img: coverFor(s.theme, vi * 100 + i) % Math.max(1, imageCount),
-      });
-    }
-  });
-  return { voyages, shots };
+export function unpackHome(p: PackedHome): HomeData {
+  const shots = p.rows.map(
+    (r, i): Shot => ({
+      id: String(i),
+      v: r[0],
+      t: r[1] * 60000,
+      hour: r[2] / 100,
+      clock: r[3] / 100,
+      lat: p.voyages[r[0]].lat,
+      lon: p.voyages[r[0]].lon,
+      focal: r[4],
+      f: r[5],
+      iso: r[6],
+      shutter: r[7],
+      lens: p.lenses[r[8]] ?? "",
+      img: r[9],
+    }),
+  );
+  return { voyages: p.voyages, shots, images: p.images, sample: p.sample };
 }
 
 // ---- summaries -----------------------------------------------------------------
@@ -263,9 +199,10 @@ export interface YearSummary {
   end: number;
 }
 
-export function derivePlaces(voyages: Voyage[]): Place[] {
+/** Places the voyages roll up into. `include` keeps indices into the full list (shots refer to them), e.g. to leave events off the map. */
+export function derivePlaces(voyages: Voyage[], include: (v: Voyage) => boolean = () => true): Place[] {
   const by = new Map<string, number[]>();
-  voyages.forEach((v, i) => by.set(v.placeSlug, [...(by.get(v.placeSlug) ?? []), i]));
+  voyages.forEach((v, i) => include(v) && by.set(v.placeSlug, [...(by.get(v.placeSlug) ?? []), i]));
   const places: Place[] = [];
   for (const [slug, idxs] of by) {
     const vs = idxs.map((i) => voyages[i]);
@@ -366,4 +303,4 @@ export function pickPhotos(shots: Shot[], images: PreviewImage[], voyage: number
 }
 
 /** "Oct 4, 2025 · 5:43 am · 50mm f/8" — the metadata line under a photograph. */
-export const metaLine = (s: Shot) => `${fmtDate(s.t)} · ${fmtHour(s.hour)} · ${s.focal}mm f/${s.f}`;
+export const metaLine = (s: Shot) => `${fmtDate(s.t)} · ${fmtHour(s.clock)} · ${s.focal}mm f/${s.f}`;

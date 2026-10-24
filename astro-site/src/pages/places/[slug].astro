@@ -1,6 +1,6 @@
 ---
 // Place gallery (Figma: GALLERIES / Place). One group per voyage made in the place.
-// PROTOTYPE: built from the sample voyage metadata, like /places.
+// Built from the voyages, like /places.
 import Base from "../../layouts/Base.astro";
 import Navbar from "../../components/Navbar.astro";
 import ChapterNav from "../../components/ChapterNav.astro";
@@ -8,15 +8,15 @@ import GalleryHero from "../../components/GalleryHero.astro";
 import MetaStrip from "../../components/MetaStrip.astro";
 import GalleryGroup from "../../components/GalleryGroup.astro";
 import NextBlock from "../../components/NextBlock.astro";
-import { loadSample } from "../../lib/sample-home";
-import { derivePlaces, fmtSpan, goldenShare, heroImage, pickPhotos, topSetting } from "../../lib/voyages";
+import { loadHomeData } from "../../lib/home-data";
+import { derivePlaces, fmtN, fmtSpan, goldenShare, heroImage, pickPhotos, topSetting } from "../../lib/voyages";
 
 export const prerender = false;
 
 const { slug = "" } = Astro.params;
-const { nav, data } = await loadSample();
+const { nav, data } = await loadHomeData();
 const { voyages, shots, images } = data;
-const places = derivePlaces(voyages);
+const places = derivePlaces(voyages, (v) => v.kind !== "event");
 const at = places.findIndex((p) => p.slug === slug);
 const place = places[at];
 if (!place) Astro.response.status = 404;
@@ -27,7 +27,7 @@ const mine = place ? shots.filter((s) => place.voyages.includes(s.v)) : [];
 const top = topSetting(mine);
 const facts = place
   ? [
-      { label: "Photographs", value: String(place.count) },
+      { label: "Photographs", value: fmtN(place.count) },
       { label: "Voyages", value: String(place.voyages.length) },
       { label: "Dates", value: fmtSpan(place.start, place.end) },
       { label: "Most often", value: top ? `${top.focal}mm f/${top.f}` : "—" },
@@ -39,7 +39,7 @@ const next = place && places.length > 1 ? places[(at + 1) % places.length] : und
 const hero = place ? images[heroImage(images, place.cover)] : undefined;
 ---
 
-<Base title={place ? `${place.name} — nykelab` : "Not found — nykelab"} description={place ? `${place.name}, ${place.country}: ${place.count} photographs, ${fmtSpan(place.start, place.end)}.` : "Nothing here."} image={hero?.src}>
+<Base title={place ? `${place.name} — nykelab` : "Not found — nykelab"} description={place ? `${place.name}, ${place.country}: ${fmtN(place.count)} photographs, ${fmtSpan(place.start, place.end)}.` : "Nothing here."} image={hero?.src}>
   <Navbar surface="media" collections={nav} />
   {
     !place ? (
@@ -49,10 +49,10 @@ const hero = place ? images[heroImage(images, place.cover)] : undefined;
       </main>
     ) : (
       <main>
-        <GalleryHero title={place.name} subtitle={`${place.country} · ${place.count} photographs`} crumb={{ label: "Places", href: "/places" }} image={hero} />
+        <GalleryHero title={place.name} subtitle={`${place.country} · ${fmtN(place.count)} photographs`} crumb={{ label: "Places", href: "/places" }} image={hero} />
         <section class="facts"><MetaStrip facts={facts} /></section>
         {groups.map((g) => <GalleryGroup {...g} images={images} />)}
-        {next && <div class="next-wrap"><NextBlock eyebrow="Next place" title={next.name} meta={`${next.country} · ${next.count} photographs`} href={`/places/${next.slug}`} image={images[next.cover]} /></div>}
+        {next && <div class="next-wrap"><NextBlock eyebrow="Next place" title={next.name} meta={`${next.country} · ${fmtN(next.count)} photographs`} href={`/places/${next.slug}`} image={images[next.cover]} /></div>}
       </main>
     )
   }

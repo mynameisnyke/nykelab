@@ -1,28 +1,29 @@
 ---
 // Home: the whole archive as a map you can read. Where (three.js globe), When (d3 sky
 // strip), How (d3 gear chart), linked together. Data model: src/lib/voyages.ts.
-// PROTOTYPE: voyage metadata is generated sample data until EXIF is captured at upload.
+// Voyage metadata comes from the Lightroom catalog (src/data/catalog.json, `npm run catalog`).
 import Base from "../layouts/Base.astro";
 import Navbar from "../components/Navbar.astro";
 import ChapterNav from "../components/ChapterNav.astro";
-import { loadSample } from "../lib/sample-home";
-import { fmtMonthYear, summarize } from "../lib/voyages";
+import { loadHomeData } from "../lib/home-data";
+import { fmtMonthYear, fmtN, packHome, summarize } from "../lib/voyages";
+import { lenses } from "../lib/catalog";
 
 export const prerender = false;
 Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
 
-const { nav, data } = await loadSample();
+const { nav, data } = await loadHomeData();
 const { voyages, shots } = data;
 const stats = summarize(voyages, shots);
 // Newest first, like a table of contents.
 const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages[a].start);
 ---
 
-<Base title="nykelab — photographs by Nyke Harewood" description={`${stats.photos} photographs from ${stats.voyages} voyages, ${stats.from}–${stats.to}.`}>
+<Base title="nykelab — photographs by Nyke Harewood" description={`${fmtN(stats.photos)} photographs from ${stats.voyages} voyages, ${stats.from}–${stats.to}.`}>
   <Navbar collections={nav} />
   <main class="home" data-lens="where">
     <aside class="list" aria-label="Voyages">
-      <p class="eyebrow">Voyages <span class="proto">Sample metadata</span></p>
+      <p class="eyebrow">Voyages {data.sample && <span class="proto">Sample metadata</span>}</p>
       <ol id="voyage-list">
         {
           order.map((i) => {
@@ -43,7 +44,7 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
         }
       </ol>
       <p class="stats" id="stats">
-        <span>{stats.photos} photographs · {stats.voyages} voyages</span>
+        <span>{fmtN(stats.photos)} photographs · {stats.voyages} voyages</span>
         <span>{stats.countries} countries · {stats.from}–{stats.to}</span>
       </p>
     </aside>
@@ -73,7 +74,7 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
   </main>
   <div class="nav-backdrop" aria-hidden="true"></div>
   <ChapterNav />
-  <script type="application/json" id="home-data" set:html={JSON.stringify(data)} />
+  <script type="application/json" id="home-data" set:html={JSON.stringify(packHome(data, lenses))} />
 </Base>
 
 <script>
@@ -251,14 +252,14 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
   }
   .insight {
     position: absolute;
-    left: 0;
-    right: 0;
+    left: 404px; /* between the list and the preview, like .chart */
+    right: 424px;
     bottom: 0;
     z-index: 3;
     margin: 0;
     text-align: center;
-    font-size: 20px;
-    line-height: 28px;
+    font-size: 18px;
+    line-height: 26px;
     color: var(--text-secondary);
     pointer-events: none;
   }
@@ -377,6 +378,8 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
       aspect-ratio: 4 / 3;
     }
     .insight {
+      left: 0;
+      right: 0;
       font-size: 17px;
       line-height: 24px;
     }

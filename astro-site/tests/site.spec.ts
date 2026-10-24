@@ -31,6 +31,7 @@ test("unknown routes are real 404s", async ({ request }) => {
 });
 
 test("every internal link resolves", async ({ page, request }) => {
+  test.setTimeout(120_000); // crawls every page, then every place and year link they list
   const seen = new Set<string>();
   for (const path of PAGES) {
     await page.goto(path);
@@ -50,6 +51,7 @@ test("every internal link resolves", async ({ page, request }) => {
 // Catches invisible layers that swallow clicks (the /places bug): the element at the center of
 // every link/button must be that element or inside it.
 test("nothing blocks a click on any link or button", async ({ page }) => {
+  test.setTimeout(120_000);
   for (const path of [...PAGES, "/admin"]) {
     await page.goto(path);
     await page.waitForLoadState("networkidle");

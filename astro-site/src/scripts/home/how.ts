@@ -3,8 +3,8 @@
 import * as d3 from "d3";
 import type { Store } from "./store";
 
-const FOCALS = [14, 24, 35, 50, 70, 100, 200, 400];
-const APERTURES = [2.8, 4, 5.6, 8, 11, 16];
+const FOCALS = [14, 24, 35, 50, 85, 100, 200, 400];
+const APERTURES = [1.4, 2, 2.8, 4, 5.6, 8, 11, 16, 22];
 
 interface Bubble {
   focal: number;
@@ -45,7 +45,7 @@ export function createHow(host: HTMLElement, store: Store) {
     const g = svg.append("g").attr("transform", `translate(${m.l},${m.t})`);
 
     const x = d3.scaleLog([12, 480], [0, w]);
-    const y = d3.scaleLog([2.3, 19], [0, h]);
+    const y = d3.scaleLog([1.2, 26], [0, h]);
     const maxN = d3.max(bubbles, (b) => b.idx.length) ?? 1;
     rScale = d3.scaleSqrt([0, maxN], [0, Math.min(34, Math.max(18, w / 16))]);
 

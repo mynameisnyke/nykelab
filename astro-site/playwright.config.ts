@@ -4,8 +4,9 @@ import { defineConfig } from "@playwright/test";
 // download is needed. If the server is not running, Playwright starts it.
 export default defineConfig({
   testDir: "tests",
-  timeout: 30_000,
+  timeout: 45_000,
   fullyParallel: true,
+  workers: 3, // the home page renders a WebGL globe in software; more parallel pages starve each other
   reporter: [["list"]],
   use: { baseURL: "http://localhost:4322", channel: "chrome" },
   webServer: { command: "npm run dev", url: "http://localhost:4322", reuseExistingServer: true, timeout: 60_000 },

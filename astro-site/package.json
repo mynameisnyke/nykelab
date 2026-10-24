@@ -11,7 +11,8 @@
     "seed": "./seed/seed.sh",
     "types": "wrangler types",
     "deploy": "astro build && wrangler deploy",
-    "test": "playwright test"
+    "test": "playwright test",
+    "catalog": "node scripts/build-catalog.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",
