@@ -19,6 +19,15 @@ npx wrangler dev --persist-to .wrangler/state   # run the production build local
 
 `npm run types` regenerates `worker-configuration.d.ts` after changing `wrangler.jsonc`.
 
+## Tests
+
+```bash
+npm run dev     # in one terminal (port 4322); `npm test` starts it if it is not running
+npm test        # Playwright, desktop + phone, uses the installed Chrome (no browser download)
+```
+
+`tests/site.spec.ts`: every page loads with no console errors or failed requests; every internal link resolves; nothing blocks a click on any link or button (the `/places` bug); the menu matches the bottom nav and is keyboard-operable; theme, home views, places filter, soft navigation. `tests/a11y.spec.ts`: axe WCAG 2.1 A/AA on every page in both themes. The link-preview card (`public/og.png`) is regenerated from `scripts/og.html` (command in the file).
+
 ## Writing a post
 
 Add a `.md` or `.mdx` file to `src/content/journal/`. Frontmatter (schema in `src/content.config.ts`):
@@ -40,7 +49,7 @@ Code fences accept a filename: ` ```ts title="worker/index.ts" `. In `.mdx`, use
 | Figma | Code |
 |---|---|
 | Variables (Theme · Scale · Layout) | CSS custom properties in `src/styles/global.css` (`data-theme="light"` swaps the Theme set) |
-| Navbar + MenuOverlay | `src/components/Navbar.astro` (menu = list + footer links; preview image + sunburst come with the photo pages) |
+| Navbar + MenuOverlay | `src/components/Navbar.astro` (menu = the five main destinations from `src/lib/nav.ts` + a small Voyages group + Email; no preview photo or sunburst, on purpose) |
 | Pill | `src/components/Pill.astro` |
 | PostRow (Cover=None/Thumb) | `src/components/PostRow.astro` |
 | JournalHeader + filters | `src/components/JournalIndex.astro` |
@@ -89,7 +98,7 @@ Layout rhythm (same idea as the Vue `CollectionView`, using the Figma sections):
 
 ## Not done yet
 
-- Home (sunburst, cover crossfade) and World (three.js walkable gallery): deliberately skipped for now. When wanted, they mount as Vue islands like the admin does. (The admin's "In World" checkbox and the `featured` flag are kept so nothing is lost.)
+- World (three.js walkable gallery): deliberately skipped for now. When wanted, it mounts as Vue islands like the admin does. (The admin's "In World" checkbox and the `featured` flag are kept so nothing is lost.)
 - The Figma Offset collage and Diptych sections (they need an editorial pairing field; today layout is derived from orientation).
-- The menu overlay's preview image + sunburst; the Instagram/Email menu links are placeholders. About links: GitHub, LinkedIn and Email are the real ones from the old About page; the Figma's Instagram pill is left out (no handle on record).
+- Dropped on purpose: the menu overlay's voyage preview photo and sunburst (the home globe replaced the sunburst; the menu lists the main destinations). The Figma MenuOverlay and Sunburst components still show the old design. About links: GitHub, LinkedIn and Email are the real ones. There is no Instagram account, so none is linked.
 - Production deploy: needs the real D1 `database_id` / Access vars in `wrangler.jsonc`, then `npm run deploy`. Not done.

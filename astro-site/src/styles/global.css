@@ -34,7 +34,7 @@
   --space-32: 128px;
   --radius-md: 16px;
   --radius-full: 999px;
-  --opacity-menu-inactive: 0.32;
+  --opacity-menu-inactive: 0.5; /* Figma had 0.32, which is under 3:1 for the large menu text */
 
   /* Layout / Desktop */
   --margin: 64px;

@@ -42,7 +42,7 @@ const isActive = (href: string) => isHere(href, Astro.url.pathname);
     display: inline-flex;
     gap: 8px;
     flex: none;
-    opacity: 0.5;
+    opacity: 0.7; /* inactive: 0.5 measured below 4.5:1 on the light page */
     transition: opacity 0.2s ease;
   }
   a:hover,

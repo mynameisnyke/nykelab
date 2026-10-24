@@ -11,7 +11,8 @@ interface Props {
 }
 const { title, description, image, type = "website", published } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const ogImage = image ? new URL(image, Astro.site) : undefined;
+// Pages without their own image share the logo card (public/og.png, source in scripts/og.html).
+const ogImage = new URL(image ?? "/og.png", Astro.site);
 ---
 
 <!doctype html>
@@ -30,9 +31,9 @@ const ogImage = image ? new URL(image, Astro.site) : undefined;
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:image" content={ogImage} />
     {published && <meta property="article:published_time" content={published.toISOString()} />}
-    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+    <meta name="twitter:card" content="summary_large_image" />
 
     <!-- Apply the saved theme before first paint (default: dark, like the Figma). -->
     <script is:inline>
@@ -62,13 +63,20 @@ const ogImage = image ? new URL(image, Astro.site) : undefined;
       localStorage.setItem("theme", theme);
     } catch {}
   }
+  let opener: HTMLElement | null = null;
   function setMenu(open: boolean) {
     const menu = document.getElementById("menu");
     if (!menu) return;
+    const wasOpen = !menu.hidden;
+    if (open && !wasOpen) opener = document.activeElement as HTMLElement | null;
     menu.hidden = !open;
     root.dataset.menu = open ? "open" : "closed";
     document.querySelectorAll("[data-menu-open]").forEach((b) => b.setAttribute("aria-expanded", String(open)));
     if (open) menu.querySelector<HTMLElement>("[data-menu-close]")?.focus();
+    else if (wasOpen) {
+      opener?.focus(); // back to the button that opened it
+      opener = null;
+    }
   }
 
   document.addEventListener("click", (e) => {
@@ -79,6 +87,15 @@ const ogImage = image ? new URL(image, Astro.site) : undefined;
   });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") setMenu(false);
+    if (e.key !== "Tab") return;
+    const menu = document.getElementById("menu");
+    if (!menu || menu.hidden) return;
+    // aria-modal: keep Tab inside the open menu.
+    const items = [...menu.querySelectorAll<HTMLElement>("a[href], button")].filter((el) => !el.closest("[hidden]"));
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) (e.preventDefault(), last.focus());
+    else if (!e.shiftKey && document.activeElement === last) (e.preventDefault(), first.focus());
   });
 
   // Keep the theme across page swaps.

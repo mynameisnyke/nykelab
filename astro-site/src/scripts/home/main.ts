@@ -9,9 +9,8 @@ import {
   type HomeData,
 } from "../../lib/voyages";
 import { createStore, type Lens } from "./store";
-import { createGlobe } from "./globe";
-import { createWhen } from "./when";
-import { createHow } from "./how";
+// three.js (globe) and d3 (When / How) are the bulk of the page's script, so they load on demand:
+// the list, preview and stats paint first.
 
 export function initHome(): () => void {
   const root = document.querySelector<HTMLElement>("main.home")!;
@@ -37,16 +36,27 @@ export function initHome(): () => void {
   };
 
   // ---- views ------------------------------------------------------------------
+  let destroyed = false;
   let globe: { destroy(): void } | null = null;
-  try {
-    globe = createGlobe(canvas, store);
-  } catch (err) {
+  let view: { destroy(): void } | null = null;
+  let seq = 0; // guards async view loads against quick tab switching
+
+  const hasWebGL = () => {
+    try {
+      const probe = document.createElement("canvas");
+      return !!(probe.getContext("webgl2") || probe.getContext("webgl"));
+    } catch {
+      return false;
+    }
+  };
+  const webgl = hasWebGL();
+  const dropGlobe = (err?: unknown) => {
     // No WebGL: the 2D views still work.
-    console.warn("WebGL unavailable; showing 2D views only", err);
+    if (err) console.warn("WebGL unavailable; showing 2D views only", err);
     canvas.hidden = true;
     tabs.find((t) => t.dataset.lensBtn === "where")!.hidden = true;
-  }
-  let view: { destroy(): void } | null = null;
+  };
+  if (!webgl) dropGlobe();
 
   function setLens(lens: Lens) {
     store.set({ lens });
@@ -56,8 +66,9 @@ export function initHome(): () => void {
     view = null;
     chart.replaceChildren();
     chart.hidden = lens === "where";
-    if (lens === "when") view = createWhen(chart, store);
-    if (lens === "how") view = createHow(chart, store);
+    const mine = ++seq;
+    if (lens === "when") void import("./when").then((m) => mine === seq && !destroyed && ((view = m.createWhen(chart, store)), render()));
+    if (lens === "how") void import("./how").then((m) => mine === seq && !destroyed && ((view = m.createHow(chart, store)), render()));
     render();
   }
   tabs.forEach((t) =>
@@ -182,10 +193,29 @@ export function initHome(): () => void {
   // Tap the empty globe to clear a pinned voyage on touch devices.
   // Deep-linkable: /#when, /#how. Falls back to the 2D views when WebGL is missing.
   const fromHash = location.hash.slice(1) as Lens;
-  const start: Lens = fromHash === "when" || fromHash === "how" || (fromHash === "where" && globe) ? fromHash : globe ? "where" : "when";
+  const start: Lens = fromHash === "when" || fromHash === "how" ? fromHash : webgl ? "where" : "when";
   setLens(start);
+  if (webgl) {
+    void import("./globe").then(({ createGlobe }) => {
+      if (destroyed) return;
+      try {
+        globe = createGlobe(canvas, store);
+      } catch (err) {
+        dropGlobe(err);
+        if (store.state.lens === "where") setLens("when");
+      }
+    });
+  }
+  // Following or typing /#when while already on the home page changes only the hash.
+  const onHash = () => {
+    const h = location.hash.slice(1) as Lens;
+    if ((h === "when" || h === "how" || (h === "where" && webgl)) && h !== store.state.lens) setLens(h);
+  };
+  window.addEventListener("hashchange", onHash);
+  cleanups.push(() => window.removeEventListener("hashchange", onHash));
 
   return () => {
+    destroyed = true;
     unsub();
     cleanups.forEach((f) => f());
     view?.destroy();

@@ -2,7 +2,10 @@
   <div class="min-h-screen bg-black text-white">
     <header class="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-b border-white/10">
       <div class="flex items-baseline gap-3">
-        <h1 class="text-sm font-semibold tracking-widest">NYKELAB <span class="text-white/40">ADMIN</span></h1>
+        <h1 class="flex items-center gap-2 text-sm font-semibold tracking-widest">
+          <svg class="h-4 w-4" viewBox="1.5 2 21 23.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 9.5 17.5 21 3.5M9.5 17.5V24" /></svg>
+          NYKELAB <span class="text-white/40">ADMIN</span>
+        </h1>
         <a href="/" class="text-xs text-white/50 hover:text-white">View site ↗</a>
       </div>
       <span class="text-xs text-white/40">{{ email }}</span>
