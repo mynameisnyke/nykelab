@@ -1,0 +1,13 @@
+---
+import Base from "../../layouts/Base.astro";
+import Navbar from "../../components/Navbar.astro";
+import JournalIndex from "../../components/JournalIndex.astro";
+import { getPosts } from "../../lib/journal";
+
+const posts = await getPosts();
+---
+
+<Base title="Notes — nykelab" description="Writing about code, cameras and the tools in between.">
+  <Navbar />
+  <JournalIndex posts={posts} all={posts} />
+</Base>

@@ -1,0 +1,46 @@
+---
+// Figma: Pill (Surface=Page, Size=Default | Small)
+interface Props {
+  label: string;
+  href?: string;
+  size?: "default" | "small";
+  current?: boolean;
+}
+const { label, href, size = "default", current = false } = Astro.props;
+const Tag = href ? "a" : "span";
+---
+
+<Tag
+  class:list={["pill", { small: size === "small", current }]}
+  href={href}
+  aria-current={current ? "page" : undefined}>{label}</Tag
+>
+
+<style>
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-full);
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 15px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-primary);
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+  }
+  .pill.small {
+    padding: 8px 16px;
+    font-size: 11px;
+    line-height: 13px;
+  }
+  a.pill:hover,
+  .pill.current {
+    background: var(--fill-ring-soft);
+  }
+</style>

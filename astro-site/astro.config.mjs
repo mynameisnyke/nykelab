@@ -1,0 +1,29 @@
+import { defineConfig } from "astro/config";
+import mdx from "@astrojs/mdx";
+import sitemap from "@astrojs/sitemap";
+
+// Adds `data-title` / `data-lang` to code fences so CSS can draw the
+// filename + language header from the Figma CodeBlock component.
+//   ```ts title="worker/index.ts"
+const codeHeader = {
+  name: "code-header",
+  pre(node) {
+    const raw = this.options.meta?.__raw ?? "";
+    const title = /title="([^"]+)"/.exec(raw)?.[1];
+    if (title) node.properties["data-title"] = title;
+    node.properties["data-lang"] = this.options.lang;
+  },
+};
+
+export default defineConfig({
+  site: "https://nykelab.nyc",
+  integrations: [mdx(), sitemap()],
+  redirects: { "/": "/journal" },
+  markdown: {
+    shikiConfig: {
+      themes: { dark: "github-dark-default", light: "github-light-default" },
+      defaultColor: false,
+      transformers: [codeHeader],
+    },
+  },
+});

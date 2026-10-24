@@ -1,0 +1,224 @@
+---
+// Figma: Navbar (Surface=Page) + MenuOverlay (footer carries the JOURNAL link).
+// The overlay here is the list + footer only; the preview image and sunburst
+// from the Figma menu come with the photo pages.
+const chapters = [
+  { label: "Home", href: "/" },
+  { label: "Westminster", href: "/westminster" },
+  { label: "Grand Tetons", href: "/grand-tetons" },
+  { label: "Yellowstone", href: "/yellowstone" },
+  { label: "New York", href: "/new-york" },
+  { label: "World", href: "/world" },
+];
+const footer = [
+  { label: "About", href: "/about" },
+  { label: "Journal", href: "/journal", current: true },
+  { label: "Instagram", href: "#" },
+  { label: "Email", href: "#" },
+];
+---
+
+<header class="navbar" transition:persist="navbar">
+  <button class="icon-btn" type="button" data-theme-toggle aria-label="Toggle light / dark theme">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M19.5 14.2A8 8 0 0 1 9.8 4.5a8 8 0 1 0 9.7 9.7Z"></path>
+      <path d="M18 2.5v4M16 4.5h4"></path>
+    </svg>
+  </button>
+  <a class="wordmark" href="/" aria-label="NYKELAB home">NYKELAB</a>
+  <button class="icon-btn" type="button" data-menu-open aria-label="Open menu" aria-expanded="false" aria-controls="menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+      <path d="M4 8h16M4 12h16M4 16h16"></path>
+    </svg>
+  </button>
+</header>
+
+<div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Site menu" hidden>
+  <div class="menu-bar">
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Toggle light / dark theme">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M19.5 14.2A8 8 0 0 1 9.8 4.5a8 8 0 1 0 9.7 9.7Z"></path>
+        <path d="M18 2.5v4M16 4.5h4"></path>
+      </svg>
+    </button>
+    <span class="wordmark">NYKELAB</span>
+    <button class="close" type="button" data-menu-close aria-label="Close menu">
+      <span class="eyebrow-ui">Close</span>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+        <path d="M3 3l10 10M13 3L3 13"></path>
+      </svg>
+    </button>
+  </div>
+  <nav class="menu-list" aria-label="Chapters">
+    <ol>
+      {
+        chapters.map((c, i) => (
+          <li>
+            <span class="num">{i}</span>
+            <a href={c.href}>{c.label}</a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
+  <nav class="menu-footer" aria-label="Site links">
+    {
+      footer.map((f) => (
+        <a href={f.href} aria-current={f.current ? "page" : undefined}>
+          {f.label}
+        </a>
+      ))
+    }
+  </nav>
+</div>
+
+<style>
+  .navbar,
+  .menu-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    height: var(--nav-height);
+    padding: 0 var(--margin);
+  }
+  .navbar {
+    position: absolute;
+    inset: 0 0 auto 0;
+    z-index: 10;
+  }
+  .navbar > :last-child,
+  .menu-bar > :last-child {
+    justify-self: end;
+  }
+  .icon-btn,
+  .close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--icon-primary);
+    font: inherit;
+    cursor: pointer;
+  }
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+  }
+  .wordmark {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 39px;
+    letter-spacing: 0.01em;
+    color: var(--text-primary);
+  }
+  .eyebrow-ui {
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    overflow-y: auto;
+  }
+  .menu[hidden] {
+    display: none;
+  }
+  .menu-list {
+    flex: 1;
+    padding: 86px var(--margin) 48px;
+  }
+  .menu-list ol {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .menu-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .num {
+    width: 28px;
+    padding-top: 6px;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-caption);
+  }
+  .menu-list a {
+    font-family: var(--font-title);
+    font-size: 84px;
+    line-height: 100px;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    opacity: var(--opacity-menu-inactive);
+    transition: opacity 0.2s ease;
+  }
+  .menu-list a:hover,
+  .menu-list a:focus-visible {
+    opacity: 1;
+  }
+  .menu-footer {
+    display: flex;
+    gap: 24px;
+    padding: 0 var(--margin) 48px;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .menu-footer a {
+    color: var(--text-secondary);
+  }
+  .menu-footer a:hover,
+  .menu-footer a[aria-current] {
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 767px) {
+    .wordmark {
+      font-size: 16px;
+      line-height: 19px;
+    }
+    .icon-btn {
+      width: 24px;
+      height: 24px;
+    }
+    .menu-list {
+      padding-top: 46px;
+    }
+    .menu-list li {
+      gap: 12px;
+    }
+    .num {
+      width: 18px;
+      padding-top: 2px;
+      font-size: 12px;
+    }
+    .menu-list a {
+      font-size: 40px;
+      line-height: 52px;
+    }
+    .menu-footer {
+      gap: 20px;
+      font-size: 12px;
+    }
+  }
+</style>

@@ -1,0 +1,176 @@
+@import "@fontsource-variable/playfair-display";
+@import "@fontsource-variable/newsreader";
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/jetbrains-mono";
+
+/* ------------------------------------------------------------------
+   Tokens — mirrored from the Figma variable collections
+   (Theme · Scale · Layout). Names match the Figma variable paths.
+   ------------------------------------------------------------------ */
+:root {
+  /* Theme / Dark (default) */
+  --bg-page: #101010;
+  --bg-surface: #161616;
+  --text-primary: #f2f2f2;
+  --text-secondary: #bdbdbd;
+  --text-caption: #8d8d8d;
+  --icon-primary: #f2f2f2;
+  --border-subtle: #ffffff24;
+  --border-strong: #ffffffb2;
+  --fill-ring-soft: #ffffff17;
+  color-scheme: dark;
+
+  /* Scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+  --radius-md: 16px;
+  --radius-full: 999px;
+  --opacity-menu-inactive: 0.32;
+
+  /* Layout / Desktop */
+  --margin: 64px;
+  --gutter: 24px;
+  --nav-height: 64px;
+  --column: 680px;
+
+  /* Type */
+  --font-title: "Playfair Display Variable", "Playfair Display", serif;
+  --font-body: "Newsreader Variable", "Newsreader", serif;
+  --font-ui: "Inter Variable", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
+}
+
+:root[data-theme="light"] {
+  --bg-page: #faf3e1;
+  --bg-surface: #f1e9d2;
+  --text-primary: #101010;
+  --text-secondary: #4c4c4c;
+  --text-caption: #4c4c4c;
+  --icon-primary: #101010;
+  --border-subtle: #00000024;
+  --border-strong: #000000b2;
+  --fill-ring-soft: #00000017;
+  color-scheme: light;
+}
+
+/* Layout / Mobile */
+@media (max-width: 767px) {
+  :root {
+    --margin: 16px;
+    --gutter: 16px;
+    --nav-height: 64px;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg-page);
+  -webkit-text-size-adjust: 100%;
+}
+
+html[data-menu="open"] {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 20px;
+  line-height: 30px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+:focus-visible {
+  outline: 1px solid var(--border-strong);
+  outline-offset: 4px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------
+   Text styles (Figma: Label/Eyebrow, Caption, Body/Bio, Title/*, Post/*)
+   ------------------------------------------------------------------ */
+.eyebrow {
+  font-family: var(--font-ui);
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-caption);
+}
+
+.caption {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-caption);
+}
+
+.body-bio {
+  font-size: 20px;
+  line-height: 30px;
+}
+
+@media (max-width: 767px) {
+  body {
+    font-size: 17px;
+    line-height: 25px;
+  }
+  .body-bio {
+    font-size: 17px;
+    line-height: 25px;
+  }
+}
+
+/* Prefer the browser's cross-document view transition for plain navigations
+   when ClientRouter isn't active. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
