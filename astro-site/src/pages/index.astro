@@ -69,7 +69,7 @@ const chapters = [
       <canvas id="globe" aria-hidden="true"></canvas>
       <div id="chart" class="chart" hidden></div>
       <p class="insight" id="insight" aria-live="polite"></p>
-      <button class="reset" id="reset" hidden>Clear filter ✕</button>
+      <button class="reset" id="reset" hidden>Clear ✕</button>
     </section>
 
     <aside class="preview" id="preview" aria-live="polite">
@@ -83,6 +83,7 @@ const chapters = [
       <a id="preview-open" class="open eyebrow" hidden>Open voyage →</a>
     </aside>
   </main>
+  <div class="nav-backdrop" aria-hidden="true"></div>
   <ChapterNav items={chapters} active={0} />
   <script type="application/json" id="home-data" set:html={JSON.stringify(data)} />
 </Base>
@@ -279,7 +280,7 @@ const chapters = [
   .reset {
     position: absolute;
     top: 0;
-    right: 0;
+    left: calc(50% + 138px); /* just right of the lens tabs, clear of the preview photo */
     z-index: 3;
     padding: 9px 14px;
     border: 1px solid var(--border-subtle);
@@ -346,6 +347,11 @@ const chapters = [
     display: none;
   }
 
+  /* Mobile: the fixed chapter nav sits on a page-colored backdrop so it never collides with the list. */
+  .nav-backdrop {
+    display: none;
+  }
+
   /* -- mobile: stacked, page scrolls -- */
   @media (max-width: 1179px) {
     .home {
@@ -384,6 +390,22 @@ const chapters = [
     .insight {
       font-size: 17px;
       line-height: 24px;
+    }
+    .nav-backdrop {
+      display: block;
+      position: fixed;
+      inset: auto 0 0 0;
+      height: 64px;
+      z-index: 19;
+      background: var(--bg-page);
+      opacity: 0.94;
+      pointer-events: none;
+    }
+    .reset {
+      top: auto;
+      bottom: 56px;
+      left: auto;
+      right: 0;
     }
     .name {
       font-size: 22px;
