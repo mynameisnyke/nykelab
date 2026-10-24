@@ -70,6 +70,91 @@ adminRoutes.put("/api/admin/upload/:id/:role", async (c) => {
   return c.json({ key, size: obj.size });
 });
 
+// ---- Multipart uploads (any file size) -----------------------------------
+// The browser sends a file in <=PART_SIZE chunks, each a normal request well under the
+// Worker body limit; the Worker forwards each chunk to an R2 multipart upload. Images keep
+// their original (<id>/orig.<ext>); sized variants are generated later on demand.
+
+const PART_SIZE = 16 * 1024 * 1024; // R2 parts must be >=5 MiB (except the last) and equal sized
+const UPLOAD_TYPES: Record<string, { ext: string; kind: "image" | "video" }> = {
+  "image/jpeg": { ext: "jpg", kind: "image" },
+  "image/png": { ext: "png", kind: "image" },
+  "image/webp": { ext: "webp", kind: "image" },
+  "video/mp4": { ext: "mp4", kind: "video" },
+  "video/webm": { ext: "webm", kind: "video" },
+};
+const MAX_ORIGINAL_IMAGE = 200 * 1024 * 1024;
+const MAX_ORIGINAL_VIDEO = 2 * 1024 * 1024 * 1024;
+const UPLOAD_KEY_RE = /^([a-f0-9]{12})\/(?:orig\.(?:jpg|png|webp)|main\.(?:mp4|webm))$/;
+
+function uploadKey(c: { req: { param(n: string): string; query(n: string): string | undefined } }) {
+  const id = c.req.param("id");
+  const key = c.req.query("key") ?? "";
+  const m = UPLOAD_KEY_RE.exec(key);
+  return ID_RE.test(id) && m && m[1] === id ? key : null;
+}
+
+adminRoutes.post("/api/admin/uploads", async (c) => {
+  const b = await c.req.json().catch(() => null);
+  const type = UPLOAD_TYPES[String(b?.contentType)];
+  if (!b || !type) return c.json({ error: `Unsupported content type: ${b?.contentType}` }, 415);
+  if (typeof b.id !== "string" || !ID_RE.test(b.id)) return c.json({ error: "Bad id" }, 400);
+  const size = Number(b.size);
+  const max = type.kind === "image" ? MAX_ORIGINAL_IMAGE : MAX_ORIGINAL_VIDEO;
+  if (!Number.isFinite(size) || size <= 0) return c.json({ error: "size required" }, 400);
+  if (size > max) return c.json({ error: `File too large (max ${max / 1024 / 1024} MB)` }, 413);
+
+  const key = `${b.id}/${type.kind === "image" ? "orig" : "main"}.${type.ext}`;
+  const upload = await c.env.MEDIA.createMultipartUpload(key, {
+    httpMetadata: { contentType: b.contentType },
+  });
+  return c.json({ key, uploadId: upload.uploadId, partSize: PART_SIZE });
+});
+
+adminRoutes.put("/api/admin/uploads/:id/parts/:n", async (c) => {
+  const key = uploadKey(c);
+  const uploadId = c.req.query("uploadId");
+  const n = Number(c.req.param("n"));
+  if (!key || !uploadId || !Number.isInteger(n) || n < 1 || n > 10000) {
+    return c.json({ error: "Bad upload reference" }, 400);
+  }
+  const length = Number(c.req.header("Content-Length"));
+  if (!Number.isFinite(length) || length <= 0 || length > PART_SIZE) {
+    return c.json({ error: `Part must be 1 byte to ${PART_SIZE / 1024 / 1024} MiB` }, 413);
+  }
+  if (!c.req.raw.body) return c.json({ error: "Empty body" }, 400);
+
+  const part = await c.env.MEDIA.resumeMultipartUpload(key, uploadId).uploadPart(n, c.req.raw.body);
+  return c.json({ partNumber: part.partNumber, etag: part.etag });
+});
+
+adminRoutes.post("/api/admin/uploads/:id/complete", async (c) => {
+  const key = uploadKey(c);
+  const b = await c.req.json().catch(() => null);
+  if (!key || !b || typeof b.uploadId !== "string" || !Array.isArray(b.parts) || !b.parts.length) {
+    return c.json({ error: "Expected {uploadId, parts[]}" }, 400);
+  }
+  const parts = (b.parts as { partNumber: number; etag: string }[]).map((p) => ({
+    partNumber: Number(p.partNumber),
+    etag: String(p.etag),
+  }));
+  const obj = await c.env.MEDIA.resumeMultipartUpload(key, b.uploadId).complete(parts);
+  const max = key.includes("/orig.") ? MAX_ORIGINAL_IMAGE : MAX_ORIGINAL_VIDEO;
+  if (obj.size > max) {
+    await c.env.MEDIA.delete(key);
+    return c.json({ error: "File too large" }, 413);
+  }
+  return c.json({ key, size: obj.size });
+});
+
+adminRoutes.delete("/api/admin/uploads/:id", async (c) => {
+  const key = uploadKey(c);
+  const uploadId = c.req.query("uploadId");
+  if (!key || !uploadId) return c.json({ error: "Bad upload reference" }, 400);
+  await c.env.MEDIA.resumeMultipartUpload(key, uploadId).abort();
+  return c.json({ ok: true });
+});
+
 // ---- Media ---------------------------------------------------------------
 
 adminRoutes.get("/api/admin/media", async (c) => {
@@ -122,10 +207,24 @@ adminRoutes.post("/api/admin/media", async (c) => {
     small: b.keys?.small ?? null,
     poster: b.keys?.poster ?? null,
   };
-  if (!keys.main) return c.json({ error: "keys.main required" }, 400);
+  // Originals-first images: the file was uploaded as <id>/orig.<ext> and has no main/small.
+  const original: string | null = b.keys?.original ?? null;
+  if (original !== null) {
+    if (b.type !== "image" || typeof original !== "string" || !new RegExp(`^${id}/orig\\.(jpg|png|webp)$`).test(original)) {
+      return c.json({ error: "Bad key for original" }, 400);
+    }
+    if (!(await c.env.MEDIA.head(original))) return c.json({ error: "original not uploaded" }, 400);
+    keys.main = original; // key_main is NOT NULL and doubles as the thing to delete
+    keys.small = null;
+  }
+  if (!keys.main) return c.json({ error: "keys.main or keys.original required" }, 400);
   let sizeBytes = 0;
   for (const [role, key] of Object.entries(keys) as [Role, string | null][]) {
     if (!key) continue;
+    if (original !== null && role === "main") {
+      sizeBytes = (await c.env.MEDIA.head(original))!.size;
+      continue;
+    }
     if (typeof key !== "string" || !keyRe.test(key) || !key.includes(`/${role}.`)) {
       return c.json({ error: `Bad key for ${role}` }, 400);
     }
@@ -137,8 +236,9 @@ adminRoutes.post("/api/admin/media", async (c) => {
   const position = await nextPosition(c.env.DB, b.collection);
   await c.env.DB.prepare(
     `INSERT INTO media (id, collection, type, caption, place, orientation, width, height,
-                        position, published, featured, key_main, key_small, key_poster, size_bytes)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                        position, published, featured, key_main, key_small, key_poster, size_bytes,
+                        key_original)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   )
     .bind(
       id,
@@ -156,6 +256,7 @@ adminRoutes.post("/api/admin/media", async (c) => {
       keys.small,
       keys.poster,
       sizeBytes,
+      original,
     )
     .run();
 
@@ -226,10 +327,17 @@ adminRoutes.delete("/api/admin/media/:id", async (c) => {
     .first<MediaRow>();
   if (!row) return c.json({ error: "Not found" }, 404);
 
-  const keys = [row.key_main, row.key_small, row.key_poster].filter(
-    (k): k is string => !!k,
+  const keys = new Set(
+    [row.key_main, row.key_small, row.key_poster, row.key_original].filter((k): k is string => !!k),
   );
-  await c.env.MEDIA.delete(keys);
+  // Also sweep generated variants (<id>/w<width>.webp) and anything else under the prefix.
+  let cursor: string | undefined;
+  do {
+    const page = await c.env.MEDIA.list({ prefix: `${id}/`, cursor });
+    page.objects.forEach((o) => keys.add(o.key));
+    cursor = page.truncated ? page.cursor : undefined;
+  } while (cursor);
+  await c.env.MEDIA.delete([...keys]);
   await c.env.DB.prepare("DELETE FROM media WHERE id = ?").bind(id).run();
   return c.json({ ok: true });
 });

@@ -1,6 +1,8 @@
 import { defineConfig } from "astro/config";
 import cloudflare from "@astrojs/cloudflare";
 import mdx from "@astrojs/mdx";
+import vue from "@astrojs/vue";
+import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
 
 // Adds `data-title` / `data-lang` to code fences so CSS can draw the
@@ -21,7 +23,8 @@ const codeHeader = {
 export default defineConfig({
   site: "https://nykelab.nyc",
   adapter: cloudflare({ prerenderEnvironment: "node" }),
-  integrations: [mdx(), sitemap()],
+  integrations: [mdx(), sitemap(), vue()],
+  vite: { plugins: [tailwindcss()] },
   redirects: { "/": "/journal" },
   markdown: {
     shikiConfig: {

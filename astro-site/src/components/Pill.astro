@@ -5,14 +5,19 @@ interface Props {
   href?: string;
   size?: "default" | "small";
   current?: boolean;
+  /** "media" = sits over a photo: white outline/text in both themes. */
+  surface?: "page" | "media";
+  external?: boolean;
 }
-const { label, href, size = "default", current = false } = Astro.props;
+const { label, href, size = "default", current = false, surface = "page", external = false } = Astro.props;
 const Tag = href ? "a" : "span";
 ---
 
 <Tag
-  class:list={["pill", { small: size === "small", current }]}
+  class:list={["pill", { small: size === "small", current, media: surface === "media" }]}
   href={href}
+  target={external ? "_blank" : undefined}
+  rel={external ? "noopener noreferrer" : undefined}
   aria-current={current ? "page" : undefined}>{label}</Tag
 >
 
@@ -38,6 +43,13 @@ const Tag = href ? "a" : "span";
     padding: 8px 16px;
     font-size: 11px;
     line-height: 13px;
+  }
+  .pill.media {
+    border-color: rgba(255, 255, 255, 0.7);
+    color: #fff;
+  }
+  .pill.media:hover {
+    background: rgba(255, 255, 255, 0.14);
   }
   a.pill:hover,
   .pill.current {

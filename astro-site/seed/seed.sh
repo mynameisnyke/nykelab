@@ -8,7 +8,8 @@ TMP=seed/.tmp; rm -rf "$TMP"; mkdir -p "$TMP"
 
 npx wrangler d1 migrations apply DB --local --persist-to "$P" >/dev/null
 
-# file | collection | orientation | caption | place
+# file | collection | orientation | caption | place   (westminster stays legacy-style on purpose:
+# browser-resized main/small, to prove old rows keep working; everything else is originals-first)
 ITEMS=(
   "hero|grand-tetons|landscape|Mount Moran at first light.\nGrand Teton National Park, Wyoming|Oxbow Bend, Wyoming"
   "port1|grand-tetons|portrait|Evergreens above the valley.\nGrand Teton National Park, Wyoming|Grand Teton National Park, Wyoming"
@@ -35,14 +36,21 @@ for row in "${ITEMS[@]}"; do
   id=$(printf '%s' "$f" | md5 | cut -c1-12)
   w=$(sips -g pixelWidth "seed/$f.jpg" | awk '/pixel/{print $2}')
   h=$(sips -g pixelHeight "seed/$f.jpg" | awk '/pixel/{print $2}')
-  cp "seed/$f.jpg" "$TMP/$f-main.jpg"
-  sips -Z 900 "seed/$f.jpg" --out "$TMP/$f-small.jpg" >/dev/null
-  npx wrangler r2 object put "nykelab-media/$id/main.jpg"  --file "$TMP/$f-main.jpg"  --content-type image/jpeg --local --persist-to "$P" >/dev/null
-  npx wrangler r2 object put "nykelab-media/$id/small.jpg" --file "$TMP/$f-small.jpg" --content-type image/jpeg --local --persist-to "$P" >/dev/null
-  size=$(stat -f%z "$TMP/$f-main.jpg")
+  size=$(stat -f%z "seed/$f.jpg")
+  if [ "$col" = "westminster" ]; then
+    # legacy: pre-sized main + small
+    sips -Z 900 "seed/$f.jpg" --out "$TMP/$f-small.jpg" >/dev/null
+    npx wrangler r2 object put "nykelab-media/$id/main.jpg"  --file "seed/$f.jpg"       --content-type image/jpeg --local --persist-to "$P" >/dev/null
+    npx wrangler r2 object put "nykelab-media/$id/small.jpg" --file "$TMP/$f-small.jpg" --content-type image/jpeg --local --persist-to "$P" >/dev/null
+    keys="'$id/main.jpg', '$id/small.jpg', NULL"
+  else
+    # originals-first: only the original is stored; variants are generated on demand
+    npx wrangler r2 object put "nykelab-media/$id/orig.jpg" --file "seed/$f.jpg" --content-type image/jpeg --local --persist-to "$P" >/dev/null
+    keys="'$id/orig.jpg', NULL, '$id/orig.jpg'"
+  fi
   cap=$(printf '%b' "$caption" | sed "s/'/''/g" | awk '{printf "%s%s", (NR>1?"'"'"' || char(10) || '"'"'":""), $0}')
   plc=$(printf '%s' "$place" | sed "s/'/''/g")
-  echo "INSERT OR REPLACE INTO media (id, collection, type, caption, place, orientation, width, height, position, published, featured, key_main, key_small, size_bytes) VALUES ('$id', '$col', 'image', '$cap', '$plc', '$orient', $w, $h, $pos, 1, 0, '$id/main.jpg', '$id/small.jpg', $size);" >> "$SQL"
+  echo "INSERT OR REPLACE INTO media (id, collection, type, caption, place, orientation, width, height, position, published, featured, key_main, key_small, key_original, size_bytes) VALUES ('$id', '$col', 'image', '$cap', '$plc', '$orient', $w, $h, $pos, 1, 0, $keys, $size);" >> "$SQL"
   pos=$((pos+1))
 done
 

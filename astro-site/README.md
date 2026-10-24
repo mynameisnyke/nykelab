@@ -3,7 +3,8 @@
 Prototype of the site in Astro, built from the Figma file ("Nyke Lab 2.0"). Every page is real HTML (SEO, link previews, RSS) with very little JavaScript. Standalone; the Vue app in the repo root is untouched.
 
 - **Journal** (`/journal`, `/journal/<slug>`): markdown posts, prerendered.
-- **Photo pages** (`/<collection-slug>`, e.g. `/grand-tetons`): server-rendered from D1 on each request (short edge cache), so edits made in the admin appear without a rebuild.
+- **Photo pages** (`/<collection-slug>`, e.g. `/grand-tetons`) and **About** (`/about`): server-rendered from D1 on each request (short edge cache), so edits made in the admin appear without a rebuild.
+- **Admin** (`/admin`): the existing Vue admin as an Astro page with a Vue island (`client:only`), styled with Tailwind 4 scoped to that page. Guarded by Cloudflare Access plus the Worker's fail-closed `requireAdmin` (503 until `ACCESS_*` are set outside development).
 - **One Worker** (`src/worker.ts`): static assets → the existing Hono API (`../worker/src`, shared unchanged: `/api/*`, `/m/*` media from R2, analytics) → Astro pages.
 
 ```bash
@@ -46,6 +47,15 @@ Code fences accept a filename: ` ```ts title="worker/index.ts" `. In `.mdx`, use
 | Post page, CodeBlock, pull quote | `src/pages/journal/[slug].astro` (`.prose` styles) |
 | Story page: Hero, FullBleed, GalleryRow, InsetFeature, NextChapter, ChapterNav | `src/pages/[slug].astro`, `src/components/ChapterNav.astro`, `MediaItem.astro` |
 
+## Uploads and image sizes
+
+- **Any file size.** The admin cuts a file into 16 MiB chunks and sends each as its own request (`POST /api/admin/uploads` → `PUT …/parts/:n` → `POST …/complete`); the Worker forwards them to an R2 multipart upload. No chunk is near the Worker body limit, so photos (≤200 MB) and videos (≤2 GB) both work. True browser→R2 presigned uploads would also need an R2 API token and bucket CORS; this needs neither.
+- **Originals first.** Photos are no longer resized in the browser. The original is stored as `<id>/orig.<ext>` and `media.key_original` is set (migration `0002_original.sql`).
+- **Variants on demand.** `/m/<id>/w{480,900,1440,2400}.webp` is generated from the original with the Cloudflare Images binding on first request, cached in R2, and served immutable. Widths never upscale past the original, and `srcset` lists only real widths (`urls.variants` in the API). Deleting a photo removes the original and every cached variant.
+- Older rows (browser-resized `main`/`small`) keep working unchanged.
+- HEIC/AVIF originals are not accepted yet (the browser must decode the file to read its size); export JPEG.
+- After pulling this change, run the new migration on any existing database: `npm run db:migrate:local` / `npm run db:migrate:remote` (root app) or `npm run seed` (astro-site local data).
+
 ## Photo pages: how data flows
 
 `src/lib/collections.ts` is the only file that reads data (D1 via `cloudflare:workers`). Pages never call the API over HTTP. If the data source changes (KV snapshot, another API, Cloudflare Images variants), only that file changes. Images are served from the existing `/m/*` route (R2, Range-capable); `srcset` uses the stored `small`/`main` variants and the stored width/height prevent layout shift. Scroll fades and analytics (`/api/event`) are small vanilla scripts (`src/scripts/photos.ts`, `src/lib/track.ts`) replacing GSAP + the Vue composables.
@@ -61,7 +71,7 @@ Layout rhythm (same idea as the Vue `CollectionView`, using the Figma sections):
 
 ## Not done yet
 
-- Home (sunburst, cover crossfade), About, World (three.js walkable gallery), `/admin` (Vue SPA): the interactive pieces stay Vue and mount as Astro islands (`@astrojs/vue`) when moved.
+- Home (sunburst, cover crossfade) and World (three.js walkable gallery): deliberately skipped for now. When wanted, they mount as Vue islands like the admin does. (The admin's "In World" checkbox and the `featured` flag are kept so nothing is lost.)
 - The Figma Offset collage and Diptych sections (they need an editorial pairing field; today layout is derived from orientation).
-- The menu overlay's preview image + sunburst; menu links for About/Instagram/Email are placeholders.
+- The menu overlay's preview image + sunburst; the Instagram/Email menu links are placeholders. About links: GitHub, LinkedIn and Email are the real ones from the old About page; the Figma's Instagram pill is left out (no handle on record).
 - Production deploy: needs the real D1 `database_id` / Access vars in `wrangler.jsonc`, then `npm run deploy`. Not done.

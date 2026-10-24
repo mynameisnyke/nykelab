@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { AppEnv, MediaRow } from "./types";
-import { SLUG_RE, toApiMedia } from "./util";
+import { SLUG_RE, VARIANT_WIDTHS, toApiMedia } from "./util";
 
 export const publicRoutes = new Hono<AppEnv>();
 
@@ -74,8 +74,51 @@ function parseRange(range: R2Range, size: number) {
   return { start, end };
 }
 
+// Originals-first images: /m/<id>/w<width>.webp is generated from <id>/orig.* on first
+// request (Cloudflare Images binding) and cached in R2 under its own key.
+const VARIANT_RE = new RegExp(`^([a-f0-9]{12})/w(${VARIANT_WIDTHS.join("|")})\\.webp$`);
+
+function variantResponse(obj: R2Object | R2ObjectBody) {
+  const headers = new Headers();
+  obj.writeHttpMetadata(headers);
+  headers.set("ETag", obj.httpEtag);
+  headers.set("Cache-Control", "public, max-age=31536000, immutable");
+  if (!("body" in obj)) return new Response(null, { status: 304, headers });
+  headers.set("Content-Length", String(obj.size));
+  return new Response(obj.body, { headers });
+}
+
 publicRoutes.get("/m/*", async (c) => {
   const key = decodeURIComponent(c.req.path.slice(3));
+
+  const v = VARIANT_RE.exec(key);
+  if (v) {
+    const [, id, w] = v;
+    const cached = await c.env.MEDIA.get(key, { onlyIf: c.req.raw.headers });
+    if (cached) return variantResponse(cached);
+
+    const found = await c.env.MEDIA.list({ prefix: `${id}/orig.`, limit: 1 });
+    const origKey = found.objects[0]?.key;
+    const orig = origKey ? await c.env.MEDIA.get(origKey) : null;
+    if (!orig) return c.notFound();
+
+    const width = Number(w);
+    const out = await c.env.IMAGES.input(orig.body)
+      .transform({ width, fit: "scale-down" })
+      .output({ format: "image/webp", quality: width >= 1440 ? 85 : 80 });
+    const body = await out.response().arrayBuffer();
+    c.executionCtx.waitUntil(
+      c.env.MEDIA.put(key, body, { httpMetadata: { contentType: "image/webp" } }),
+    );
+    return new Response(body, {
+      headers: {
+        "Content-Type": "image/webp",
+        "Content-Length": String(body.byteLength),
+        "Cache-Control": "public, max-age=31536000, immutable",
+      },
+    });
+  }
+
   if (!KEY_RE.test(key)) return c.notFound();
 
   const isRange = c.req.header("Range") !== undefined;

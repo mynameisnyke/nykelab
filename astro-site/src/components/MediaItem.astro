@@ -13,6 +13,12 @@ interface Props {
 const { media: m, sizes, eager = false, fit = "natural", class: className } = Astro.props;
 const alt = m.place || m.caption.split("\n")[0] || "";
 const hasSize = m.width > 0 && m.height > 0;
+// Originals-first images list their generated widths; older rows have a small + main pair.
+const srcset = m.urls.variants
+  ? m.urls.variants.map((v) => `${v.url} ${v.width}w`).join(", ")
+  : m.urls.small
+    ? `${m.urls.small} ${m.smallWidth}w, ${m.urls.main} ${m.mainWidth}w`
+    : undefined;
 ---
 
 {
@@ -37,7 +43,7 @@ const hasSize = m.width > 0 && m.height > 0;
     <img
       class:list={["media", fit, className]}
       src={m.urls.main}
-      srcset={m.urls.small ? `${m.urls.small} ${m.smallWidth}w, ${m.urls.main} ${m.mainWidth}w` : undefined}
+      srcset={srcset}
       sizes={sizes}
       width={hasSize ? m.width : undefined}
       height={hasSize ? m.height : undefined}

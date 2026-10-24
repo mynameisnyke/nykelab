@@ -1,0 +1,23 @@
+---
+// Admin (Vue island). Protected by Cloudflare Access at the edge and by the Worker's
+// requireAdmin check (src/worker.ts). Client-only: there is nothing useful to prerender.
+import AdminView from "../admin/AdminView.vue";
+import "@fontsource-variable/inter";
+import "../styles/admin.css";
+
+export const prerender = false;
+Astro.response.headers.set("Cache-Control", "no-store");
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Admin — nykelab</title>
+  </head>
+  <body>
+    <AdminView client:only="vue" />
+  </body>
+</html>

@@ -19,6 +19,8 @@
     }
   ],
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "nykelab-media" }],
+  // Sized image variants are generated from originals (worker/src/public.ts).
+  "images": { "binding": "IMAGES" },
   "analytics_engine_datasets": [
     { "binding": "EVENTS", "dataset": "nykelab_events" }
   ],

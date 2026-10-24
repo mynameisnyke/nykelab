@@ -7,6 +7,7 @@ import { publicRoutes } from "../../worker/src/public";
 import { eventRoutes } from "../../worker/src/events";
 import { adminRoutes } from "../../worker/src/admin";
 import { statsRoutes } from "../../worker/src/stats";
+import { requireAdmin } from "../../worker/src/auth";
 import type { AppEnv } from "../../worker/src/types";
 
 const app = new Hono<AppEnv>();
@@ -20,6 +21,10 @@ app.route("/", publicRoutes);
 app.route("/", eventRoutes);
 app.route("/", adminRoutes);
 app.route("/", statsRoutes);
+
+// The admin page itself is guarded too (same fail-closed check as /api/admin/*).
+app.use("/admin", requireAdmin);
+app.use("/admin/*", requireAdmin);
 
 // Unknown /api/* paths get JSON 404s instead of an HTML page.
 app.all("/api/*", (c) => c.json({ error: "Not found" }, 404));

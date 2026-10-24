@@ -2,6 +2,8 @@ export interface Env {
   DB: D1Database;
   MEDIA: R2Bucket;
   EVENTS: AnalyticsEngineDataset;
+  /** Cloudflare Images binding: sized variants are generated from originals on demand. */
+  IMAGES: ImagesBinding;
   ASSETS: Fetcher;
   ENVIRONMENT: string;
   ACCESS_TEAM_DOMAIN?: string;
@@ -31,6 +33,8 @@ export interface MediaRow {
   key_main: string;
   key_small: string | null;
   key_poster: string | null;
+  /** Set for originals-first uploads; see migrations/0002_original.sql. */
+  key_original: string | null;
   size_bytes: number;
   created_at: string;
   updated_at: string;
@@ -57,6 +61,12 @@ export interface ApiMedia {
   position: number;
   published: boolean;
   featured: boolean;
-  urls: { main: string; small?: string; poster?: string };
+  urls: {
+    main: string;
+    small?: string;
+    poster?: string;
+    /** Originals-first images only: usable widths, smallest first (for srcset). */
+    variants?: { width: number; url: string }[];
+  };
   createdAt: string;
 }
