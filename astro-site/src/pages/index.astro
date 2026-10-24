@@ -5,29 +5,17 @@
 import Base from "../layouts/Base.astro";
 import Navbar from "../components/Navbar.astro";
 import ChapterNav from "../components/ChapterNav.astro";
-import { getNav, getPreviewPool } from "../lib/collections";
-import { buildSample, fmtMonthYear, summarize, type HomeData } from "../lib/voyages";
+import { loadSample } from "../lib/sample-home";
+import { fmtMonthYear, summarize } from "../lib/voyages";
 
 export const prerender = false;
 Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
 
-const [nav, pool] = await Promise.all([getNav(), getPreviewPool()]);
-const pickFrom = (list: number[], k: number) => (list.length ? list[k % list.length] : 0);
-const { voyages, shots } = buildSample(pool.images.length, (theme, k) =>
-  pickFrom(theme === "city" ? (pool.city.length ? pool.city : pool.nature) : (pool.nature.length ? pool.nature : pool.city), k),
-);
-const slugs = new Set(nav.map((n) => n.slug));
-voyages.forEach((v) => (v.available = slugs.has(v.slug)));
-
-const data: HomeData = { voyages, shots, images: pool.images, sample: true };
+const { nav, data } = await loadSample();
+const { voyages, shots } = data;
 const stats = summarize(voyages, shots);
 // Newest first, like a table of contents.
 const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages[a].start);
-const chapters = [
-  { label: "Home", href: "/" },
-  ...nav.map((n) => ({ label: n.title, href: `/${n.slug}` })),
-  { label: "World", href: "/world" },
-];
 ---
 
 <Base title="nykelab — photographs by Nyke Harewood" description={`${stats.photos} photographs from ${stats.voyages} voyages, ${stats.from}–${stats.to}.`}>
@@ -69,7 +57,7 @@ const chapters = [
       <canvas id="globe" aria-hidden="true"></canvas>
       <div id="chart" class="chart" hidden></div>
       <p class="insight" id="insight" aria-live="polite"></p>
-      <button class="reset" id="reset" hidden>Clear filter ✕</button>
+      <button class="reset" id="reset" hidden>Clear ✕</button>
     </section>
 
     <aside class="preview" id="preview" aria-live="polite">
@@ -83,7 +71,8 @@ const chapters = [
       <a id="preview-open" class="open eyebrow" hidden>Open voyage →</a>
     </aside>
   </main>
-  <ChapterNav items={chapters} active={0} />
+  <div class="nav-backdrop" aria-hidden="true"></div>
+  <ChapterNav />
   <script type="application/json" id="home-data" set:html={JSON.stringify(data)} />
 </Base>
 
@@ -198,7 +187,8 @@ const chapters = [
     text-transform: uppercase;
     color: var(--text-caption);
   }
-  .stats span {
+  /* :global because main.ts rewrites these spans, and the rewritten ones carry no scope attribute */
+  .stats :global(span) {
     display: block;
   }
 
@@ -279,7 +269,7 @@ const chapters = [
   .reset {
     position: absolute;
     top: 0;
-    right: 0;
+    left: calc(50% + 138px); /* just right of the lens tabs, clear of the preview photo */
     z-index: 3;
     padding: 9px 14px;
     border: 1px solid var(--border-subtle);
@@ -346,6 +336,11 @@ const chapters = [
     display: none;
   }
 
+  /* Mobile: the fixed chapter nav sits on a page-colored backdrop so it never collides with the list. */
+  .nav-backdrop {
+    display: none;
+  }
+
   /* -- mobile: stacked, page scrolls -- */
   @media (max-width: 1179px) {
     .home {
@@ -384,6 +379,22 @@ const chapters = [
     .insight {
       font-size: 17px;
       line-height: 24px;
+    }
+    .nav-backdrop {
+      display: block;
+      position: fixed;
+      inset: auto 0 0 0;
+      height: 64px;
+      z-index: 19;
+      background: var(--bg-page);
+      opacity: 0.94;
+      pointer-events: none;
+    }
+    .reset {
+      top: auto;
+      bottom: 56px;
+      left: auto;
+      right: 0;
     }
     .name {
       font-size: 22px;

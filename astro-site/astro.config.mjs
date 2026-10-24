@@ -22,6 +22,8 @@ const codeHeader = {
 // `export const prerender = false`.
 export default defineConfig({
   site: "https://nykelab.nyc",
+  // Dev on 4322: an early build redirected / -> /journal and browsers cache redirects per origin.
+  server: { port: 4322 },
   adapter: cloudflare({ prerenderEnvironment: "node" }),
   integrations: [mdx(), sitemap(), vue()],
   vite: { plugins: [tailwindcss()] },

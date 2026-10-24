@@ -1,0 +1,79 @@
+---
+// Figma: NextChapter, reused for "Next place" / "Next year".
+import type { PreviewImage } from "../lib/voyages";
+
+interface Props {
+  eyebrow: string;
+  title: string;
+  meta: string;
+  href: string;
+  image?: PreviewImage;
+}
+const { eyebrow, title, meta, href, image } = Astro.props;
+---
+
+<a class="next" href={href}>
+  <div class="text">
+    <p class="eyebrow">{eyebrow}</p>
+    <h2>{title}</h2>
+    <p class="meta">{meta}</p>
+  </div>
+  {image && <div class="peek"><img src={image.src} srcset={image.srcset} sizes="(max-width: 767px) 100vw, 620px" alt="" loading="lazy" decoding="async" /></div>}
+</a>
+
+<style>
+  .next {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 620px;
+    align-items: center;
+    gap: var(--gutter);
+    min-height: 620px;
+    padding: 0 var(--margin);
+  }
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .text > * {
+    margin: 0;
+  }
+  h2 {
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-size: 64px;
+    line-height: 72px;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  .meta {
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+  .peek {
+    aspect-ratio: 620 / 400;
+    overflow: hidden;
+    background: var(--bg-surface);
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  @media (max-width: 767px) {
+    .next {
+      grid-template-columns: 1fr;
+      min-height: 0;
+      padding-top: 64px;
+    }
+    h2 {
+      font-size: 40px;
+      line-height: 46px;
+    }
+  }
+</style>

@@ -1,0 +1,70 @@
+---
+import Pill from "./Pill.astro";
+import ArchiveTabs from "./ArchiveTabs.astro";
+
+interface Props {
+  title: string;
+  subtitle: string;
+  active: "voyages" | "places" | "years";
+  sample?: boolean;
+}
+const { title, subtitle, active, sample = true } = Astro.props;
+---
+
+<header class="head">
+  <div class="block">
+    <p class="eyebrow row">Archive {sample && <Pill label="Sample metadata" size="small" />}</p>
+    <h1>{title}</h1>
+    <p class="sub body-bio">{subtitle}</p>
+  </div>
+  <ArchiveTabs active={active} />
+</header>
+
+<style>
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 24px;
+    padding: 160px var(--margin) 0;
+  }
+  .block {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .block > * {
+    margin: 0;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  h1 {
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-size: 84px;
+    line-height: 92px;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  .sub {
+    color: var(--text-secondary);
+  }
+  @media (max-width: 767px) {
+    .head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      padding-top: 112px;
+    }
+    .block {
+      gap: 12px;
+    }
+    h1 {
+      font-size: 64px;
+      line-height: 70px;
+    }
+  }
+</style>

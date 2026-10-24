@@ -4,13 +4,14 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "astro dev --port 4322",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
     "seed": "./seed/seed.sh",
     "types": "wrangler types",
-    "deploy": "astro build && wrangler deploy"
+    "deploy": "astro build && wrangler deploy",
+    "test": "playwright test"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.12",
@@ -36,7 +37,9 @@
     "world-atlas": "^2.0.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@cloudflare/workers-types": "^5.20261024.1",
+    "@playwright/test": "^1.64.1",
     "@types/d3": "^7.4.3",
     "@types/three": "^0.186.0",
     "@types/topojson-client": "^3.1.5",

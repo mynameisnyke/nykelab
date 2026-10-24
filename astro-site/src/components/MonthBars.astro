@@ -1,0 +1,84 @@
+---
+// Figma: MonthBars — photographs per month, each bar colored by that month's main voyage.
+import type { Voyage } from "../lib/voyages";
+
+interface Props {
+  counts: number[];
+  voyageByMonth: (number | null)[];
+  voyages: Voyage[];
+  max: number;
+  year: number;
+  /** Bar width in px (40 in a year row, 56 in a gallery). */
+  bw?: number;
+  label?: boolean;
+}
+const { counts, voyageByMonth, voyages, max, year, bw = 40, label = false } = Astro.props;
+const MONTHS = "JFMAMJJASOND";
+---
+
+{label && <p class="axis">Photographs per month</p>}
+<div class="bars" style={`--bw:${bw}px`} role="img" aria-label={`Photographs per month in ${year}`}>
+  {
+    counts.map((c, m) => (
+      <div class="col">
+        <span class:list={["bar", { zero: c === 0 }]} style={`--h:${c / max};${c ? `--c:${voyages[voyageByMonth[m]!].color}` : ""}`}></span>
+        <span class="m">{MONTHS[m]}</span>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .axis {
+    margin: 20px 0 0;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+  .bars {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    margin-top: 12px;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    height: 120px;
+  }
+  .bar {
+    width: var(--bw);
+    max-width: 100%;
+    height: calc(var(--h) * 96px);
+    min-height: 2px;
+    background: var(--c, var(--text-caption));
+    opacity: 0.9;
+  }
+  .bar.zero {
+    opacity: 0.35;
+  }
+  .m {
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 10px;
+    line-height: 12px;
+    letter-spacing: 0.1em;
+    color: var(--text-caption);
+  }
+  @media (max-width: 767px) {
+    .col {
+      height: 76px;
+    }
+    .bars {
+      --bw: 18px;
+    }
+    .bar {
+      height: calc(var(--h) * 56px);
+    }
+  }
+</style>
