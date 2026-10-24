@@ -1,0 +1,44 @@
+---
+// Figma: ArchiveTabs — Voyages · Places · Years
+interface Props {
+  active: "voyages" | "places" | "years";
+}
+const { active } = Astro.props;
+const tabs = [
+  { id: "voyages", label: "Voyages", href: "/" },
+  { id: "places", label: "Places", href: "/places" },
+  { id: "years", label: "Years", href: "/years" },
+] as const;
+---
+
+<nav class="tabs" aria-label="Archive">
+  {tabs.map((t) => <a href={t.href} class:list={{ on: t.id === active }} aria-current={t.id === active ? "page" : undefined}>{t.label}</a>)}
+</nav>
+
+<style>
+  .tabs {
+    display: flex;
+    gap: 8px;
+  }
+  a {
+    padding: 9px 18px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full);
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 15px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  a:hover {
+    color: var(--text-primary);
+  }
+  a.on {
+    border-color: var(--border-strong);
+    background: var(--fill-ring-soft);
+    color: var(--text-primary);
+  }
+</style>

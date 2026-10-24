@@ -1,0 +1,45 @@
+---
+// Years index (Figma: ARCHIVE / Years). PROTOTYPE: derived from the sample voyage metadata.
+import Base from "../layouts/Base.astro";
+import Navbar from "../components/Navbar.astro";
+import ChapterNav from "../components/ChapterNav.astro";
+import ArchiveHeader from "../components/ArchiveHeader.astro";
+import YearRow from "../components/YearRow.astro";
+import { loadSample } from "../lib/sample-home";
+import { deriveYears, words } from "../lib/voyages";
+
+export const prerender = false;
+Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
+
+const { nav, data } = await loadSample();
+const { voyages, shots, images } = data;
+const years = deriveYears(voyages, shots, images.length);
+const max = Math.max(...years.flatMap((y) => y.monthCounts));
+const chapters = [{ label: "Home", href: "/" }, ...nav.map((n) => ({ label: n.title, href: `/${n.slug}` })), { label: "World", href: "/world" }];
+---
+
+<Base title="Years — nykelab" description={`${shots.length} photographs across ${years.length} years.`}>
+  <Navbar collections={nav} />
+  <main>
+    <ArchiveHeader title="Years" subtitle={`${shots.length} photographs across ${words(years.length)} years.`} active="years" />
+    <section class="years" aria-label="Years">
+      {years.map((y) => <YearRow y={y} voyages={voyages} images={images} max={max} />)}
+    </section>
+  </main>
+  <ChapterNav items={chapters} active={-1} />
+</Base>
+
+<style>
+  .years {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 64px var(--margin) 160px;
+  }
+  @media (max-width: 767px) {
+    .years {
+      padding-top: 40px;
+      padding-bottom: 96px;
+    }
+  }
+</style>

@@ -5,21 +5,14 @@
 import Base from "../layouts/Base.astro";
 import Navbar from "../components/Navbar.astro";
 import ChapterNav from "../components/ChapterNav.astro";
-import { getNav, getPreviewPool } from "../lib/collections";
-import { buildSample, fmtMonthYear, summarize, type HomeData } from "../lib/voyages";
+import { loadSample } from "../lib/sample-home";
+import { fmtMonthYear, summarize } from "../lib/voyages";
 
 export const prerender = false;
 Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
 
-const [nav, pool] = await Promise.all([getNav(), getPreviewPool()]);
-const pickFrom = (list: number[], k: number) => (list.length ? list[k % list.length] : 0);
-const { voyages, shots } = buildSample(pool.images.length, (theme, k) =>
-  pickFrom(theme === "city" ? (pool.city.length ? pool.city : pool.nature) : (pool.nature.length ? pool.nature : pool.city), k),
-);
-const slugs = new Set(nav.map((n) => n.slug));
-voyages.forEach((v) => (v.available = slugs.has(v.slug)));
-
-const data: HomeData = { voyages, shots, images: pool.images, sample: true };
+const { nav, data } = await loadSample();
+const { voyages, shots } = data;
 const stats = summarize(voyages, shots);
 // Newest first, like a table of contents.
 const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages[a].start);

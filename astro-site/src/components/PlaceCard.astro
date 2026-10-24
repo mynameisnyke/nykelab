@@ -1,0 +1,77 @@
+---
+// Figma: PlaceCard (Default / Hot / Dim)
+import { fmtSpan, type Place, type PreviewImage } from "../lib/voyages";
+
+interface Props {
+  place: Place;
+  image?: PreviewImage;
+}
+const { place, image } = Astro.props;
+---
+
+<a class="card" href={`/places/${place.slug}`} data-place={place.slug} data-country={place.country}>
+  <div class="photo">
+    {image && <img src={image.src} srcset={image.srcset} sizes="(max-width: 767px) 50vw, 421px" alt={image.alt || place.name} loading="lazy" decoding="async" />}
+  </div>
+  <div class="caption">
+    <span class="name">{place.name}</span>
+    <span class="meta">{place.country} · {place.count} photographs</span>
+    <span class="meta">{fmtSpan(place.start, place.end)}</span>
+  </div>
+</a>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    transition: opacity 0.25s ease;
+  }
+  .photo {
+    aspect-ratio: 421 / 480;
+    background: var(--bg-surface);
+    overflow: hidden;
+    outline: 1px solid transparent;
+    outline-offset: -1px;
+    transition: outline-color 0.2s ease;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .caption {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .name {
+    font-family: var(--font-title);
+    font-size: 22px;
+    line-height: 28px;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+  .meta {
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 16px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+  .card.hot .photo {
+    outline-color: var(--border-strong);
+  }
+  :global([data-hot]) .card:not(.hot) {
+    opacity: 0.32;
+  }
+  @media (max-width: 767px) {
+    .photo {
+      aspect-ratio: 171 / 214;
+    }
+  }
+</style>

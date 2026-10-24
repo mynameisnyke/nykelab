@@ -9,6 +9,9 @@ export interface Voyage {
   slug: string;
   title: string;
   place: string; // "Grand Teton National Park, Wyoming"
+  /** The Place this voyage belongs to (several voyages can share one: Tetons + Yellowstone → Wyoming). */
+  placeSlug: string;
+  placeName: string;
   country: string;
   lat: number;
   lon: number;
@@ -109,6 +112,8 @@ type Theme = "nature" | "city";
 interface Seed {
   slug: string;
   title: string;
+  placeSlug: string;
+  placeName: string;
   place: string;
   country: string;
   lat: number;
@@ -121,14 +126,14 @@ interface Seed {
 
 // Real places; made-up trips. Colors read on both the dark and the light theme.
 const SEEDS: Seed[] = [
-  { slug: "westminster", title: "Westminster", place: "Madison Square Garden, New York", country: "United States", lat: 40.7505, lon: -73.9934, start: "2025-02-10", days: 3, count: 22, theme: "city" },
-  { slug: "grand-tetons", title: "Grand Tetons", place: "Grand Teton National Park, Wyoming", country: "United States", lat: 43.79, lon: -110.68, start: "2025-10-04", days: 9, count: 34, theme: "nature" },
-  { slug: "yellowstone", title: "Yellowstone", place: "Yellowstone National Park, Wyoming", country: "United States", lat: 44.46, lon: -110.83, start: "2025-09-14", days: 6, count: 26, theme: "nature" },
-  { slug: "new-york", title: "New York", place: "Long Island City, New York", country: "United States", lat: 40.7447, lon: -73.9485, start: "2024-12-02", days: 20, count: 30, theme: "city" },
-  { slug: "arizona", title: "Arizona", place: "Page, Arizona", country: "United States", lat: 36.914, lon: -111.456, start: "2024-03-21", days: 5, count: 18, theme: "nature" },
-  { slug: "iceland", title: "Iceland", place: "Snæfellsnes, Iceland", country: "Iceland", lat: 64.85, lon: -23.0, start: "2024-08-12", days: 8, count: 24, theme: "nature" },
-  { slug: "kyoto", title: "Kyoto", place: "Kyoto, Japan", country: "Japan", lat: 35.01, lon: 135.77, start: "2023-11-14", days: 7, count: 20, theme: "city" },
-  { slug: "lofoten", title: "Lofoten", place: "Lofoten, Norway", country: "Norway", lat: 68.2, lon: 13.6, start: "2023-01-20", days: 6, count: 16, theme: "nature" },
+  { slug: "westminster", placeSlug: "new-york", placeName: "New York", title: "Westminster", place: "Madison Square Garden, New York", country: "United States", lat: 40.7505, lon: -73.9934, start: "2025-02-10", days: 3, count: 22, theme: "city" },
+  { slug: "grand-tetons", placeSlug: "wyoming", placeName: "Wyoming", title: "Grand Tetons", place: "Grand Teton National Park, Wyoming", country: "United States", lat: 43.79, lon: -110.68, start: "2025-10-04", days: 9, count: 34, theme: "nature" },
+  { slug: "yellowstone", placeSlug: "wyoming", placeName: "Wyoming", title: "Yellowstone", place: "Yellowstone National Park, Wyoming", country: "United States", lat: 44.46, lon: -110.83, start: "2025-09-14", days: 6, count: 26, theme: "nature" },
+  { slug: "new-york", placeSlug: "new-york", placeName: "New York", title: "New York", place: "Long Island City, New York", country: "United States", lat: 40.7447, lon: -73.9485, start: "2024-12-02", days: 20, count: 30, theme: "city" },
+  { slug: "arizona", placeSlug: "arizona", placeName: "Arizona", title: "Arizona", place: "Page, Arizona", country: "United States", lat: 36.914, lon: -111.456, start: "2024-03-21", days: 5, count: 18, theme: "nature" },
+  { slug: "iceland", placeSlug: "iceland", placeName: "Iceland", title: "Iceland", place: "Snæfellsnes, Iceland", country: "Iceland", lat: 64.85, lon: -23.0, start: "2024-08-12", days: 8, count: 24, theme: "nature" },
+  { slug: "kyoto", placeSlug: "kyoto", placeName: "Kyoto", title: "Kyoto", place: "Kyoto, Japan", country: "Japan", lat: 35.01, lon: 135.77, start: "2023-11-14", days: 7, count: 20, theme: "city" },
+  { slug: "lofoten", placeSlug: "lofoten", placeName: "Lofoten", title: "Lofoten", place: "Lofoten, Norway", country: "Norway", lat: 68.2, lon: 13.6, start: "2023-01-20", days: 6, count: 16, theme: "nature" },
 ];
 
 const COLORS = ["#d9a05b", "#5fa8d3", "#d9776a", "#7fbf7b", "#a98be0", "#d6c35a", "#4fbfae", "#d98bb0"];
@@ -152,6 +157,8 @@ export function buildSample(imageCount: number, coverFor: (theme: Theme, i: numb
     voyages.push({
       slug: s.slug,
       title: s.title,
+      placeSlug: s.placeSlug,
+      placeName: s.placeName,
       place: s.place,
       country: s.country,
       lat: s.lat,
@@ -223,3 +230,111 @@ export function topSetting(shots: Shot[]): { focal: number; f: number; share: nu
   const [focal, f] = key.split("|").map(Number);
   return { focal, f, share: n / shots.length };
 }
+
+// ---- archive: Places and Years derived from voyages + shots -------------------------
+
+export interface Place {
+  slug: string;
+  name: string;
+  country: string;
+  lat: number;
+  lon: number;
+  count: number;
+  start: number;
+  end: number;
+  voyages: number[];
+  /** Index into PreviewImage[] (the cover of the place's largest voyage). */
+  cover: number;
+  /** A gallery page exists for this place (any of its voyages has a page). */
+  available: boolean;
+}
+
+export interface YearSummary {
+  year: number;
+  count: number;
+  voyages: number[];
+  countries: string[];
+  top: { focal: number; f: number; share: number } | null;
+  monthCounts: number[]; // 12
+  monthVoyage: (number | null)[]; // dominant voyage per month
+  /** Preview image indices for the contact strip. */
+  photos: number[];
+  start: number;
+  end: number;
+}
+
+export function derivePlaces(voyages: Voyage[]): Place[] {
+  const by = new Map<string, number[]>();
+  voyages.forEach((v, i) => by.set(v.placeSlug, [...(by.get(v.placeSlug) ?? []), i]));
+  const places: Place[] = [];
+  for (const [slug, idxs] of by) {
+    const vs = idxs.map((i) => voyages[i]);
+    const count = vs.reduce((n, v) => n + v.count, 0);
+    const biggest = vs.reduce((a, b) => (b.count > a.count ? b : a));
+    places.push({
+      slug,
+      name: biggest.placeName,
+      country: biggest.country,
+      lat: vs.reduce((n, v) => n + v.lat * v.count, 0) / count,
+      lon: vs.reduce((n, v) => n + v.lon * v.count, 0) / count,
+      count,
+      start: Math.min(...vs.map((v) => v.start)),
+      end: Math.max(...vs.map((v) => v.end)),
+      voyages: idxs,
+      cover: biggest.cover,
+      available: false,
+    });
+  }
+  return places.sort((a, b) => b.count - a.count);
+}
+
+export function deriveYears(voyages: Voyage[], shots: Shot[], imageCount: number): YearSummary[] {
+  const by = new Map<number, Shot[]>();
+  for (const s of shots) {
+    const y = new Date(s.t).getUTCFullYear();
+    by.set(y, [...(by.get(y) ?? []), s]);
+  }
+  const out: YearSummary[] = [];
+  for (const [year, list] of by) {
+    const monthCounts = new Array(12).fill(0);
+    const perMonthVoyage = Array.from({ length: 12 }, () => new Map<number, number>());
+    for (const s of list) {
+      const m = new Date(s.t).getUTCMonth();
+      monthCounts[m]++;
+      perMonthVoyage[m].set(s.v, (perMonthVoyage[m].get(s.v) ?? 0) + 1);
+    }
+    const monthVoyage = perMonthVoyage.map((mp) => (mp.size ? [...mp.entries()].sort((a, b) => b[1] - a[1])[0][0] : null));
+    const vIdx = [...new Set(list.map((s) => s.v))];
+    const photos = [...new Set(list.map((s) => s.img))].slice(0, 6);
+    for (let k = 0; photos.length < Math.min(6, imageCount) && k < imageCount; k++) {
+      const j = (k + year * 3) % imageCount; // offset by year so strips don't all start the same
+      if (!photos.includes(j)) photos.push(j);
+    }
+    out.push({
+      year,
+      count: list.length,
+      voyages: vIdx,
+      countries: [...new Set(vIdx.map((i) => voyages[i].country))],
+      top: topSetting(list),
+      monthCounts,
+      monthVoyage,
+      photos,
+      start: Math.min(...list.map((s) => s.t)),
+      end: Math.max(...list.map((s) => s.t)),
+    });
+  }
+  return out.sort((a, b) => b.year - a.year);
+}
+
+/** "AUG 2024" · "SEP – OCT 2025" · "DEC 2024 – FEB 2025" */
+export function fmtSpan(start: number, end: number): string {
+  const a = new Date(start), b = new Date(end);
+  const mon = (d: Date) => d.toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
+  const ay = a.getUTCFullYear(), by = b.getUTCFullYear();
+  if (ay === by && a.getUTCMonth() === b.getUTCMonth()) return `${mon(a)} ${ay}`;
+  if (ay === by) return `${mon(a)} – ${mon(b)} ${ay}`;
+  return `${mon(a)} ${ay} – ${mon(b)} ${by}`;
+}
+
+const WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+export const words = (n: number) => WORDS[n] ?? String(n);

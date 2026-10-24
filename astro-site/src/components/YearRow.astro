@@ -1,0 +1,166 @@
+---
+// Figma: YearRow — numeral, contact strip, computed stats, photographs per month.
+import type { PreviewImage, Voyage, YearSummary } from "../lib/voyages";
+
+interface Props {
+  y: YearSummary;
+  voyages: Voyage[];
+  images: PreviewImage[];
+  max: number; // largest monthly count across all years, so bars are comparable
+}
+const { y, voyages, images, max } = Astro.props;
+const MONTHS = "JFMAMJJASOND";
+const n = (k: number, one: string, many: string) => `${k} ${k === 1 ? one : many}`;
+---
+
+<a class="row" href={`/years/${y.year}`}>
+  <div class="id">
+    <span class="year">{y.year}</span>
+    <p class="stats">{y.count} photographs · {n(y.voyages.length, "voyage", "voyages")} · {n(y.countries.length, "country", "countries")}</p>
+    {y.top && <p class="stats">Most often {y.top.focal}mm f/{y.top.f}</p>}
+  </div>
+  <div class="data">
+    <div class="strip">
+      {y.photos.map((i) => images[i] && <img src={images[i].src} srcset={images[i].srcset} sizes="(max-width: 767px) 25vw, 140px" alt="" loading="lazy" decoding="async" />)}
+    </div>
+    <p class="axis">Photographs per month</p>
+    <div class="bars" role="img" aria-label={`Photographs per month in ${y.year}`}>
+      {
+        y.monthCounts.map((c, m) => (
+          <div class="col">
+            <span class:list={["bar", { zero: c === 0 }]} style={`--h:${c / max};${c ? `--c:${voyages[y.monthVoyage[m]!].color}` : ""}`}></span>
+            <span class="m">{MONTHS[m]}</span>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</a>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    column-gap: 60px;
+    padding: 32px 0 60px;
+    border-top: 1px solid var(--border-subtle);
+    transition: opacity 0.25s ease, border-color 0.25s ease;
+  }
+  .id {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 12px;
+  }
+  .year {
+    font-family: var(--font-title);
+    font-size: 160px;
+    line-height: 190px;
+    letter-spacing: -0.02em;
+  }
+  .stats {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 22px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+  .id .stats:first-of-type {
+    margin-top: 32px;
+  }
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .strip img {
+    width: 100%;
+    aspect-ratio: 135 / 180;
+    object-fit: cover;
+    background: var(--bg-surface);
+  }
+  .axis {
+    margin: 20px 0 0;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+  .bars {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    margin-top: 12px;
+  }
+  .col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    height: 120px;
+  }
+  .bar {
+    width: 40px;
+    height: calc(var(--h) * 96px);
+    min-height: 2px;
+    background: var(--c, var(--text-caption));
+    opacity: 0.9;
+  }
+  .bar.zero {
+    opacity: 0.35;
+  }
+  .m {
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 10px;
+    line-height: 12px;
+    letter-spacing: 0.1em;
+    color: var(--text-caption);
+  }
+
+  /* dim the others, like the Figma hover state */
+  :global(.years:has(.row:hover, .row:focus-visible)) .row:not(:hover, :focus-visible) {
+    opacity: 0.32;
+  }
+  .row:hover,
+  .row:focus-visible {
+    border-top-color: var(--border-strong);
+  }
+
+  @media (max-width: 767px) {
+    .row {
+      display: block;
+      padding: 28px 0 40px;
+    }
+    .year {
+      font-size: 96px;
+      line-height: 104px;
+    }
+    .id .stats:first-of-type {
+      margin-top: 12px;
+    }
+    .strip {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 20px;
+    }
+    .strip img:nth-child(n + 5) {
+      display: none;
+    }
+    .strip img {
+      aspect-ratio: 85 / 110;
+    }
+    .col {
+      height: 76px;
+    }
+    .bar {
+      width: 18px;
+      height: calc(var(--h) * 56px);
+    }
+  }
+</style>

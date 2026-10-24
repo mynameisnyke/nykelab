@@ -1,0 +1,177 @@
+---
+// Figma: PlacesMap — flat dotted world map, pin size = photographs.
+// Land dots come from src/lib/land-dots.json (scripts/gen-land.mjs). Dots are one SVG path
+// (round-capped zero-length segments); pins are HTML positioned in % so they stay crisp.
+import land from "../lib/land-dots.json";
+import type { Place } from "../lib/voyages";
+
+interface Props {
+  places: Place[];
+}
+const { places } = Astro.props;
+
+const TOP = 72;
+const BOTTOM = -43;
+const VIEWS = {
+  desktop: { lonMin: -180, lonMax: 180, base: 3, k: 0.8, labels: true },
+  mobile: { lonMin: -130, lonMax: 150, base: 2, k: 0.5, labels: false },
+} as const;
+// Where the label sits relative to its pin (hand-tuned for the sample places; a real
+// version would do collision avoidance).
+const SIDE: Record<string, string> = { wyoming: "left-up", arizona: "left-down", "new-york": "right", iceland: "below", lofoten: "below", kyoto: "below" };
+
+const d = (land as [number, number][]).map(([lon, lat]) => `M${lon} ${-lat}h0`).join("");
+const pos = (p: Place, v: (typeof VIEWS)[keyof typeof VIEWS]) => ({
+  left: ((p.lon - v.lonMin) / (v.lonMax - v.lonMin)) * 100,
+  top: ((TOP - p.lat) / (TOP - BOTTOM)) * 100,
+  r: v.base + Math.sqrt(p.count) * v.k,
+});
+---
+
+<svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs><path id="land-dots" d={d} vector-effect="non-scaling-stroke"></path></defs>
+</svg>
+<div class="map" data-map>
+  {
+    (Object.keys(VIEWS) as (keyof typeof VIEWS)[]).map((name) => {
+      const v = VIEWS[name];
+      return (
+        <div class={`view ${name}`} style={`aspect-ratio:${v.lonMax - v.lonMin}/${TOP - BOTTOM}`}>
+          <svg viewBox={`${v.lonMin} ${-TOP} ${v.lonMax - v.lonMin} ${TOP - BOTTOM}`} preserveAspectRatio="none" aria-hidden="true">
+            <use href="#land-dots" />
+          </svg>
+          {places.map((p) => {
+            const q = pos(p, v);
+            return (
+              <a class={`pin ${SIDE[p.slug] ?? "right"}`} href={`/places/${p.slug}`} data-place={p.slug} style={`left:${q.left}%;top:${q.top}%;--r:${q.r}px`} aria-label={`${p.name}, ${p.count} photographs`}>
+                <i></i>
+                <span class="label" data-chip={`${p.name} · ${p.count} photographs`}>{v.labels ? p.name : ""}</span>
+              </a>
+            );
+          })}
+        </div>
+      );
+    })
+  }
+</div>
+
+<style>
+  .defs {
+    position: absolute;
+  }
+  .map {
+    position: relative;
+  }
+  .view {
+    position: relative;
+    width: 100%;
+  }
+  .view.mobile {
+    display: none;
+  }
+  svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  svg use {
+    fill: none;
+    stroke: var(--text-primary);
+    stroke-opacity: 0.4;
+    stroke-width: 3px;
+    stroke-linecap: round;
+  }
+  .view.mobile svg use {
+    stroke-width: 1.8px;
+  }
+  .pin {
+    position: absolute;
+    width: 0;
+    height: 0;
+    transition: opacity 0.2s ease;
+  }
+  .pin i {
+    position: absolute;
+    width: calc(var(--r) * 2);
+    height: calc(var(--r) * 2);
+    left: calc(var(--r) * -1);
+    top: calc(var(--r) * -1);
+    border-radius: 50%;
+    background: var(--text-primary);
+    opacity: 0.85;
+    box-shadow: 0 0 0 4px transparent, 0 0 calc(var(--r) * 2) 0 color-mix(in srgb, var(--text-primary) 30%, transparent);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .pin .label {
+    position: absolute;
+    white-space: nowrap;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 10px;
+    line-height: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+    transition: color 0.2s ease;
+  }
+  .pin.right .label {
+    left: calc(var(--r) + 14px);
+    top: -8px;
+  }
+  .pin.left-up .label {
+    right: calc(var(--r) + 14px);
+    top: -26px;
+  }
+  .pin.left-down .label {
+    right: calc(var(--r) + 14px);
+    top: 4px;
+  }
+  .pin.below .label {
+    left: 0;
+    transform: translateX(-50%);
+    top: calc(var(--r) + 8px);
+  }
+  /* hover/focus: accent pin + chip with the full name · count, the rest fall back */
+  :global([data-hot]) .pin:not(.hot) {
+    opacity: 0.35;
+  }
+  .pin.off {
+    opacity: 0.12 !important;
+    pointer-events: none;
+  }
+  .pin.hot i {
+    background: var(--accent, #5fa8d3);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent, #5fa8d3) 35%, transparent);
+  }
+  .pin.hot .label {
+    color: var(--text-primary);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+  .pin.hot .label::after {
+    content: attr(data-chip);
+  }
+  .pin.hot .label {
+    font-size: 0; /* hide the short name, show the chip text via ::after */
+  }
+  .pin.hot .label::after {
+    font-size: 11px;
+  }
+
+  @media (max-width: 767px) {
+    .view.desktop {
+      display: none;
+    }
+    .view.mobile {
+      display: block;
+    }
+    .pin .label {
+      display: none;
+    }
+    .pin.hot .label {
+      display: block;
+    }
+  }
+</style>

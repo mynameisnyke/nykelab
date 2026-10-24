@@ -8,9 +8,11 @@ interface Props {
   /** "media" = sits over a photo: white outline/text in both themes. */
   surface?: "page" | "media";
   external?: boolean;
+  /** Render a <button> (filters) instead of a link/span. */
+  button?: boolean;
 }
-const { label, href, size = "default", current = false, surface = "page", external = false } = Astro.props;
-const Tag = href ? "a" : "span";
+const { label, href, size = "default", current = false, surface = "page", external = false, button = false } = Astro.props;
+const Tag = button ? "button" : href ? "a" : "span";
 ---
 
 <Tag
@@ -18,10 +20,17 @@ const Tag = href ? "a" : "span";
   href={href}
   target={external ? "_blank" : undefined}
   rel={external ? "noopener noreferrer" : undefined}
-  aria-current={current ? "page" : undefined}>{label}</Tag
+  type={button ? "button" : undefined}
+  aria-pressed={button ? (current ? "true" : "false") : undefined}
+  aria-current={!button && current ? "page" : undefined}>{label}</Tag
 >
 
 <style>
+  button.pill {
+    background: transparent;
+    cursor: pointer;
+    font-family: var(--font-ui);
+  }
   .pill {
     display: inline-flex;
     align-items: center;

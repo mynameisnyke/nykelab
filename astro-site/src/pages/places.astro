@@ -1,0 +1,100 @@
+---
+// Places index (Figma: ARCHIVE / Places). PROTOTYPE: places are derived from the sample voyage
+// metadata (src/lib/voyages.ts); real ones come from EXIF GPS + reverse geocoding.
+import Base from "../layouts/Base.astro";
+import Navbar from "../components/Navbar.astro";
+import ChapterNav from "../components/ChapterNav.astro";
+import ArchiveHeader from "../components/ArchiveHeader.astro";
+import PlacesMap from "../components/PlacesMap.astro";
+import PlaceCard from "../components/PlaceCard.astro";
+import Pill from "../components/Pill.astro";
+import { loadSample } from "../lib/sample-home";
+import { derivePlaces, words } from "../lib/voyages";
+
+export const prerender = false;
+Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
+
+const { nav, data } = await loadSample();
+const { voyages, shots, images } = data;
+const places = derivePlaces(voyages);
+places.forEach((p) => (p.available = p.voyages.some((i) => voyages[i].available)));
+const countries = [...new Set(places.map((p) => p.country))];
+const years = shots.map((s) => new Date(s.t).getUTCFullYear());
+const from = Math.min(...years);
+const to = Math.max(...years);
+const chapters = [{ label: "Home", href: "/" }, ...nav.map((n) => ({ label: n.title, href: `/${n.slug}` })), { label: "World", href: "/world" }];
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+---
+
+<Base title="Places — nykelab" description={`${shots.length} photographs from ${places.length} places in ${countries.length} countries.`}>
+  <Navbar collections={nav} />
+  <main data-archive>
+    <ArchiveHeader title="Places" subtitle={`${cap(words(places.length))} places in ${words(countries.length)} countries, ${from}–${to}.`} active="places" />
+
+    <section class="map" aria-label="Map of places">
+      <PlacesMap places={places} />
+    </section>
+
+    <nav class="filters" aria-label="Filter by country">
+      <Pill button label="All" current />
+      {countries.map((c) => <Pill button label={c} />)}
+    </nav>
+
+    <section class="grid" aria-label="Places">
+      {places.map((p) => <PlaceCard place={p} image={images[p.cover]} />)}
+    </section>
+
+    <p class="totals">{shots.length} photographs · {places.length} places · {countries.length} countries</p>
+  </main>
+  <ChapterNav items={chapters} active={-1} />
+</Base>
+
+<script>
+  import { initArchive } from "../scripts/archive";
+  document.addEventListener("astro:page-load", initArchive);
+</script>
+
+<style>
+  .map {
+    padding: 48px var(--margin) 0;
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 48px var(--margin) 0;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 64px var(--gutter);
+    padding: 40px var(--margin) 0;
+  }
+  .totals {
+    margin: 0;
+    padding: 64px var(--margin) 160px;
+    text-align: center;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+  @media (max-width: 767px) {
+    .map {
+      padding-top: 32px;
+    }
+    .filters {
+      padding-top: 24px;
+    }
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 40px 16px;
+      padding-top: 32px;
+    }
+    .totals {
+      padding: 48px var(--margin) 96px;
+    }
+  }
+</style>

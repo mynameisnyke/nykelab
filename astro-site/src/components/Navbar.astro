@@ -19,9 +19,12 @@ const chapters = [
   ]).map((c) => ({ label: c.title, href: `/${c.slug}` })),
   { label: "World", href: "/world" },
 ];
+const here = Astro.url.pathname;
 const footer = [
   { label: "About", href: "/about" },
-  { label: "Journal", href: "/journal", current: true },
+  { label: "Places", href: "/places" },
+  { label: "Years", href: "/years" },
+  { label: "Journal", href: "/journal" },
   { label: "Instagram", href: "#" },
   { label: "Email", href: "#" },
 ];
@@ -73,7 +76,7 @@ const footer = [
   <nav class="menu-footer" aria-label="Site links">
     {
       footer.map((f) => (
-        <a href={f.href} aria-current={f.current ? "page" : undefined}>
+        <a href={f.href} aria-current={f.href !== "#" && (here === f.href || here.startsWith(f.href + "/")) ? "page" : undefined}>
           {f.label}
         </a>
       ))
@@ -189,7 +192,8 @@ const footer = [
   }
   .menu-footer {
     display: flex;
-    gap: 24px;
+    flex-wrap: wrap;
+    gap: 12px 24px;
     padding: 0 var(--margin) 48px;
     font-family: var(--font-ui);
     font-weight: 500;
