@@ -1,0 +1,92 @@
+---
+// Figma: JournalHeader + filter pills + PostRow list.
+import Pill from "./Pill.astro";
+import PostRow from "./PostRow.astro";
+import { categories, slugifyTag, type Post } from "../lib/journal";
+
+interface Props {
+  posts: Post[];
+  all: Post[];
+  title?: string;
+  subtitle?: string;
+  current?: string; // active category (lowercase) or undefined for "All"
+}
+const {
+  posts,
+  all,
+  title = "Notes",
+  subtitle = "Writing about code, cameras and the tools in between.",
+  current,
+} = Astro.props;
+const cats = categories(all);
+---
+
+<main>
+  <header class="head">
+    <p class="eyebrow">Journal</p>
+    <h1>{title}</h1>
+    <p class="sub body-bio">{subtitle}</p>
+  </header>
+
+  <nav class="filters" aria-label="Filter posts">
+    <Pill label="All" href="/journal" current={!current} />
+    {cats.map((c) => <Pill label={c} href={`/journal/tag/${slugifyTag(c)}`} current={current === c.toLowerCase()} />)}
+  </nav>
+
+  <section class="posts" aria-label="Posts">
+    {posts.map((p) => <PostRow post={p} />)}
+  </section>
+</main>
+
+<style>
+  main {
+    padding-bottom: 160px;
+  }
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 160px var(--margin) 64px;
+  }
+  .head p,
+  .head h1 {
+    margin: 0;
+  }
+  h1 {
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-size: 84px;
+    line-height: 92px;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  .sub {
+    color: var(--text-secondary);
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 var(--margin) 64px;
+  }
+  .posts {
+    padding: 0 var(--margin);
+  }
+
+  @media (max-width: 767px) {
+    main {
+      padding-bottom: 80px;
+    }
+    .head {
+      gap: 12px;
+      padding: 112px var(--margin) 32px;
+    }
+    h1 {
+      font-size: 64px;
+      line-height: 70px;
+    }
+    .filters {
+      padding-bottom: 32px;
+    }
+  }
+</style>

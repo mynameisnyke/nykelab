@@ -7,7 +7,7 @@
       id="2"
       :media="media"
       :enableFade="enableFade"
-      width="w-[85%] md:w-[600px] lg:md:w-[1230px]"
+      :width="width"
     />
     <MediaCaption :media="media" :enableFade="enableFade" />
   </section>
@@ -31,6 +31,10 @@ const props = defineProps({
   objectFit: {
     type: String,
     default: "cover",
+  },
+  width: {
+    type: String,
+    default: "w-[85%] md:w-[600px] lg:w-[900px] xl:w-[1230px]",
   },
 });
 

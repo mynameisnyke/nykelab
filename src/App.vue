@@ -17,7 +17,7 @@
   </svg>
 
   <main>
-    <app-nav class="fixed top-0" />
+    <app-nav v-if="!route.meta.admin" class="fixed top-0" />
     <router-view />
   </main>
 </template>
@@ -25,6 +25,8 @@
 <script setup lang="ts">
 import UAParser from "ua-parser-js";
 import { provide } from "vue";
+import { useRoute } from "vue-router";
+const route = useRoute();
 // Create a new instance of the parser
 const parser = new UAParser();
 // Parse the user-agent string

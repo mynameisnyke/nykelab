@@ -1,0 +1,393 @@
+---
+// Home: the whole archive as a map you can read. Where (three.js globe), When (d3 sky
+// strip), How (d3 gear chart), linked together. Data model: src/lib/voyages.ts.
+// PROTOTYPE: voyage metadata is generated sample data until EXIF is captured at upload.
+import Base from "../layouts/Base.astro";
+import Navbar from "../components/Navbar.astro";
+import ChapterNav from "../components/ChapterNav.astro";
+import { getNav, getPreviewPool } from "../lib/collections";
+import { buildSample, fmtMonthYear, summarize, type HomeData } from "../lib/voyages";
+
+export const prerender = false;
+Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
+
+const [nav, pool] = await Promise.all([getNav(), getPreviewPool()]);
+const pickFrom = (list: number[], k: number) => (list.length ? list[k % list.length] : 0);
+const { voyages, shots } = buildSample(pool.images.length, (theme, k) =>
+  pickFrom(theme === "city" ? (pool.city.length ? pool.city : pool.nature) : (pool.nature.length ? pool.nature : pool.city), k),
+);
+const slugs = new Set(nav.map((n) => n.slug));
+voyages.forEach((v) => (v.available = slugs.has(v.slug)));
+
+const data: HomeData = { voyages, shots, images: pool.images, sample: true };
+const stats = summarize(voyages, shots);
+// Newest first, like a table of contents.
+const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages[a].start);
+const chapters = [
+  { label: "Home", href: "/" },
+  ...nav.map((n) => ({ label: n.title, href: `/${n.slug}` })),
+  { label: "World", href: "/world" },
+];
+---
+
+<Base title="nykelab — photographs by Nyke Harewood" description={`${stats.photos} photographs from ${stats.voyages} voyages, ${stats.from}–${stats.to}.`}>
+  <Navbar collections={nav} />
+  <main class="home" data-lens="where">
+    <aside class="list" aria-label="Voyages">
+      <p class="eyebrow">Voyages <span class="proto">Sample metadata</span></p>
+      <ol id="voyage-list">
+        {
+          order.map((i) => {
+            const v = voyages[i];
+            const Tag = v.available ? "a" : "span";
+            return (
+              <li data-v={i} class:list={{ off: !v.available }}>
+                <Tag class="item" href={v.available ? `/${v.slug}` : undefined}>
+                  <span class="dot" style={`--c:${v.color}`}></span>
+                  <span class="name">{v.title}</span>
+                  <span class="meta">
+                    {fmtMonthYear(v.start)} · <span class="n">{v.count}</span>
+                  </span>
+                </Tag>
+              </li>
+            );
+          })
+        }
+      </ol>
+      <p class="stats" id="stats">
+        <span>{stats.photos} photographs · {stats.voyages} voyages</span>
+        <span>{stats.countries} countries · {stats.from}–{stats.to}</span>
+      </p>
+    </aside>
+
+    <section class="stage" aria-label="Visualization">
+      <div class="lens" role="tablist" aria-label="View">
+        <button role="tab" aria-selected="true" data-lens-btn="where">Where</button>
+        <button role="tab" aria-selected="false" data-lens-btn="when">When</button>
+        <button role="tab" aria-selected="false" data-lens-btn="how">How</button>
+      </div>
+      <canvas id="globe" aria-hidden="true"></canvas>
+      <div id="chart" class="chart" hidden></div>
+      <p class="insight" id="insight" aria-live="polite"></p>
+      <button class="reset" id="reset" hidden>Clear filter ✕</button>
+    </section>
+
+    <aside class="preview" id="preview" aria-live="polite">
+      <figure>
+        <div class="frame"><img id="preview-img" alt="" /></div>
+        <figcaption>
+          <span id="preview-title" class="title"></span>
+          <span id="preview-meta" class="caption"></span>
+        </figcaption>
+      </figure>
+      <a id="preview-open" class="open eyebrow" hidden>Open voyage →</a>
+    </aside>
+  </main>
+  <ChapterNav items={chapters} active={0} />
+  <script type="application/json" id="home-data" set:html={JSON.stringify(data)} />
+</Base>
+
+<script>
+  import { initHome } from "../scripts/home/main";
+  let dispose: (() => void) | undefined;
+  document.addEventListener("astro:page-load", () => {
+    if (document.querySelector("main.home")) dispose = initHome();
+  });
+  document.addEventListener("astro:before-swap", () => {
+    dispose?.();
+    dispose = undefined;
+  });
+</script>
+
+<style>
+  .home {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr) minmax(300px, 400px);
+    gap: var(--gutter);
+    height: 100vh;
+    height: 100svh;
+    min-height: 620px;
+    padding: calc(var(--nav-height) + 24px) var(--margin) 72px;
+    overflow: hidden;
+  }
+
+  /* -- voyage list (the Figma menu list, repurposed as the legend) -- */
+  .list {
+    grid-column: 1;
+    grid-row: 1;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .list::-webkit-scrollbar {
+    display: none;
+  }
+  .list .eyebrow {
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+  }
+  .proto {
+    padding: 2px 8px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    letter-spacing: 0.08em;
+  }
+  ol {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  li {
+    transition: opacity 0.25s ease;
+  }
+  .item {
+    display: grid;
+    grid-template-columns: 12px 1fr auto;
+    align-items: baseline;
+    column-gap: 12px;
+    padding: 6px 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+  li.off .item {
+    cursor: default;
+  }
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--c);
+    align-self: center;
+  }
+  .name {
+    font-family: var(--font-title);
+    font-size: 26px;
+    line-height: 34px;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+  .meta {
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+  .home[data-dim] li:not(.hot) {
+    opacity: 0.32;
+  }
+  li.dead {
+    opacity: 0.2 !important;
+  }
+  .stats {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 16px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+  .stats span {
+    display: block;
+  }
+
+  /* -- stage: spans the whole grid so the globe can sit large behind the list + preview -- */
+  .stage {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+  }
+  .lens {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    gap: 8px;
+  }
+  .lens button {
+    padding: 9px 18px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .lens button[aria-selected="true"] {
+    border-color: var(--border-strong);
+    background: var(--fill-ring-soft);
+    color: var(--text-primary);
+  }
+  #globe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: pan-y;
+    transition: opacity 0.6s ease;
+  }
+  .home:not([data-lens="where"]) #globe {
+    opacity: 0.1;
+    pointer-events: none;
+  }
+  .chart {
+    position: absolute;
+    inset: 52px 424px 56px 404px; /* between the list and the preview */
+    z-index: 2;
+  }
+  .chart[hidden] {
+    display: none;
+  }
+  .insight {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    margin: 0;
+    text-align: center;
+    font-size: 20px;
+    line-height: 28px;
+    color: var(--text-secondary);
+    pointer-events: none;
+  }
+  .insight b {
+    font-weight: 400;
+    color: var(--text-primary);
+  }
+  .reset {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 3;
+    padding: 9px 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .reset[hidden] {
+    display: none;
+  }
+
+  /* -- preview (the Figma menu preview) -- */
+  .preview {
+    grid-column: 3;
+    grid-row: 1;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 14px;
+    min-height: 0;
+  }
+  .frame {
+    aspect-ratio: 520 / 560;
+    max-height: calc(100svh - var(--nav-height) - 24px - 72px - 90px);
+    margin-inline: auto;
+    background: var(--bg-surface);
+    overflow: hidden;
+  }
+  .frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.35s ease;
+  }
+  figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .title {
+    font-family: var(--font-title);
+    font-size: 22px;
+    line-height: 28px;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  .open {
+    color: var(--text-primary);
+  }
+  .open[hidden] {
+    display: none;
+  }
+
+  /* -- mobile: stacked, page scrolls -- */
+  @media (max-width: 1179px) {
+    .home {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+      overflow: visible;
+      padding-top: calc(var(--nav-height) + 16px);
+    }
+    .chart {
+      inset: 52px 0 56px;
+    }
+    .stage {
+      order: 1;
+      grid-column: auto;
+      grid-row: auto;
+      height: min(100vw, 62svh);
+      min-height: 340px;
+      margin-top: 48px;
+    }
+    .list {
+      order: 2;
+      grid-column: auto;
+      grid-row: auto;
+      overflow: visible;
+    }
+    .preview {
+      order: 3;
+      grid-column: auto;
+      grid-row: auto;
+    }
+    .frame {
+      max-height: 60svh;
+      aspect-ratio: 4 / 3;
+    }
+    .insight {
+      font-size: 17px;
+      line-height: 24px;
+    }
+    .name {
+      font-size: 22px;
+      line-height: 30px;
+    }
+  }
+</style>

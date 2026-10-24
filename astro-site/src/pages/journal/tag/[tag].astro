@@ -1,0 +1,20 @@
+---
+import Base from "../../../layouts/Base.astro";
+import Navbar from "../../../components/Navbar.astro";
+import JournalIndex from "../../../components/JournalIndex.astro";
+import { categories, getPosts, slugifyTag } from "../../../lib/journal";
+
+export async function getStaticPaths() {
+  const all = await getPosts();
+  return categories(all).map((cat) => ({
+    params: { tag: slugifyTag(cat) },
+    props: { cat, all, posts: all.filter((p) => p.data.tags.includes(cat)) },
+  }));
+}
+const { cat, all, posts } = Astro.props;
+---
+
+<Base title={`${cat} — Notes — nykelab`} description={`Journal posts tagged ${cat}.`}>
+  <Navbar />
+  <JournalIndex posts={posts} all={all} title={cat} subtitle={`${posts.length} ${posts.length === 1 ? "post" : "posts"} tagged ${cat}.`} current={cat.toLowerCase()} />
+</Base>

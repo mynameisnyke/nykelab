@@ -19,6 +19,7 @@
     <template v-else-if="media.fileType === MediaType.Video">
       <video
         :src="source.updatedSrc.value"
+        :poster="media.posterUrl"
         :class="[computedObjectFitClass, `w-full h-full`]"
         autoplay
         loop
@@ -35,6 +36,7 @@ import { Media } from "../../models/media";
 import { MediaType } from "@/types/media";
 import { useGsapFade } from "../../composables/useGsapFade";
 import { useSrcSetter } from "../../composables/useSrcSetter";
+import { useMediaTracking } from "../../composables/useTracking";
 
 // Prop setup
 const props = defineProps({
@@ -126,8 +128,7 @@ const toggleExpand = () => {
 // Setup the fading logic
 const mediaElement = ref<HTMLElement | null>(null);
 useGsapFade(mediaElement, props.enableFade);
-
-console.log(props.media);
+useMediaTracking(mediaElement, props.media);
 </script>
 
 <style scoped>

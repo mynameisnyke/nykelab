@@ -1,0 +1,39 @@
+---
+title: Moving nykelab to Cloudflare Workers
+description: Why I dropped the old server for a Worker, D1 and R2, and what it cost me.
+date: 2026-10-24
+tags: [Code, Cloudflare]
+---
+
+import Figure from "../../components/Figure.astro";
+import tetons from "../../assets/journal/tetons.jpg";
+
+For two years nykelab ran on a small VPS: a Node server, a folder of originals and a cron job that kept breaking. Last month I moved all of it to Cloudflare.
+
+## The shape of it
+
+A single Worker now handles the API. Photos live in R2, metadata lives in D1, and the Vue app ships as static assets from the same deploy.
+
+```ts title="worker/index.ts"
+export default {
+  async fetch(req, env) {
+    const url = new URL(req.url);
+    const o = await env.R2.get(url.pathname);
+    return new Response(o?.body);
+  },
+};
+```
+
+The code is almost boring, which was the point. Everything the old server did fits in a handler you can read on one screen.
+
+<Figure src={tetons} alt="Mount Moran at first light above a layer of fog" caption="The home page, now served from the edge." />
+
+> Everything the old server did now fits on one screen.
+
+## What it cost
+
+- Deploys take seconds, not minutes.
+- Serving media from R2 is cheaper.
+- Local development needs a little more setup.
+
+Would I do it again? Yes, mostly because I stopped thinking about the server at all.

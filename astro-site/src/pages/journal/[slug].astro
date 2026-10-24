@@ -1,0 +1,337 @@
+---
+import { render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import Navbar from "../../components/Navbar.astro";
+import Pill from "../../components/Pill.astro";
+import { formatDate, getPosts, readingMinutes, slugifyTag } from "../../lib/journal";
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    // posts are newest-first: i-1 is newer ("next"), i+1 is older ("previous")
+    props: { post, next: posts[i - 1], previous: posts[i + 1] },
+  }));
+}
+
+const { post, next, previous } = Astro.props;
+const { Content } = await render(post);
+const { title, description, date, tags, cover } = post.data;
+const minutes = readingMinutes(post.body);
+---
+
+<Base title={`${title} — nykelab`} description={description} type="article" published={date} image={cover?.src}>
+  <Navbar />
+  <main>
+    <article class="column">
+      <header class="header">
+        <a class="eyebrow back" href="/journal">← Journal</a>
+        <p class="eyebrow">{tags.join(" · ")}</p>
+        <h1>{title}</h1>
+        <p class="dek body-bio">{description}</p>
+        <p class="eyebrow">Nyke Harewood · <time datetime={date.toISOString()}>{formatDate(date)}</time> · {minutes} min read</p>
+        <hr />
+      </header>
+
+      <div class="prose"><Content /></div>
+    </article>
+
+    <footer class="column foot">
+      <ul class="tags">
+        {tags.map((t) => <li><Pill label={t} href={`/journal/tag/${slugifyTag(t)}`} /></li>)}
+      </ul>
+      <nav class="pn" aria-label="More posts">
+        {
+          previous ? (
+            <a class="prev" href={`/journal/${previous.id}`}>
+              <span class="eyebrow">← Previous</span>
+              <span class="pn-title">{previous.data.title}</span>
+            </a>
+          ) : <span />
+        }
+        {
+          next && (
+            <a class="next" href={`/journal/${next.id}`}>
+              <span class="eyebrow">Next →</span>
+              <span class="pn-title">{next.data.title}</span>
+            </a>
+          )
+        }
+      </nav>
+      <div class="all"><Pill label="All posts" href="/journal" /></div>
+    </footer>
+  </main>
+</Base>
+
+<style>
+  main {
+    padding-bottom: 120px;
+  }
+  .column {
+    width: min(var(--column), 100% - 2 * var(--margin));
+    margin-inline: auto;
+  }
+  article {
+    padding-top: 184px;
+    padding-bottom: 96px;
+  }
+  .header {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .header > * {
+    margin: 0;
+  }
+  .back:hover {
+    color: var(--text-primary);
+  }
+  h1 {
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 56px;
+    letter-spacing: -0.01em;
+  }
+  .dek {
+    color: var(--text-secondary);
+  }
+  hr {
+    width: 100%;
+    height: 0;
+    border: 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .prose {
+    margin-top: 28px;
+  }
+
+  .foot {
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pn {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .pn a {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pn .next {
+    grid-column: 2;
+    text-align: right;
+  }
+  .pn-title {
+    font-family: var(--font-title);
+    font-size: 26px;
+    line-height: 32px;
+    letter-spacing: -0.01em;
+  }
+  .pn a:hover .pn-title {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 1px;
+  }
+  .all {
+    display: flex;
+    justify-content: center;
+    padding-top: 16px;
+  }
+
+  @media (max-width: 767px) {
+    main {
+      padding-bottom: 64px;
+    }
+    article {
+      padding-top: 120px;
+      padding-bottom: 48px;
+    }
+    .header {
+      gap: 20px;
+    }
+    h1 {
+      font-size: 34px;
+      line-height: 40px;
+    }
+    .prose {
+      margin-top: 20px;
+    }
+    .foot {
+      gap: 32px;
+    }
+    .pn {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      padding-top: 24px;
+    }
+    .pn .next {
+      grid-column: 1;
+      text-align: left;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Rendered markdown / MDX content (Figma: Post/Heading, Code/Block, pull quote, figure, list) */
+  .prose > * {
+    margin-block: 0;
+  }
+  .prose > * + * {
+    margin-top: 28px;
+  }
+  .prose figure {
+    margin-inline: 0;
+  }
+  .prose > h2 {
+    margin-top: 48px;
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 38px;
+    letter-spacing: -0.01em;
+  }
+  .prose > h2 + * {
+    margin-top: 20px;
+  }
+  .prose p {
+    margin-bottom: 0;
+  }
+  .prose a {
+    text-decoration: underline;
+    text-decoration-color: var(--border-strong);
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+  }
+  .prose a:hover {
+    text-decoration-color: var(--text-primary);
+  }
+  .prose ul,
+  .prose ol {
+    margin-bottom: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .prose ul > li::before {
+    content: "–\00a0\00a0";
+  }
+  .prose ol {
+    counter-reset: item;
+  }
+  .prose ol > li {
+    counter-increment: item;
+  }
+  .prose ol > li::before {
+    content: counter(item) ".\00a0\00a0";
+  }
+  .prose blockquote {
+    margin-bottom: 0;
+    margin-left: 0;
+    margin-right: 0;
+    padding: 16px 28px;
+    border-left: 1px solid var(--border-subtle);
+    font-size: 34px;
+    line-height: 42px;
+  }
+  .prose blockquote p {
+    margin: 0;
+  }
+  .prose code:not(pre code) {
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: var(--bg-surface);
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    line-height: 1;
+  }
+  .prose pre.astro-code {
+    position: relative;
+    margin-bottom: 0;
+    padding: 24px;
+    overflow-x: auto;
+    background-color: var(--bg-surface) !important;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 22px;
+    tab-size: 2;
+  }
+  .prose pre.astro-code code {
+    font-family: inherit;
+    font-weight: 400;
+  }
+  .prose pre.astro-code span {
+    color: var(--shiki-dark);
+  }
+  :root[data-theme="light"] .prose pre.astro-code span {
+    color: var(--shiki-light);
+  }
+  /* CodeBlock header: filename left, language right */
+  .prose pre.astro-code[data-title]::before {
+    content: attr(data-title);
+    display: block;
+    margin-bottom: 16px;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+  .prose pre.astro-code[data-title]::after {
+    content: attr(data-lang);
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+
+  @media (max-width: 767px) {
+    .prose > * + * {
+      margin-top: 20px;
+    }
+    .prose > h2 {
+      margin-top: 32px;
+      font-size: 24px;
+      line-height: 30px;
+    }
+    .prose > h2 + * {
+      margin-top: 12px;
+    }
+    .prose blockquote {
+      padding: 8px 16px;
+      font-size: 20px;
+      line-height: 28px;
+    }
+    .prose pre.astro-code {
+      padding: 16px;
+      font-size: 12px;
+      line-height: 19px;
+    }
+    .prose pre.astro-code[data-title]::after {
+      top: 16px;
+      right: 16px;
+    }
+  }
+</style>

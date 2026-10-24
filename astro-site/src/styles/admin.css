@@ -1,0 +1,9 @@
+/* Admin only: Tailwind (utilities + preflight) is scoped to this page's stylesheet. */
+@import "tailwindcss";
+@source "../admin";
+
+html,
+body {
+  background: #000;
+  font-family: "Inter Variable", "Inter", system-ui, sans-serif;
+}
