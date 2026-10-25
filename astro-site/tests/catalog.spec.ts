@@ -56,7 +56,8 @@ test("hours are in range and camera settings are bucketed", () => {
 test("events are kept off the places map but stay on the home list", async ({ request }) => {
   const events = catalog.voyages.filter((v) => v.kind === "event");
   expect(events.map((v) => v.title)).toEqual(expect.arrayContaining(["Westminster 2020", "Westminster 2021", "NYCC 2021", "NYCC 2022"]));
-  const places = await (await request.get("/places")).text();
+  // the page's own content: the menu (outside <main>) lists every voyage, events included
+  const places = ((await (await request.get("/places")).text()).match(/<main[\s\S]*<\/main>/) ?? [""])[0];
   const home = await (await request.get("/")).text();
   for (const e of events) {
     expect(places).not.toContain(`>${e.title}<`);

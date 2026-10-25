@@ -26,6 +26,7 @@ const { values: a } = parseArgs({
     bucket: { type: "string", default: "nykelab-media" },
     "position-base": { type: "string", default: "100" },
     "exclude-borderline": { type: "boolean", default: false },
+    "no-clips": { type: "boolean", default: false }, // photographs only (a quick local copy to build pages against)
   },
 });
 const LIB = a.library;
@@ -124,7 +125,7 @@ function plan() {
     c.photos.push({ ...p, use: p.looks[look], look });
     cols.set(slug, c);
   }
-  for (const s of clipsM.subclips) {
+  for (const s of a["no-clips"] ? [] : clipsM.subclips) {
     const c = cols.get(CLIP_TRIP[s.folder]);
     if (c) c.clips.push(s);
   }

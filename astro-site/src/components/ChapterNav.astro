@@ -1,5 +1,6 @@
 ---
 // Figma: ChapterNav. Same destinations as the menu's top level (src/lib/nav.ts); voyages live only in the menu.
+import InfinityMark from "./InfinityMark.astro";
 import { NAV_ITEMS, isHere } from "../lib/nav";
 const items = NAV_ITEMS;
 const isActive = (href: string) => isHere(href, Astro.url.pathname);
@@ -8,8 +9,15 @@ const isActive = (href: string) => isHere(href, Astro.url.pathname);
 <nav class="chapter-nav" aria-label="Site">
   {
     items.map((it) => (
-      <a href={it.href} data-astro-reload={it.href === "/" ? "" : undefined} class:list={{ active: isActive(it.href) }} aria-current={isActive(it.href) ? "page" : undefined}>
-        {it.label}
+      <a
+        href={it.href}
+        data-astro-reload={it.href === "/" || it.icon ? "" : undefined}
+        class:list={{ active: isActive(it.href), mark: !!it.icon }}
+        aria-current={isActive(it.href) ? "page" : undefined}
+        aria-label={it.icon ? it.label : undefined}
+        title={it.icon ? it.label : undefined}
+      >
+        {it.icon === "infinity" ? <InfinityMark size={20} /> : it.label}
       </a>
     ))
   }
@@ -48,6 +56,10 @@ const isActive = (href: string) => isHere(href, Astro.url.pathname);
   a:hover,
   a.active {
     opacity: 1;
+  }
+  a.mark {
+    align-items: center;
+    margin-left: -4px; /* the mark has its own side bearing */
   }
   @media (max-width: 767px) {
     .chapter-nav {
