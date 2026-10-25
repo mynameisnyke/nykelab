@@ -47,6 +47,15 @@ eventRoutes.post("/api/event", async (c) => {
 
   const country = (c.req.raw as Request & { cf?: { country?: string } }).cf?.country ?? "";
 
+  // The public view counter: one more for every real page view (bots were dropped above, /admin is never sent).
+  if (type === "page_view") {
+    c.executionCtx.waitUntil(
+      c.env.DB.prepare("INSERT INTO counters (name, n) VALUES ('views', 1) ON CONFLICT(name) DO UPDATE SET n = n + 1")
+        .run()
+        .catch(() => {}), // a counting problem must never break a page
+    );
+  }
+
   c.env.EVENTS?.writeDataPoint({
     indexes: [(id || path).slice(0, 96)],
     blobs: [type, id, collection, path, country, device, referrer],
@@ -54,4 +63,13 @@ eventRoutes.post("/api/event", async (c) => {
   });
 
   return c.body(null, 204);
+});
+
+// The number shown at the bottom right of every page. Cheap (one row) and cached for a few seconds at the edge.
+eventRoutes.get("/api/views", async (c) => {
+  const row = await c.env.DB.prepare("SELECT n FROM counters WHERE name = 'views'")
+    .first<{ n: number }>()
+    .catch(() => null);
+  c.header("Cache-Control", "public, max-age=10");
+  return c.json({ views: row?.n ?? null });
 });

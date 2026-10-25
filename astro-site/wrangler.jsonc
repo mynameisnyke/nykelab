@@ -20,10 +20,10 @@
   "kv_namespaces": [{ "binding": "SESSION", "id": "c6e0df0f085f44c981dbd72aae7ed382" }],
   // Sized WebP variants are generated from originals on demand (see ../worker/src/public.ts).
   "images": { "binding": "IMAGES" },
-  // View counting. Turned off until Analytics Engine can be enabled on the account (deploys fail with error 10089
-  // otherwise); the code skips counting when the binding is absent. To turn on: enable it in the dashboard, then
-  // uncomment this line and run `npm run deploy`.
-  // "analytics_engine_datasets": [{ "binding": "EVENTS", "dataset": "nykelab_events" }],
+  // Event tracking: every page / photo / video event is written here (worker/src/events.ts); the admin Stats tab reads it back.
+  // If a deploy ever fails with error 10089, Analytics Engine is not enabled on the account (dashboard > Storage & databases >
+  // Analytics Engine): enable it, or comment this line out. The public view counter does not depend on it (it lives in D1).
+  "analytics_engine_datasets": [{ "binding": "EVENTS", "dataset": "nykelab_events" }],
   "vars": {
     // Production by default: anything other than "development" makes /admin and /api/admin/* require a valid
     // Cloudflare Access login (and answers 503 until the two ACCESS_ values below are set). Local development

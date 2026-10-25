@@ -224,7 +224,7 @@ const [feed, nav] = await Promise.all([getAzureFeed(), getNav()]);
   .az-sound {
     position: fixed;
     right: var(--inset);
-    bottom: 26px;
+    bottom: 58px; /* above the view counter */
     z-index: 21;
     display: inline-flex;
     align-items: center;
@@ -415,8 +415,8 @@ const [feed, nav] = await Promise.all([getAzureFeed(), getNav()]);
       letter-spacing: 0.26em;
     }
     .az-sound {
-      bottom: 52px; /* above the bottom nav, which runs the full width on a phone */
-      right: 16px;
+      bottom: 74px; /* above the view counter and the bottom nav */
+      right: 12px;
     }
     .az-combo {
       top: 24vh;

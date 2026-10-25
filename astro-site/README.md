@@ -140,16 +140,17 @@ Export from Lightroom with **All Metadata** and without "Remove Location Info", 
 
 ## Going live
 
-Nothing is deployed yet (the Cloudflare account has no Workers, D1 or R2 as of 24 Oct 2026). `wrangler.jsonc` is production by default (`ENVIRONMENT: "production"`): `/admin` and `/api/admin/*` answer `503 Admin is not configured` until Access is set up, so a first deploy is safe. Local development gets `ENVIRONMENT=development` from `.dev.vars` (gitignored), which skips the admin login; if you ever create a new checkout, recreate it: `echo ENVIRONMENT=development > astro-site/.dev.vars`.
+Staging is live: https://nykelab-astro.nykelab-astro.workers.dev (since 24 Oct 2026; Infinite Azure and the view counter since 25 Oct). `wrangler.jsonc` is production by default (`ENVIRONMENT: "production"`): `/admin` and `/api/admin/*` require a valid Cloudflare Access login. Local development gets `ENVIRONMENT=development` from `.dev.vars` (gitignored); in a new checkout recreate it: `echo ENVIRONMENT=development > astro-site/.dev.vars`.
 
-1. **Account:** `npx wrangler login`; enable R2 in the dashboard (R2 needs a payment method on file); the `nykelab.nyc` zone must be on Cloudflare.
-   *Staging is live (24 Oct 2026): https://nykelab-astro.nykelab-astro.workers.dev. The `SESSION` KV namespace id is pinned in `wrangler.jsonc` (without it every deploy tries to create a second one). View counting (Analytics Engine) is commented out in `wrangler.jsonc` because the account could not enable it yet (error 10089); the Worker skips counting when the binding is absent. Enable it in the dashboard, uncomment the binding, redeploy.*
-2. **Staging deploy:** `cd astro-site && npm run deploy` (auto-provisions D1 / R2 / KV from `wrangler.jsonc`), then `npx wrangler d1 migrations apply DB --remote`. Open the `*.workers.dev` URL it prints.
-3. **Lock the admin before sharing any URL:** Zero Trust, Access, Applications, self-hosted. Destinations `nykelab.nyc/admin*` and `nykelab.nyc/api/admin/*` (plus the workers.dev host while testing), policy Allow with your email. Copy the Audience tag and team domain into `ACCESS_AUD` / `ACCESS_TEAM_DOMAIN` in `wrangler.jsonc`, deploy again. Check: logged in, `/api/admin/me` returns your email; in a private window `/admin` goes to the Access login and `/api/admin/me` is 401/403.
-4. **Photos:** upload through `/admin` (originals; sized WebP variants are generated on first request). Until photos exist the pages render with empty photo slots.
-5. **Privacy check once, with a geotagged JPEG** *(done 24 Oct 2026: a Sony A7 III original with GPS, lens, serial-style tags and date, 330 EXIF tags, produced public `w480/900/1440/2400.webp` copies with zero metadata, only pixel size; the original stays private in R2)*: upload it, then `curl -s https://<host>/m/<id>/w900.webp | exiftool -` must show no GPS. Originals are never served (only `main|small|poster` legacy keys and `w<width>.webp` variants).
-6. **Domain:** uncomment the `routes` entry in `wrangler.jsonc`, deploy.
-7. **Optional:** `CF_ACCOUNT_ID` + `wrangler secret put CF_API_TOKEN` for the admin Stats tab; push the repo to GitHub and connect Workers Builds for auto-deploys.
+Everything below is done for staging except steps 6 and 7. To put the site on `nykelab.nyc`:
+
+1. **DNS:** in the Cloudflare dashboard for the `nykelab.nyc` zone, delete the two old `A` records for the apex (they point at the previous host). Keep the Gmail `MX` and `TXT` records.
+2. **Domain:** uncomment `routes` at the bottom of `wrangler.jsonc` (`{ "pattern": "nykelab.nyc", "custom_domain": true }`), add a second `{ "pattern": "www.nykelab.nyc", "custom_domain": true }` or a redirect rule from `www` to the apex, then `npm run deploy`. Cloudflare creates the DNS record and certificate itself.
+3. **Admin:** in Zero Trust > Access > the `nykelab-astro` application, add `nykelab.nyc/admin*` and `nykelab.nyc/api/admin/*` as destinations (keep the workers.dev ones while testing). Check from a private window: `/admin` redirects to the Access login, `/api/admin/me` is 401/403.
+4. **Counter:** the view counter starts from whatever is in the `counters` table. Reset it right before launch: `npx wrangler d1 execute DB --remote --command "UPDATE counters SET n = 0 WHERE name = 'views'"`.
+5. **Analytics (optional):** the `EVENTS` binding writes every page / photo / video event to Analytics Engine. To read it in the admin Stats tab: set `CF_ACCOUNT_ID` in `wrangler.jsonc` vars and `npx wrangler secret put CF_API_TOKEN` (a token with Account Analytics: Read).
+6. **Placeholders:** delete the sample journal posts (src/content) or replace them; check `/about`.
+7. **Backup:** push the repo to GitHub (there is no remote yet) and optionally connect Workers Builds for auto-deploys.
 
 ## Notes
 
@@ -163,4 +164,4 @@ Nothing is deployed yet (the Cloudflare account has no Workers, D1 or R2 as of 2
 - World (three.js walkable gallery): deliberately skipped for now. When wanted, it mounts as Vue islands like the admin does. (The admin's "In World" checkbox and the `featured` flag are kept so nothing is lost.)
 - The Figma Offset collage and Diptych sections (they need an editorial pairing field; today layout is derived from orientation).
 - Dropped on purpose: the menu overlay's voyage preview photo and sunburst (the home globe replaced the sunburst; the menu lists the main destinations). The Figma MenuOverlay and Sunburst components still show the old design. About links: GitHub, LinkedIn and Email are the real ones. There is no Instagram account, so none is linked.
-- Production deploy: not done yet. See "Going live" below.
+- The custom domain (nykelab.nyc): see "Going live".
