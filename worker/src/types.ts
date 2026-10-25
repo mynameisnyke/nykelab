@@ -1,7 +1,8 @@
 export interface Env {
   DB: D1Database;
   MEDIA: R2Bucket;
-  EVENTS: AnalyticsEngineDataset;
+  /** Optional: view counting is skipped when the Analytics Engine binding is not configured. */
+  EVENTS?: AnalyticsEngineDataset;
   /** Cloudflare Images binding: sized variants are generated from originals on demand. */
   IMAGES: ImagesBinding;
   ASSETS: Fetcher;

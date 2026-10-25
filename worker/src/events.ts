@@ -47,7 +47,7 @@ eventRoutes.post("/api/event", async (c) => {
 
   const country = (c.req.raw as Request & { cf?: { country?: string } }).cf?.country ?? "";
 
-  c.env.EVENTS.writeDataPoint({
+  c.env.EVENTS?.writeDataPoint({
     indexes: [(id || path).slice(0, 96)],
     blobs: [type, id, collection, path, country, device, referrer],
     doubles: [value],

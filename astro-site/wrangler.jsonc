@@ -15,9 +15,15 @@
     }
   ],
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "nykelab-media" }],
+  // Astro sessions (the adapter adds this binding itself; naming the existing namespace stops wrangler
+  // from trying to create a second one on every deploy).
+  "kv_namespaces": [{ "binding": "SESSION", "id": "c6e0df0f085f44c981dbd72aae7ed382" }],
   // Sized WebP variants are generated from originals on demand (see ../worker/src/public.ts).
   "images": { "binding": "IMAGES" },
-  "analytics_engine_datasets": [{ "binding": "EVENTS", "dataset": "nykelab_events" }],
+  // View counting. Turned off until Analytics Engine can be enabled on the account (deploys fail with error 10089
+  // otherwise); the code skips counting when the binding is absent. To turn on: enable it in the dashboard, then
+  // uncomment this line and run `npm run deploy`.
+  // "analytics_engine_datasets": [{ "binding": "EVENTS", "dataset": "nykelab_events" }],
   "vars": {
     // Production by default: anything other than "development" makes /admin and /api/admin/* require a valid
     // Cloudflare Access login (and answers 503 until the two ACCESS_ values below are set). Local development
