@@ -12,16 +12,24 @@
         <textarea
           v-model="edits[m.id].caption"
           rows="2"
-          placeholder="Caption (line breaks allowed)"
+          placeholder="Caption (blank = from the photo's tags)"
           class="field w-full"
           @blur="save(m, 'caption')"
         ></textarea>
         <input
           v-model="edits[m.id].place"
-          placeholder="Place"
+          placeholder="Place (blank = from the photo's GPS or tags)"
           class="field w-full"
           @blur="save(m, 'place')"
         />
+        <p v-if="m.type === 'image'" class="text-[11px] leading-4 text-white/45">
+          <span v-if="m.placeSource === 'gps'">Place from the photo's GPS (shown as the city only).</span>
+          <span v-else-if="m.placeSource === 'tags'">Place from the photo's location tags.</span>
+          <span v-else-if="m.placeSource === 'manual'">Place typed by you.</span>
+          <span v-else>No place in the photo yet.</span>
+          <span v-if="m.captionSource === 'photo'"> Caption from the photo.</span>
+          <span v-if="m.capturedAt || m.camera"><br />{{ details(m) }}</span>
+        </p>
         <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-white/70">
           <label class="flex items-center gap-1">
             <input type="checkbox" :checked="m.published" @change="toggle(m, 'published', $event)" /> Published
@@ -37,6 +45,7 @@
           <div class="flex gap-1">
             <button v-if="reorderable" class="btn" :disabled="i === 0" @click="shift(i, -1)" aria-label="Move earlier">↑</button>
             <button v-if="reorderable" class="btn" :disabled="i === media.length - 1" @click="shift(i, 1)" aria-label="Move later">↓</button>
+            <button v-if="m.type === 'image'" class="btn" title="Read caption, place and camera data from the file again" @click="reread(m)">Re-read</button>
             <button class="btn btn--danger" @click="remove(m)">Delete</button>
           </div>
         </div>
@@ -81,6 +90,13 @@ watch(
   { immediate: true },
 );
 
+// "Jan 30, 2020 · SONY ILCE-7M3 · 85mm f/1.8 · 1/250 · ISO 400"
+function details(m: ApiMedia) {
+  const when = m.capturedAt ? new Date(`${m.capturedAt}Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }) : "";
+  const gear = [m.focal ? `${Math.round(m.focal)}mm` : "", m.aperture ? `f/${m.aperture}` : "", m.shutter || "", m.iso ? `ISO ${m.iso}` : ""].filter(Boolean).join(" · ");
+  return [when, m.camera, gear].filter(Boolean).join(" · ");
+}
+
 const thumb = (m: ApiMedia) => m.urls.small ?? m.urls.poster ?? m.urls.main;
 
 async function run(fn: () => Promise<unknown>, ok?: string) {
@@ -97,6 +113,7 @@ const save = (m: ApiMedia, field: "caption" | "place") => {
   if (edits[m.id][field] === m[field]) return;
   run(() => admin.updateMedia(m.id, { [field]: edits[m.id][field] }), "Saved");
 };
+const reread = (m: ApiMedia) => run(() => admin.readMetadata(m.id), "Read from the photo");
 const toggle = (m: ApiMedia, field: "published" | "featured", e: Event) =>
   run(() => admin.updateMedia(m.id, { [field]: (e.target as HTMLInputElement).checked }));
 const move = (m: ApiMedia, e: Event) =>

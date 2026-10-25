@@ -14,6 +14,22 @@ export interface ApiMedia {
   featured: boolean;
   urls: { main: string; small?: string; poster?: string; variants?: { width: number; url: string }[] };
   createdAt: string;
+  // Read from the photo at upload. The exact GPS fix is never sent to the browser (only hasGps).
+  capturedAt?: string | null;
+  camera?: string;
+  lens?: string;
+  focal?: number | null;
+  aperture?: number | null;
+  iso?: number | null;
+  shutter?: string;
+  city?: string;
+  region?: string;
+  country?: string;
+  placeLat?: number | null;
+  placeLon?: number | null;
+  placeSource?: "tags" | "gps" | "manual" | "";
+  captionSource?: "photo" | "manual" | "";
+  hasGps?: boolean;
 }
 
 export interface CollectionSummary {
@@ -112,6 +128,9 @@ export const admin = {
       Pick<ApiMedia, "caption" | "place" | "collection" | "orientation" | "published" | "featured">
     >,
   ) => request<{ media: ApiMedia }>(`/api/admin/media/${id}`, json("PATCH", patch)).then((r) => r.media),
+  /** Re-read caption, place and camera data from the stored original. `overwrite` also replaces typed values. */
+  readMetadata: (id: string, overwrite = false) =>
+    request<{ media: ApiMedia }>(`/api/admin/media/${id}/read-metadata`, json("POST", { overwrite })).then((r) => r.media),
   deleteMedia: (id: string) =>
     request<{ ok: true }>(`/api/admin/media/${id}`, { method: "DELETE" }),
   orderMedia: (collection: string, ids: string[]) =>

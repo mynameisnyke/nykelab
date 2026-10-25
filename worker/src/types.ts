@@ -39,6 +39,25 @@ export interface MediaRow {
   size_bytes: number;
   created_at: string;
   updated_at: string;
+  // Read from the photo at upload (migrations/0003_photo_meta.sql). gps_lat / gps_lon are PRIVATE.
+  captured_at: string | null;
+  camera: string;
+  lens: string;
+  focal: number | null;
+  aperture: number | null;
+  iso: number | null;
+  shutter: string;
+  city: string;
+  region: string;
+  country: string;
+  country_code: string;
+  place_lat: number | null;
+  place_lon: number | null;
+  place_source: "tags" | "gps" | "manual" | "";
+  caption_source: "photo" | "manual" | "";
+  gps_lat: number | null;
+  gps_lon: number | null;
+  meta_read_at: string | null;
 }
 
 export interface CollectionRow {
@@ -70,4 +89,23 @@ export interface ApiMedia {
     variants?: { width: number; url: string }[];
   };
   createdAt: string;
+  /** Local wall-clock capture time ("2020-01-30T05:56:22"), read from the photo. */
+  capturedAt: string | null;
+  camera: string;
+  lens: string;
+  focal: number | null;
+  aperture: number | null;
+  iso: number | null;
+  shutter: string;
+  /** City-level place read from the photo. The exact GPS fix is never exposed. */
+  city: string;
+  region: string;
+  country: string;
+  countryCode: string;
+  placeLat: number | null;
+  placeLon: number | null;
+  placeSource: "tags" | "gps" | "manual" | "";
+  captionSource: "photo" | "manual" | "";
+  /** The file carried a GPS fix (the fix itself stays private). */
+  hasGps: boolean;
 }

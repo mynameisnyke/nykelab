@@ -36,6 +36,14 @@
           >
             {{ c.title }} ({{ c.count }})
           </button>
+          <button
+            class="pill ml-auto"
+            :disabled="rereading"
+            title="Read caption, place and camera data from every photo shown (typed values are kept)"
+            @click="rereadAll"
+          >
+            {{ rereading ? "Reading…" : "Re-read all from photos" }}
+          </button>
         </div>
 
         <MediaGrid
@@ -72,7 +80,7 @@ const tabs = [
   { id: "stats", label: "Stats" },
 ] as const;
 
-const { message: toast, kind: toastKind } = useToast();
+const { message: toast, kind: toastKind, show, fail } = useToast();
 const tab = ref<(typeof tabs)[number]["id"]>("library");
 const email = ref("");
 const collections = ref<AdminCollection[]>([]);
@@ -85,6 +93,27 @@ const viewCounts = ref<Record<string, number>>({});
 const visibleMedia = computed(() =>
   filter.value ? allMedia.value.filter((m) => m.collection === filter.value) : allMedia.value,
 );
+
+const rereading = ref(false);
+// Photos uploaded before auto-fill existed, or after the reader improved. Typed captions and places are kept.
+async function rereadAll() {
+  const photos = visibleMedia.value.filter((m) => m.type === "image");
+  if (!photos.length) return;
+  rereading.value = true;
+  let done = 0;
+  try {
+    for (const m of photos) {
+      await admin.readMetadata(m.id);
+      done++;
+    }
+    show(`Read ${done} photo${done === 1 ? "" : "s"}`);
+  } catch (err) {
+    fail(err);
+  } finally {
+    rereading.value = false;
+    await refresh();
+  }
+}
 
 async function refresh() {
   try {

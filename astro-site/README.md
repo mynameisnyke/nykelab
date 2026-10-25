@@ -104,6 +104,21 @@ npm run catalog -- /Volumes/Whiskey/photos-3plus-or-picked.csv   # rerun wheneve
 
 Layout rhythm (same idea as the Vue `CollectionView`, using the Figma sections): hero = first landscape item; remaining landscapes alternate full-bleed / inset; runs of portraits become 1–3-up rows; the next collection is shown as "Next chapter".
 
+## Upload metadata (caption and place filled in automatically)
+
+When a photo is uploaded the Worker reads its own tags from the stored original (`worker/src/ingest.ts`, EXIF / IPTC / XMP via `exifr`) and fills in what you left blank; anything you type wins and is remembered as typed.
+
+| Field | Where it comes from |
+|---|---|
+| **Caption** | XMP description, IPTC caption, then EXIF ImageDescription. Camera defaults ("SONY DSC", file names, one-word junk) are ignored. |
+| **Place** | 1) place text written in Lightroom (IPTC/XMP city, state, country), else 2) GPS, as the biggest city within 20 km (`worker/src/places.ts`, offline GeoNames `cities15000`, CC BY 4.0, regenerate with `node worker/scripts/build-cities.mjs`); far from any city it is region and country only. |
+| **Capture time, camera, lens, focal length, aperture, shutter, ISO** | EXIF. Stored in `media` (migration `0003_photo_meta.sql`) and returned by the API. |
+| **Exact GPS fix** | Stored in `gps_lat` / `gps_lon` for the admin's own use. **No API returns it** (tests assert this); the public place is the city. |
+
+The admin shows where each value came from and has **Re-read** (one photo) and **Re-read all from photos** (typed values are kept; `{"overwrite": true}` on `POST /api/admin/media/:id/read-metadata` replaces them). Test photos with known tags are in `tests/fixtures` (made with exiftool); `tests/ingest.spec.ts` and `tests/upload-metadata.spec.ts` cover the reader and the whole upload path.
+
+Export from Lightroom with **All Metadata** and without "Remove Location Info", otherwise there is nothing to read. Photos that carry neither GPS nor place text get no place; the site then falls back to the collection's place.
+
 ## Going live
 
 Nothing is deployed yet (the Cloudflare account has no Workers, D1 or R2 as of 24 Oct 2026). `wrangler.jsonc` is production by default (`ENVIRONMENT: "production"`): `/admin` and `/api/admin/*` answer `503 Admin is not configured` until Access is set up, so a first deploy is safe. Local development gets `ENVIRONMENT=development` from `.dev.vars` (gitignored), which skips the admin login; if you ever create a new checkout, recreate it: `echo ENVIRONMENT=development > astro-site/.dev.vars`.
