@@ -24,3 +24,11 @@ Target: the staging site (`nykelab-astro.nykelab-astro.workers.dev`), built from
 ## Not done on purpose
 - Proofs are 1280 px, so full-width heroes on large retina screens are slightly soft. The same keys can be overwritten later with bigger exports.
 - Nothing already on the site is deleted or changed.
+
+## Result (staging, 2026-10-25)
+
+- Published: 68 collections, 1,028 photos, 543 clips (2.40 GB uploaded). Rerunning `node scripts/publish-library.mjs --target remote` skips everything unchanged.
+- Slug collision: the library's Bogota is `bogota-library` (staging's own `bogota` is untouched).
+- Verified live: every clip, poster and one image variant per photo answers 200/206 (2,113 URLs); all 68 collection pages load with no broken images, video errors, failed requests or horizontal scroll at 1280 and 390 px.
+- Found and fixed while verifying: the "Next chapter" row on collection pages overflowed sideways when the next title was long (`[slug].astro`: `minmax(0, 1fr)` column, wrapping heading).
+- Not done on purpose: `tmag` look, `text_on` styling, home covers from each collection's rank-1 photo, higher-resolution stills (the proofs are 1280 px).

@@ -237,7 +237,7 @@ const lines = (s: string) => s.split("\n").filter(Boolean);
 
   .next {
     display: grid;
-    grid-template-columns: 1fr 620px;
+    grid-template-columns: minmax(0, 1fr) 620px;
     align-items: center;
     gap: var(--gutter);
     min-height: 620px;
@@ -254,7 +254,8 @@ const lines = (s: string) => s.split("\n").filter(Boolean);
   h2 {
     font-size: 64px;
     line-height: 72px;
-    white-space: pre;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
   .peek {
     aspect-ratio: 620 / 400;
@@ -284,7 +285,7 @@ const lines = (s: string) => s.split("\n").filter(Boolean);
       gap: 40px;
     }
     .next {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       min-height: 0;
       padding-top: 40px;
     }
