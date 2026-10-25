@@ -96,7 +96,11 @@ publicRoutes.get("/m/*", async (c) => {
   const v = VARIANT_RE.exec(key);
   if (v) {
     const [, id, w] = v;
-    const cached = await c.env.MEDIA.get(key, { onlyIf: c.req.raw.headers });
+    // a replaced photograph is asked for as ?r=<rev>: its sized copies are cached under their own keys, so the old ones are never reused
+    const q = c.req.query("r");
+    const rev = q && /^\d{1,3}$/.test(q) ? Number(q) : 1;
+    const cacheKey = rev > 1 ? `${id}/w${w}-r${rev}.webp` : key;
+    const cached = await c.env.MEDIA.get(cacheKey, { onlyIf: c.req.raw.headers });
     if (cached) return variantResponse(cached);
 
     const found = await c.env.MEDIA.list({ prefix: `${id}/orig.`, limit: 1 });
@@ -110,7 +114,7 @@ publicRoutes.get("/m/*", async (c) => {
       .output({ format: "image/webp", quality: width >= 1440 ? 85 : 80 });
     const body = await out.response().arrayBuffer();
     c.executionCtx.waitUntil(
-      c.env.MEDIA.put(key, body, { httpMetadata: { contentType: "image/webp" } }),
+      c.env.MEDIA.put(cacheKey, body, { httpMetadata: { contentType: "image/webp" } }),
     );
     return new Response(body, {
       headers: {

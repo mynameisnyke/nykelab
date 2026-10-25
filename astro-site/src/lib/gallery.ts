@@ -45,5 +45,9 @@ export async function loadGalleries(voyages: Voyage[], order: number[], year?: n
     .sort((a, b) => b.voyage.count - a.voyage.count)
     .filter((g) => !year || g.photos.length || new Date(g.voyage.start).getUTCFullYear() === year)
     .flatMap((g) => slugsOf(g.voyage).flatMap((c) => (videos.has(c) ? [videos.get(c)!] : [])))[0];
-  return { groups, heroVideo };
+  // hero still, when there is no clip: the best-ranked landscape from the biggest voyage that has one sharp enough to fill the screen
+  const heroPhoto = [...order]
+    .sort((a, b) => voyages[b].count - voyages[a].count)
+    .flatMap((i) => merged(voyages[i]).filter((p) => p.type === "image" && p.orientation !== "portrait" && p.heroOk).slice(0, 1))[0];
+  return { groups, heroVideo, heroPhoto };
 }

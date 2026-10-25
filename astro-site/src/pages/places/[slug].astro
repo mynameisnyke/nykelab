@@ -35,7 +35,7 @@ const facts = place
       { label: "Golden hour", value: `${Math.round(goldenShare(mine) * 100)}%` },
     ]
   : [];
-const { groups, heroVideo } = await loadGalleries(voyages, order);
+const { groups, heroVideo, heroPhoto } = await loadGalleries(voyages, order);
 const next = place && places.length > 1 ? places[(at + 1) % places.length] : undefined;
 const hero = place ? images[heroImage(images, place.cover, place.voyages.map((i) => voyages[i].cover))] : undefined;
 ---
@@ -50,7 +50,7 @@ const hero = place ? images[heroImage(images, place.cover, place.voyages.map((i)
       </main>
     ) : (
       <main>
-        <GalleryHero title={place.name} subtitle={`${place.country} · ${fmtN(place.count)} photographs`} crumb={{ label: "Places", href: "/places" }} image={hero} video={heroVideo} />
+        <GalleryHero title={place.name} subtitle={`${place.country} · ${fmtN(place.count)} photographs`} crumb={{ label: "Places", href: "/places" }} image={hero} video={heroVideo} photo={heroPhoto} />
         <section class="facts"><MetaStrip facts={facts} /></section>
         {groups.map((g) => <GalleryGroup {...g} count={g.voyage.count} />)}
         {next && <div class="next-wrap"><NextBlock eyebrow="Next place" title={next.name} meta={`${next.country} · ${fmtN(next.count)} photographs`} href={`/places/${next.slug}`} image={images[next.cover]} /></div>}

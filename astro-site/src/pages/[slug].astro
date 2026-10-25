@@ -8,6 +8,7 @@ import ChapterNav from "../components/ChapterNav.astro";
 import MediaItem from "../components/MediaItem.astro";
 import { getCollectionPage, getNav, type Photo } from "../lib/collections";
 import GeoCaption from "../components/GeoCaption.astro";
+import { pickHero } from "../lib/hero";
 import { placeText } from "../lib/caption";
 
 export const prerender = false;
@@ -19,9 +20,8 @@ else Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60
 
 const nav = page ? await getNav() : [];
 const media = page?.media ?? [];
-// The hero is the first landscape clip when the collection has one (it plays), else the first landscape still.
-const firstLandscape = (type?: "video") => media.findIndex((m) => m.orientation !== "portrait" && (!type || m.type === type));
-const heroIdx = Math.max(0, firstLandscape("video") >= 0 ? firstLandscape("video") : firstLandscape());
+// The hero: a landscape clip if the collection has one, else a landscape still sharp enough to fill the screen (see lib/hero.ts).
+const { index: heroIdx } = pickHero(media);
 const hero = media[heroIdx];
 
 // Layout rhythm: landscapes alternate full-bleed / inset; runs of portraits
@@ -37,7 +37,8 @@ for (let i = 0; i < rest.length; ) {
     while (i < rest.length && rest[i].orientation === "portrait" && run.length < 3) run.push(rest[i++]);
     blocks.push({ kind: "row", ms: run });
   } else {
-    blocks.push({ kind: "single", style: landscapes++ % 2 === 0 ? "full" : "inset", m });
+    // full-bleed fills the whole width, so only a sharp still (or a clip) gets it; a smaller one sits inset
+    blocks.push({ kind: "single", style: m.heroOk && landscapes++ % 2 === 0 ? "full" : "inset", m });
     i++;
   }
 }

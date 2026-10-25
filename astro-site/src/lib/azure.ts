@@ -4,20 +4,20 @@ import { env } from "cloudflare:workers";
 import type { Env } from "../../../worker/src/types";
 import { cached } from "./cache";
 
-/** [id, width, height, place, best (1 = one of its collection's top three)] */
-export type AzureItem = [id: string, w: number, h: number, place: string, best: 0 | 1];
+/** [id, width, height, place, best (1 = one of its collection's top three), rev (file version, for the cache)] */
+export type AzureItem = [id: string, w: number, h: number, place: string, best: 0 | 1, rev: number];
 
 async function load(): Promise<AzureItem[]> {
   const { results } = await (env as unknown as Env).DB
     .prepare(
-      `SELECT id, width, height, place, rn FROM (
-         SELECT m.id, m.width, m.height, m.place,
+      `SELECT id, width, height, place, rev, rn FROM (
+         SELECT m.id, m.width, m.height, m.place, m.rev,
                 ROW_NUMBER() OVER (PARTITION BY m.collection ORDER BY m.position, m.created_at) AS rn
            FROM media m JOIN collections c ON c.slug = m.collection
           WHERE m.published = 1 AND c.published = 1 AND m.type = 'image' AND m.key_original IS NOT NULL AND m.width > 0 AND m.height > 0)`,
     )
-    .all<{ id: string; width: number; height: number; place: string; rn: number }>();
-  return results.map((r) => [r.id, r.width, r.height, r.place, r.rn <= 3 ? 1 : 0]);
+    .all<{ id: string; width: number; height: number; place: string; rev: number; rn: number }>();
+  return results.map((r) => [r.id, r.width, r.height, r.place, r.rn <= 3 ? 1 : 0, r.rev ?? 1]);
 }
 
 export const getAzureFeed = (): Promise<AzureItem[]> => cached("azure-feed", 300, load);

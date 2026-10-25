@@ -26,6 +26,7 @@ const { values: a } = parseArgs({
     bucket: { type: "string", default: "nykelab-media" },
     "position-base": { type: "string", default: "100" },
     "exclude-borderline": { type: "boolean", default: false },
+    "photos-dir": { type: "string", default: "web2560" }, // the 2560 px set; its own manifest has the real sizes and hero_ok
     "no-clips": { type: "boolean", default: false }, // photographs only (a quick local copy to build pages against)
   },
 });
@@ -53,7 +54,11 @@ function sh(args, { input } = {}) {
 }
 
 // ---- plan ------------------------------------------------------------------------------------------
-const photosM = JSON.parse(fs.readFileSync(path.join(LIB, "photos/manifest.json"), "utf8"));
+const PHOTO_DIR = path.join("photos", a["photos-dir"]);
+const photosM = JSON.parse(fs.readFileSync(path.join(LIB, PHOTO_DIR, "manifest.json"), "utf8"));
+// The photographs were re-rendered at 2560 px and replace the 1280 px proofs under the same keys. rev 2 gives them new URLs, so the
+// browser and the cache never serve a sized copy made from the old file.
+const PHOTO_REV = 2;
 const clipsAll = JSON.parse(fs.readFileSync(path.join(LIB, "subclips/manifest.json"), "utf8"));
 
 // Duplicate clips are hidden, never deleted: ids listed in excluded-clips.json (see scripts/build-excluded-clips.mjs)
@@ -159,9 +164,10 @@ function rowFor(c, it, position) {
     const g = GEO[it.id];
     return {
       id, position, type: "image", orientation: it.orientation, width: u.width, height: u.height, source_id: it.id,
-      files: [{ key: `${id}/orig.jpg`, file: path.join(LIB, "photos", u.file), type: "image/jpeg" }],
+      files: [{ key: `${id}/orig.jpg`, file: path.join(LIB, PHOTO_DIR, u.file), type: "image/jpeg" }],
       key_main: `${id}/orig.jpg`, key_original: `${id}/orig.jpg`, key_poster: null,
       captured_at: it.capture ?? null, avg_colour: u.avg_colour, text_on: u.text_on, look: it.look, duration: null,
+      hero_ok: it.hero_ok ? 1 : 0, rev: PHOTO_REV,
       place: g?.place ?? c.place, geo_lat: g ? g.lat : c.lat, geo_lon: g ? g.lon : c.lon, geo_source: g ? g.source : c.place ? "trip" : "",
     };
   }
@@ -177,6 +183,7 @@ function rowFor(c, it, position) {
     ],
     key_main: `${id}/main.mp4`, key_original: null, key_poster: `${id}/poster.jpg`,
     captured_at: null, avg_colour: u.avg_colour, text_on: u.text_on, look: "voyages", duration: u.duration,
+    hero_ok: 1, rev: 1,
     place: clip.place, geo_lat: clip.lat, geo_lon: clip.lon, geo_source: clip.place ? "trip" : "",
   };
 }
@@ -232,15 +239,15 @@ ON CONFLICT(slug) DO UPDATE SET title = excluded.title, position = excluded.posi
   for (const r of rows) {
     out.push(`INSERT INTO media (id, collection, type, caption, place, orientation, width, height, position, published, featured,
   key_main, key_small, key_poster, size_bytes, key_original, captured_at, avg_colour, text_on, look, source_id, duration,
-  geo_lat, geo_lon, geo_source)
+  geo_lat, geo_lon, geo_source, hero_ok, rev)
 VALUES (${q(r.id)}, ${q(slug)}, ${q(r.type)}, '', ${q(r.place)}, ${q(r.orientation)}, ${r.width}, ${r.height}, ${r.position}, 1, 0,
   ${q(r.key_main)}, NULL, ${q(r.key_poster)}, ${r.files.reduce((n, f) => n + (f.size ?? 0), 0)}, ${q(r.key_original)}, ${q(r.captured_at)}, ${q(r.avg_colour)}, ${q(r.text_on)}, ${q(r.look)}, ${q(r.source_id)}, ${q(r.duration)},
-  ${q(r.geo_lat)}, ${q(r.geo_lon)}, ${q(r.geo_source)})
+  ${q(r.geo_lat)}, ${q(r.geo_lon)}, ${q(r.geo_source)}, ${r.hero_ok}, ${r.rev})
 ON CONFLICT(id) DO UPDATE SET collection = excluded.collection, position = excluded.position, width = excluded.width,
   height = excluded.height, orientation = excluded.orientation, key_main = excluded.key_main, key_poster = excluded.key_poster,
   key_original = excluded.key_original, size_bytes = excluded.size_bytes, captured_at = excluded.captured_at,
   avg_colour = excluded.avg_colour, text_on = excluded.text_on, look = excluded.look, duration = excluded.duration, published = 1,
-  place = excluded.place, geo_lat = excluded.geo_lat, geo_lon = excluded.geo_lon, geo_source = excluded.geo_source,
+  hero_ok = excluded.hero_ok, rev = excluded.rev, place = excluded.place, geo_lat = excluded.geo_lat, geo_lon = excluded.geo_lon, geo_source = excluded.geo_source,
   updated_at = datetime('now');`);
   }
   return out.join("\n");

@@ -72,12 +72,9 @@ const [feed, nav] = await Promise.all([getAzureFeed(), getNav()]);
   :global(html.az-locked body) {
     overflow: hidden;
   }
-  /* the page's own backdrop sits on <html> so the fixed video (behind everything) is not painted over by <body> */
-  :global(html:root) {
-    background: #050f18;
-  }
+  /* The loop is a fixed layer *above* the body's own background (z-index 0, not negative): a negative layer is painted under
+     <body>'s background, and which stylesheet wins for that background depends on build order, so it once hid the video. */
   :global(body) {
-    background: transparent;
     color: #fff;
   }
   .az-bg {
@@ -86,13 +83,13 @@ const [feed, nav] = await Promise.all([getAzureFeed(), getNav()]);
     width: 100%;
     height: 100%;
     object-fit: cover;
-    z-index: -2;
+    z-index: 0;
     background: #07131d;
   }
   .az-scrim {
     position: fixed;
     inset: 0;
-    z-index: -1;
+    z-index: 0; /* later in the page than the video, so it lies over it */
     background: linear-gradient(to bottom, rgba(3, 12, 20, 0.35), rgba(3, 12, 20, 0.12) 40%, rgba(3, 12, 20, 0.4));
     pointer-events: none;
   }
