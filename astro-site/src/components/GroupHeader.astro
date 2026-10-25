@@ -13,7 +13,7 @@ const { voyage: v, count } = Astro.props;
   <span class="dot" style={`--c:${v.color}`}></span>
   <h2>{v.title}</h2>
   <span class="meta">{fmtMonthYear(v.start)} · {fmtN(count)} photographs</span>
-  {v.available && <a class="open eyebrow" href={`/${v.slug}`}>Open voyage →</a>}
+  {v.collection && <a class="open eyebrow" href={`/${v.collection}`}>Open voyage →</a>}
 </header>
 
 <style>

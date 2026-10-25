@@ -6,6 +6,8 @@ export interface Env {
   /** Cloudflare Images binding: sized variants are generated from originals on demand. */
   IMAGES: ImagesBinding;
   ASSETS: Fetcher;
+  /** KV namespace; page-data cache entries live under "cache:" (src/lib/cache.ts). */
+  SESSION?: KVNamespace;
   ENVIRONMENT: string;
   ACCESS_TEAM_DOMAIN?: string;
   ACCESS_AUD?: string;
@@ -58,6 +60,16 @@ export interface MediaRow {
   gps_lat: number | null;
   gps_lon: number | null;
   meta_read_at: string | null;
+  // Graded library (migrations/0004_library.sql)
+  avg_colour: string;
+  text_on: string;
+  look: string;
+  source_id: string | null;
+  duration: number | null;
+  // Where it was made (migrations/0005_geo.sql); already rounded for display
+  geo_lat: number | null;
+  geo_lon: number | null;
+  geo_source: string;
 }
 
 export interface CollectionRow {
@@ -97,7 +109,13 @@ export interface ApiMedia {
   aperture: number | null;
   iso: number | null;
   shutter: string;
-  /** City-level place read from the photo. The exact GPS fix is never exposed. */
+  /**
+   * Where it was made, rounded for display (about 100 m; coarser when only approximate), with how we know:
+   * "exif" the photo's own GPS, "phone" / "phone-approx" matched to a phone photo taken at the same time, "trip" no coordinates.
+   * The exact GPS fix is never exposed.
+   */
+  geo: { lat: number; lon: number; source: string } | null;
+  /** City-level place read from the photo. */
   city: string;
   region: string;
   country: string;
@@ -108,4 +126,10 @@ export interface ApiMedia {
   captionSource: "photo" | "manual" | "";
   /** The file carried a GPS fix (the fix itself stays private). */
   hasGps: boolean;
+  /** Average colour as "#rrggbb": a placeholder while the file loads ("" when unknown). */
+  avgColour: string;
+  /** "light" or "dark": the text colour that reads best on top of this item ("" when unknown). */
+  textOn: "light" | "dark" | "";
+  /** Clip length in seconds (videos). */
+  duration: number | null;
 }

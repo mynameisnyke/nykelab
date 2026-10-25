@@ -127,7 +127,14 @@ export function initHome(): () => void {
   const newest = voyages.reduce((a, v, i) => (v.start > voyages[a].start ? i : a), 0);
   function showImage(i: number) {
     const img = images[i];
-    if (!img) return;
+    if (!img) {
+      // No published photograph for this voyage: show nothing rather than another voyage's.
+      previewImg.removeAttribute("src");
+      previewImg.removeAttribute("srcset");
+      previewImg.alt = "";
+      previewImg.style.opacity = "0";
+      return;
+    }
     if (previewImg.getAttribute("src") === img.src) return;
     previewImg.style.opacity = "0";
     previewImg.onload = () => (previewImg.style.opacity = "1");
@@ -160,7 +167,7 @@ export function initHome(): () => void {
     const v = voyages[vi];
     previewOpen.hidden = !v.available;
     if (v.available) {
-      previewOpen.href = `/${v.slug}`;
+      previewOpen.href = `/${v.collection}`;
       previewOpen.textContent = `Open ${v.title} →`;
     }
   }

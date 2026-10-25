@@ -1,0 +1,200 @@
+{
+ "note": "Named places for captions: a photo or day-stop within radiusKm of an entry is captioned with its name (entries marked city are only used as the place for a Lightroom collection named after them, see `collections`). Coordinates are approximate (centre of the place).",
+ "places": [
+  {
+   "name": "White Sands National Park, New Mexico",
+   "lat": 32.7872,
+   "lon": -106.3257,
+   "radiusKm": 30
+  },
+  {
+   "name": "Rio Grande Gorge Bridge, New Mexico",
+   "lat": 36.3205,
+   "lon": -105.697,
+   "radiusKm": 6
+  },
+  {
+   "name": "Abiquiu Lake, New Mexico",
+   "lat": 36.24,
+   "lon": -106.43,
+   "radiusKm": 10
+  },
+  {
+   "name": "Ghost Ranch, New Mexico",
+   "lat": 36.335,
+   "lon": -106.475,
+   "radiusKm": 6
+  },
+  {
+   "name": "Bisti/De-Na-Zin Wilderness, New Mexico",
+   "lat": 36.29,
+   "lon": -108.26,
+   "radiusKm": 15
+  },
+  {
+   "name": "Grand Canyon National Park, Arizona",
+   "lat": 36.0544,
+   "lon": -112.1401,
+   "radiusKm": 45
+  },
+  {
+   "name": "Sedona, Arizona",
+   "lat": 34.8697,
+   "lon": -111.761,
+   "radiusKm": 25,
+   "city": true
+  },
+  {
+   "name": "Phoenix, Arizona",
+   "lat": 33.4484,
+   "lon": -112.074,
+   "radiusKm": 35,
+   "city": true
+  },
+  {
+   "name": "Tucson, Arizona",
+   "lat": 32.2226,
+   "lon": -110.9747,
+   "radiusKm": 35,
+   "city": true
+  },
+  {
+   "name": "Salt Lake City, Utah",
+   "lat": 40.7608,
+   "lon": -111.891,
+   "radiusKm": 30,
+   "city": true
+  },
+  {
+   "name": "Grand Teton National Park, Wyoming",
+   "lat": 43.7904,
+   "lon": -110.6818,
+   "radiusKm": 35
+  },
+  {
+   "name": "Yellowstone National Park, Wyoming",
+   "lat": 44.428,
+   "lon": -110.5885,
+   "radiusKm": 70
+  },
+  {
+   "name": "Great Sand Dunes National Park, Colorado",
+   "lat": 37.7916,
+   "lon": -105.5943,
+   "radiusKm": 20
+  },
+  {
+   "name": "Garden of the Gods, Colorado",
+   "lat": 38.8784,
+   "lon": -104.8697,
+   "radiusKm": 6
+  },
+  {
+   "name": "Big Bend National Park, Texas",
+   "lat": 29.2498,
+   "lon": -103.25,
+   "radiusKm": 70
+  },
+  {
+   "name": "Monte Albán, Oaxaca, Mexico",
+   "lat": 17.0436,
+   "lon": -96.7678,
+   "radiusKm": 3
+  },
+  {
+   "name": "Hierve el Agua, Oaxaca, Mexico",
+   "lat": 16.8667,
+   "lon": -96.2756,
+   "radiusKm": 4
+  },
+  {
+   "name": "Cotopaxi National Park, Ecuador",
+   "lat": -0.683,
+   "lon": -78.436,
+   "radiusKm": 30
+  },
+  {
+   "name": "Quilotoa, Ecuador",
+   "lat": -0.85,
+   "lon": -78.9,
+   "radiusKm": 8
+  },
+  {
+   "name": "Monserrate, Bogotá, Colombia",
+   "lat": 4.6058,
+   "lon": -74.056,
+   "radiusKm": 2.5
+  },
+  {
+   "name": "Guatapé, Colombia",
+   "lat": 6.233,
+   "lon": -75.159,
+   "radiusKm": 12
+  },
+  {
+   "name": "Playa Blanca, Colombia",
+   "lat": 10.233,
+   "lon": -75.61,
+   "radiusKm": 8
+  },
+  {
+   "name": "Lyndhurst Mansion, Tarrytown, New York",
+   "lat": 41.051,
+   "lon": -73.861,
+   "radiusKm": 2
+  },
+  {
+   "name": "Javits Center, New York",
+   "lat": 40.757,
+   "lon": -74.002,
+   "radiusKm": 1.5
+  },
+  {
+   "name": "Piers 92/94, New York",
+   "lat": 40.7695,
+   "lon": -73.9997,
+   "radiusKm": 1
+  },
+  {
+   "name": "Brooklyn, New York",
+   "lat": 40.6782,
+   "lon": -73.9442,
+   "radiusKm": 12,
+   "city": true
+  },
+  {
+   "name": "Manhattan, New York",
+   "lat": 40.7831,
+   "lon": -73.9712,
+   "radiusKm": 8,
+   "city": true
+  },
+  {
+   "name": "Queens, New York",
+   "lat": 40.7282,
+   "lon": -73.7949,
+   "radiusKm": 12,
+   "city": true
+  },
+  {
+   "name": "Texas State Capitol, Austin, Texas",
+   "lat": 30.2747,
+   "lon": -97.7404,
+   "radiusKm": 0.6
+  }
+ ],
+ "collections": {
+  "grand_canyon": "Grand Canyon National Park, Arizona",
+  "phoenix": "Phoenix, Arizona",
+  "tuscon": "Tucson, Arizona",
+  "sedona": "Sedona, Arizona",
+  "slc": "Salt Lake City, Utah",
+  "grand_teton": "Grand Teton National Park, Wyoming",
+  "yellowstone": "Yellowstone National Park, Wyoming",
+  "lyndhurst_mansion": "Lyndhurst Mansion, Tarrytown, New York",
+  "playa_blanca_finals": "Playa Blanca, Colombia",
+  "brooklyn": "Brooklyn, New York",
+  "manhattan": "Manhattan, New York",
+  "queens": "Queens, New York"
+ }
+}

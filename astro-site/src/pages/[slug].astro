@@ -7,6 +7,8 @@ import Navbar from "../components/Navbar.astro";
 import ChapterNav from "../components/ChapterNav.astro";
 import MediaItem from "../components/MediaItem.astro";
 import { getCollectionPage, getNav, type Photo } from "../lib/collections";
+import GeoCaption from "../components/GeoCaption.astro";
+import { placeText } from "../lib/caption";
 
 export const prerender = false;
 
@@ -17,7 +19,9 @@ else Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60
 
 const nav = page ? await getNav() : [];
 const media = page?.media ?? [];
-const heroIdx = Math.max(0, media.findIndex((m) => m.orientation !== "portrait"));
+// The hero is the first landscape clip when the collection has one (it plays), else the first landscape still.
+const firstLandscape = (type?: "video") => media.findIndex((m) => m.orientation !== "portrait" && (!type || m.type === type));
+const heroIdx = Math.max(0, firstLandscape("video") >= 0 ? firstLandscape("video") : firstLandscape());
 const hero = media[heroIdx];
 
 // Layout rhythm: landscapes alternate full-bleed / inset; runs of portraits
@@ -44,7 +48,8 @@ const count = (page?.images ?? 0) + (page?.videos ?? 0);
 const subtitle = page
   ? [page.title, `${count} ${count === 1 ? "photograph" : "photographs"}`].join(" · ")
   : "";
-const lines = (s: string) => s.split("\n").filter(Boolean);
+// Something to say under it: a written caption, or where it was made.
+const hasCaption = (m: Photo) => !!(m.caption || placeText(m));
 ---
 
 <Base
@@ -77,13 +82,13 @@ const lines = (s: string) => s.split("\n").filter(Boolean);
             <section class="full">
               <MediaItem media={b.m} fit="cover" sizes="100vw" class="reveal" />
               <div class="scrim bottom"></div>
-              {b.m.caption && <p class="caption on-media reveal">{lines(b.m.caption).join(" · ")}</p>}
+              {hasCaption(b.m) && <p class="caption on-media reveal"><GeoCaption m={b.m} /></p>}
             </section>
           ) : b.kind === "single" ? (
             <section class="inset">
               <figure class="reveal">
                 <MediaItem media={b.m} sizes="(max-width: 767px) 100vw, 1312px" />
-                {b.m.caption && <figcaption class="caption">{lines(b.m.caption).join(" · ")}</figcaption>}
+                {hasCaption(b.m) && <figcaption class="caption"><GeoCaption m={b.m} /></figcaption>}
               </figure>
             </section>
           ) : (
@@ -91,7 +96,7 @@ const lines = (s: string) => s.split("\n").filter(Boolean);
               {b.ms.map((m) => (
                 <figure class="reveal">
                   <MediaItem media={m} sizes={`(max-width: 767px) 100vw, ${Math.round(1312 / b.ms.length)}px`} />
-                  {m.caption && <figcaption class="caption">{lines(m.caption).join(" · ")}</figcaption>}
+                  {hasCaption(m) && <figcaption class="caption"><GeoCaption m={m} /></figcaption>}
                 </figure>
               ))}
             </section>
@@ -237,7 +242,7 @@ const lines = (s: string) => s.split("\n").filter(Boolean);
 
   .next {
     display: grid;
-    grid-template-columns: 1fr 620px;
+    grid-template-columns: minmax(0, 1fr) 620px;
     align-items: center;
     gap: var(--gutter);
     min-height: 620px;
@@ -254,7 +259,8 @@ const lines = (s: string) => s.split("\n").filter(Boolean);
   h2 {
     font-size: 64px;
     line-height: 72px;
-    white-space: pre;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
   .peek {
     aspect-ratio: 620 / 400;
@@ -284,7 +290,7 @@ const lines = (s: string) => s.split("\n").filter(Boolean);
       gap: 40px;
     }
     .next {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
       min-height: 0;
       padding-top: 40px;
     }

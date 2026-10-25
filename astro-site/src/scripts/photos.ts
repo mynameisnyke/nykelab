@@ -1,6 +1,7 @@
 // Behaviour for photo pages: fade items in/out on scroll, and report views.
 // Replaces GSAP fades + useMediaTracking from the Vue components.
 import { track } from "../lib/track";
+import { initVideos } from "./video";
 
 const VIEW_DWELL_MS = 1000;
 const MILESTONES = [25, 50, 75];
@@ -38,6 +39,9 @@ export function initPhotos() {
     { threshold: [0, 0.5] },
   );
   document.querySelectorAll<HTMLElement>("[data-media]").forEach((el) => seen.observe(el));
+
+  const stopVideos = initVideos();
+  document.addEventListener("astro:before-swap", () => stopVideos(), { once: true });
 }
 
 function watchVideo(v: HTMLVideoElement, extra: { id: string; collection?: string }) {
