@@ -1,6 +1,7 @@
 ---
 // Infinite Azure: an endless, parallaxed scroll of photographs over the Infinite Azure loop, with its music.
 // Local branch for now (infinite-azure). The background loop, poster and music live in storage under azure/ (scripts/publish-azure.mjs).
+import "@fontsource-variable/orbitron";
 import Base from "../layouts/Base.astro";
 import Navbar from "../components/Navbar.astro";
 import ChapterNav from "../components/ChapterNav.astro";
@@ -38,8 +39,10 @@ const [feed, nav] = await Promise.all([getAzureFeed(), getNav()]);
 
   <div id="az-intro" class="az-intro" role="dialog" aria-modal="false" aria-label="Infinite Azure">
     <div class="az-intro-inner">
-      <span class="az-mark"><InfinityMark size={56} /></span>
-      <h1>Infinite Azure</h1>
+      <span class="az-streaks" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="az-mark"><InfinityMark size={48} /></span>
+      <h1 class="az-word" data-text="Infinite Azure"><span>Infinite Azure</span></h1>
+      <p class="az-sub">Red Hook, Brooklyn</p>
       <p class="eyebrow">Scroll. It does not end.</p>
       <div class="az-actions">
         <button id="az-enter" type="button">Enter with sound</button>
@@ -278,15 +281,87 @@ const [feed, nav] = await Promise.all([getAzureFeed(), getNav()]);
     color: #fff;
     opacity: 0.9;
   }
-  h1 {
-    margin: 0;
-    font-family: var(--font-title);
-    font-weight: 400;
-    font-size: 64px;
-    line-height: 72px;
-    letter-spacing: -0.02em;
+  /* the wordmark: wide, slanted, squared lettering in brushed chrome with a dark bevel, like an arcade title card */
+  .az-word {
+    position: relative;
+    margin: 6px 0 0;
+    font-family: "Orbitron Variable", var(--font-ui);
+    font-weight: 900;
+    font-size: clamp(26px, 6.6vw, 100px);
+    line-height: 1.05;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
+    white-space: nowrap;
+    transform: skewX(-14deg) scaleX(1.1);
   }
+  .az-word > span {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    padding: 0 0.04em;
+    background: linear-gradient(180deg, #ffffff 0%, #dbe3e6 26%, #9aa7ad 46%, #46535a 51%, #b4c0c5 56%, #f1f6f7 76%, #87949a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(12, 20, 26, 0.55);
+    filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.35));
+  }
+  .az-word::before {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    padding: 0 0.04em;
+    z-index: 0;
+    color: transparent;
+    -webkit-text-stroke: 0.13em #0b1319;
+    filter: drop-shadow(0 0.07em 0.12em rgba(0, 0, 0, 0.7));
+  }
+  .az-sub {
+    margin: 4px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: #dbe7ee;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  }
+  .az-sub::before,
+  .az-sub::after {
+    content: "";
+    width: 34px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(219, 231, 238, 0.8));
+  }
+  .az-sub::after {
+    transform: scaleX(-1);
+  }
+  /* a few thin streaks of light behind the title, like the scan lines of a stage card */
+  .az-streaks {
+    position: absolute;
+    left: 50%;
+    top: 30%;
+    width: min(92vw, 1000px);
+    height: 120px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    opacity: 0.8;
+  }
+  .az-streaks i {
+    position: absolute;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, rgba(176, 205, 225, 0.75) 25%, rgba(235, 245, 250, 0.9) 50%, rgba(176, 205, 225, 0.6) 80%, transparent);
+    filter: blur(0.4px);
+  }
+  .az-streaks i:nth-child(1) { top: 4px; left: 6%; width: 16%; }
+  .az-streaks i:nth-child(2) { top: 18px; left: 52%; width: 28%; opacity: 0.7; }
+  .az-streaks i:nth-child(3) { top: 40px; left: 20%; width: 38%; height: 1px; }
+  .az-streaks i:nth-child(4) { top: 62px; left: 64%; width: 20%; }
+  .az-streaks i:nth-child(5) { top: 90px; left: 10%; width: 24%; height: 1px; opacity: 0.6; }
   .eyebrow {
     margin: 0;
     font-family: var(--font-ui);
@@ -335,9 +410,9 @@ const [feed, nav] = await Promise.all([getAzureFeed(), getNav()]);
     text-decoration: underline;
   }
   @media (max-width: 767px) {
-    h1 {
-      font-size: 40px;
-      line-height: 46px;
+    .az-sub {
+      font-size: 11px;
+      letter-spacing: 0.26em;
     }
     .az-sound {
       bottom: 52px; /* above the bottom nav, which runs the full width on a phone */

@@ -87,7 +87,8 @@ const footer = [{ label: "Email", href: "mailto:nyke@nykelab.nyc" }];
     if (!group) return;
     group.removeAttribute("data-fill");
     try {
-      const { collections } = (await (await fetch("/api/collections")).json()) as { collections: { slug: string; title: string }[] };
+      const all = (await (await fetch("/api/collections")).json()) as { collections: { slug: string; title: string; images?: number; videos?: number }[] };
+      const collections = all.collections.filter((c) => (c.images ?? 1) + (c.videos ?? 0) > 0); // an emptied collection has no page to open
       collections.forEach((c) => {
         const a = document.createElement("a");
         a.href = `/${c.slug}`;

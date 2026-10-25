@@ -260,6 +260,7 @@ export function initAzure(): () => void {
     window.setTimeout(() => {
       el.classList.add("landed");
       bumpCombo();
+      playHit(); // in the same instant as the flash
       if (reduced) return;
       const r = el.getBoundingClientRect();
       const x = clamp(r.left + r.width * rand(0.3, 0.7), 40, window.innerWidth - 40);
@@ -294,6 +295,56 @@ export function initAzure(): () => void {
   listen("scroll", onScroll, { passive: true });
   listen("resize", onScroll);
 
+  // ---- hit sounds: six clips, one fired with each flash, only while the sound is on ----------------------------------------
+  const HIT_URLS = [1, 2, 3, 4, 5, 6].map((n) => `/m/azure/hit-${n}.wav`);
+  let sfx: AudioContext | null = null;
+  const hitBuffers: AudioBuffer[] = [];
+  let lastHitSound = -1;
+  const voices: AudioBufferSourceNode[] = [];
+  /** Must be called from a click: creates the audio context and decodes the clips once. */
+  function prepareSfx() {
+    if (sfx) {
+      void sfx.resume();
+      return;
+    }
+    const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AC) return;
+    const ctx = (sfx = new AC());
+    void ctx.resume();
+    HIT_URLS.forEach(async (url, i) => {
+      try {
+        hitBuffers[i] = await ctx.decodeAudioData(await (await fetch(url)).arrayBuffer());
+      } catch {
+        /* a missing clip just means that one never plays */
+      }
+    });
+  }
+  function playHit() {
+    // "sound on" = the music is playing: mute (or entering without sound) silences these too
+    if (!sfx || !wantSound || audio.paused || document.hidden) return;
+    const ready = hitBuffers.map((b, i) => (b ? i : -1)).filter((i) => i >= 0 && i !== lastHitSound);
+    if (!ready.length) return;
+    const i = ready[Math.floor(Math.random() * ready.length)];
+    lastHitSound = i;
+    const src = sfx.createBufferSource();
+    src.buffer = hitBuffers[i];
+    src.playbackRate.value = rand(0.96, 1.05); // a touch of variety so repeats do not sound identical
+    const gain = sfx.createGain();
+    gain.gain.value = 0.9;
+    src.connect(gain).connect(sfx.destination);
+    voices.push(src);
+    if (voices.length > 4) voices.shift()?.stop(); // never a wall of overlapping hits
+    src.onended = () => {
+      const k = voices.indexOf(src);
+      if (k >= 0) voices.splice(k, 1);
+    };
+    src.start();
+  }
+  cleanups.push(() => {
+    voices.forEach((v) => v.stop());
+    void sfx?.close();
+  });
+
   // ---- music, enter ----------------------------------------------------------------------------------------------------------
   let wantSound = false;
   const setSoundUi = () => {
@@ -314,6 +365,7 @@ export function initAzure(): () => void {
   }
   async function playMusic() {
     wantSound = true;
+    prepareSfx();
     const started = audio.play(); // `paused` flips at once; the promise settles when the track has buffered
     setSoundUi();
     try {

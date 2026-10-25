@@ -91,6 +91,42 @@ test.describe("Infinite Azure", () => {
     expect(Number(await page.locator("#az-combo-n").textContent())).toBe(settled);
   });
 
+  test("each landing plays a hit sound, but only while the sound is on", async ({ page }) => {
+    // count every sound the page starts through Web Audio
+    await page.addInitScript(() => {
+      (window as unknown as { __hitSounds: number }).__hitSounds = 0;
+      const start = AudioBufferSourceNode.prototype.start;
+      AudioBufferSourceNode.prototype.start = function (...args) {
+        (window as unknown as { __hitSounds: number }).__hitSounds++;
+        return start.apply(this, args);
+      };
+    });
+    const count = () => page.evaluate(() => (window as unknown as { __hitSounds: number }).__hitSounds);
+    const scrollSome = async () => {
+      for (let i = 0; i < 4; i++) {
+        await page.mouse.wheel(0, 1300);
+        await page.waitForTimeout(260);
+      }
+      await page.waitForTimeout(500);
+    };
+    await page.goto("/infinite-azure");
+    test.skip((await feedSize(page)) < 6, "no photographs with originals in this database");
+    await page.locator("#az-silent").click(); // in without sound: the flashes fire, the sounds do not
+    await scrollSome();
+    expect(await count()).toBe(0);
+
+    await page.locator("#az-sound").click(); // sound on
+    await page.waitForTimeout(1500); // the six clips decode
+    await scrollSome();
+    const playing = await count();
+    expect(playing).toBeGreaterThan(0);
+
+    await page.locator("#az-sound").click(); // muted again
+    await expect(page.locator("#az-sound")).toHaveAttribute("aria-pressed", "false");
+    await scrollSome();
+    expect(await count()).toBe(playing);
+  });
+
   test("with reduced motion: no drift, no flash, the loop stays on its first frame", async ({ browser }) => {
     const ctx = await browser.newContext({ reducedMotion: "reduce" });
     const page = await ctx.newPage();
@@ -118,6 +154,10 @@ test.describe("Infinite Azure", () => {
     expect(r.status()).toBe(206);
     expect(r.headers()["content-type"]).toBe("video/mp4");
     expect(r.headers()["content-range"]).toMatch(/^bytes 0-99\//);
+    const hit = await request.get("/m/azure/hit-1.wav");
+    expect(hit.status()).toBe(200);
+    expect(hit.headers()["content-type"]).toBe("audio/wav");
+    expect((await request.get("/m/azure/hit-7.wav")).status()).toBe(404);
     expect((await request.get("/m/azure/nope.mp4")).status()).toBe(404);
     expect((await request.get("/m/azure/../x.mp4")).status()).toBe(404);
   });

@@ -60,7 +60,7 @@ publicRoutes.get("/api/media", async (c) => {
 
 const KEY_RE = /^[a-f0-9]{12}\/(main|small|poster)\.(webp|jpg|mp4|webm)$/;
 // The Infinite Azure page's own media (background loop, poster, music): fixed names, so they may be replaced in place.
-const AZURE_RE = /^azure\/[a-z0-9-]+\.(jpg|mp4|mp3)$/;
+const AZURE_RE = /^azure\/[a-z0-9-]+\.(jpg|mp4|mp3|wav)$/;
 
 function parseRange(range: R2Range, size: number) {
   let start: number;
