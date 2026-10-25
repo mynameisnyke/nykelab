@@ -3,6 +3,7 @@
 import { env } from "cloudflare:workers";
 import type { ApiMedia, Env, MediaRow } from "../../../worker/src/types";
 import { RESERVED_SLUGS, SLUG_RE, toApiMedia } from "../../../worker/src/util";
+import { cached } from "./cache";
 
 const db = () => (env as unknown as Env).DB;
 
@@ -41,13 +42,13 @@ function withWidths(m: ApiMedia): Photo {
 export const isCollectionSlug = (s: string) => SLUG_RE.test(s) && !RESERVED_SLUGS.has(s);
 
 /** Published collections that have at least one published item, in nav order. */
-export async function getNav(): Promise<NavItem[]> {
+export const getNav = (): Promise<NavItem[]> => cached("nav", 120, loadNav);
+
+async function loadNav(): Promise<NavItem[]> {
   const { results } = await db()
     .prepare(
-      `SELECT c.slug, c.title
-         FROM collections c JOIN media m ON m.collection = c.slug AND m.published = 1
-        WHERE c.published = 1
-        GROUP BY c.slug
+      `SELECT c.slug, c.title FROM collections c
+        WHERE c.published = 1 AND EXISTS (SELECT 1 FROM media m WHERE m.collection = c.slug AND m.published = 1)
         ORDER BY c.position, c.title`,
     )
     .all<NavItem>();
@@ -142,15 +143,17 @@ export async function getHeroVideos(collections: string[]): Promise<Map<string, 
 }
 
 /** One photo per published collection per year (its first that year), used as hover previews and year strips. */
-export async function getPreviewPool(): Promise<PreviewPool> {
+export const getPreviewPool = (): Promise<PreviewPool> => cached("pool", 120, loadPreviewPool);
+
+async function loadPreviewPool(): Promise<PreviewPool> {
   const { results } = await db()
     .prepare(
       `SELECT * FROM (
          SELECT m.*, c.position AS cpos,
                 ROW_NUMBER() OVER (PARTITION BY m.collection ORDER BY m.position, m.created_at) AS col_rn,
                 ROW_NUMBER() OVER (PARTITION BY m.collection, SUBSTR(COALESCE(m.captured_at, ''), 1, 4) ORDER BY m.position, m.created_at) AS year_rn,
-                (SELECT MIN(m3.captured_at) FROM media m3 WHERE m3.collection = c.slug AND m3.captured_at IS NOT NULL) AS first_at,
-                (SELECT MAX(m3.captured_at) FROM media m3 WHERE m3.collection = c.slug AND m3.captured_at IS NOT NULL) AS last_at
+                MIN(m.captured_at) OVER (PARTITION BY m.collection) AS first_at,
+                MAX(m.captured_at) OVER (PARTITION BY m.collection) AS last_at
            FROM media m JOIN collections c ON c.slug = m.collection
           WHERE m.published = 1 AND c.published = 1 AND m.type = 'image')
         WHERE year_rn = 1

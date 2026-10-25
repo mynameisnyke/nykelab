@@ -6,6 +6,8 @@ export interface Env {
   /** Cloudflare Images binding: sized variants are generated from originals on demand. */
   IMAGES: ImagesBinding;
   ASSETS: Fetcher;
+  /** KV namespace; page-data cache entries live under "cache:" (src/lib/cache.ts). */
+  SESSION?: KVNamespace;
   ENVIRONMENT: string;
   ACCESS_TEAM_DOMAIN?: string;
   ACCESS_AUD?: string;

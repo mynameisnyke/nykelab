@@ -25,6 +25,7 @@ const { values: a } = parseArgs({
     "dry-run": { type: "boolean", default: false },
     bucket: { type: "string", default: "nykelab-media" },
     "position-base": { type: "string", default: "100" },
+    "exclude-borderline": { type: "boolean", default: false },
   },
 });
 const LIB = a.library;
@@ -52,7 +53,14 @@ function sh(args, { input } = {}) {
 
 // ---- plan ------------------------------------------------------------------------------------------
 const photosM = JSON.parse(fs.readFileSync(path.join(LIB, "photos/manifest.json"), "utf8"));
-const clipsM = JSON.parse(fs.readFileSync(path.join(LIB, "subclips/manifest.json"), "utf8"));
+const clipsAll = JSON.parse(fs.readFileSync(path.join(LIB, "subclips/manifest.json"), "utf8"));
+
+// Duplicate clips are hidden, never deleted: ids listed in excluded-clips.json (see scripts/build-excluded-clips.mjs)
+// are left out when the manifest is loaded, and any earlier-published row for them is unpublished (files stay in R2).
+// --exclude-borderline also hides the similar-but-not-identical list.
+const excludedFile = JSON.parse(fs.readFileSync(new URL("../excluded-clips.json", import.meta.url), "utf8"));
+const EXCLUDED = new Set([...excludedFile.excluded, ...(a["exclude-borderline"] ? excludedFile.borderline : [])]);
+const clipsM = { ...clipsAll, subclips: clipsAll.subclips.filter((s) => !EXCLUDED.has(s.id)) };
 
 /** approvals.json from the review page: tolerate a few shapes. {id: "V"|"T"|true}, [ids], or {approved:[...]} */
 function readApprovals(file) {
@@ -67,11 +75,10 @@ function readApprovals(file) {
 const approvals = readApprovals(a.approvals);
 
 // Clip folders the manifest pairs wrongly, found by looking at the footage (not the names):
-//  - "New Mexico" is the same Grand Canyon footage as phoenix_2021 (all 18 clips match), so it is published once
-//  - phoenix_2021 is Grand Canyon / Arizona-rim footage: it belongs with the grand_canyon stills
+//  - "New Mexico" and phoenix_2021 are the same Grand Canyon / Arizona-rim footage (18 clips each): both belong with the
+//    grand_canyon stills, and excluded-clips.json decides which twin of each pair stays
 //  - uk_2023 is the Brighton seafront in 2023, not the 2017 London trip the manifest links it to
-const FOLDER_HOME = { phoenix_2021: "grand_canyon", uk_2023: "brighton" };
-const DUPLICATE_FOLDERS = ["New Mexico"];
+const FOLDER_HOME = { "New Mexico": "grand_canyon", phoenix_2021: "grand_canyon", uk_2023: "brighton" };
 
 function plan() {
   const only = a.only ? new Set(a.only.split(",")) : null;
@@ -101,7 +108,6 @@ function plan() {
     primary.set(folder, cs.sort((x, y) => score(y) - score(x))[0]);
   }
   for (const s of clipsM.subclips) {
-    if (DUPLICATE_FOLDERS.includes(s.folder)) continue;
     const c = s.folder in FOLDER_HOME ? cols.get(FOLDER_HOME[s.folder]) : primary.get(s.folder);
     if (c) c.clips.push(s);
   }
@@ -225,7 +231,7 @@ const cols = plan();
 const nPhotos = cols.reduce((n, c) => n + c.photos.length, 0), nClips = cols.reduce((n, c) => n + c.clips.length, 0);
 log(`plan: ${cols.length} collections, ${nPhotos} photos, ${nClips} clips${approvals ? " (approvals applied)" : " (no approvals file: every photo, voyages look)"}`);
 for (const c of cols.slice(0, 80)) log(`  ${c.slug.padEnd(28)} ${String(c.photos.length).padStart(2)} photos ${String(c.clips.length).padStart(2)} clips  ${c.first.slice(0, 10)}  ${c.folders.length ? `(clip folders: ${c.folders.join(", ")})` : ""}`);
-const unplaced = clipsM.subclips.filter((s) => !DUPLICATE_FOLDERS.includes(s.folder) && !cols.some((c) => c.clips.includes(s)));
+const unplaced = clipsM.subclips.filter((s) => !cols.some((c) => c.clips.includes(s)));
 if (!a.only && unplaced.length) log(`  WARNING: ${unplaced.length} clips belong to no published collection`);
 if (a["dry-run"]) process.exit(0);
 
@@ -250,13 +256,14 @@ for (const c of cols) {
   report.collections++;
   log(`✓ ${slug.padEnd(28)} ${c.photos.length} photos + ${c.clips.length} clips  uploaded ${r.uploaded} (${(r.bytes / 1048576).toFixed(0)} MB), skipped ${r.skipped}  in ${((Date.now() - t0) / 1000).toFixed(0)}s${slug !== c.slug ? `  [slug ${slug}: ${c.slug} already holds other items]` : ""}`);
 }
-// duplicates published by an earlier run are taken off the site (kept in storage, not deleted)
-if (!a.only) {
-  const sql = DUPLICATE_FOLDERS.map((f) => `UPDATE media SET published = 0 WHERE source_id LIKE ${q(`${f}/%`)};`).join("\n");
-  const file = path.join(os.tmpdir(), "lib-retire.sql");
-  fs.writeFileSync(file, sql);
+// hide excluded clips an earlier run published (rows stay, published = 0; files stay in R2)
+{
+  const ids = [...EXCLUDED];
+  const file = path.join(os.tmpdir(), "lib-hide.sql");
+  fs.writeFileSync(file, ids.map((id) => `UPDATE media SET published = 0 WHERE source_id = ${q(id)};`).join("\n"));
   await sh(["d1", "execute", "DB", ...where, "--file", file]);
   fs.rmSync(file);
+  log(`hidden: ${ids.length} excluded clips${a["exclude-borderline"] ? " (including the borderline list)" : ""}`);
 }
 log(`done: ${report.collections}/${cols.length} collections, ${report.uploaded} files uploaded (${(report.bytes / 1073741824).toFixed(2)} GB), ${report.skipped} unchanged, ${report.failures.length} failures`);
 if (report.failures.length) {
