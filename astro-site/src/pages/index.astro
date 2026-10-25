@@ -33,7 +33,7 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
               <li data-v={i} class:list={{ off: !v.available }}>
                 <Tag class="item" href={v.available ? `/${v.slug}` : undefined}>
                   <span class="dot" style={`--c:${v.color}`}></span>
-                  <span class="name">{v.title}</span>
+                  <span class="name">{v.title}{v.kind === "event" && <span class="kind">Event</span>}</span>
                   <span class="meta">
                     {fmtMonthYear(v.start)} · <span class="n">{v.count}</span>
                   </span>
@@ -163,6 +163,19 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
     line-height: 34px;
     letter-spacing: -0.01em;
     text-transform: uppercase;
+  }
+  .kind {
+    margin-left: 10px;
+    padding: 2px 8px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 10px;
+    line-height: 12px;
+    letter-spacing: 0.1em;
+    vertical-align: 0.35em;
+    color: var(--text-caption);
   }
   .meta {
     font-family: var(--font-ui);

@@ -210,3 +210,10 @@ test("archive tabs are the same four on every archive page, with the current one
     await expect(page.locator('.tabs a[aria-current="page"]')).toHaveText(on);
   }
 });
+
+test("home: the four event voyages carry an Event tag, trips do not", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#voyage-list .kind")).toHaveCount(4);
+  await expect(page.locator("#voyage-list li", { hasText: "NYCC 2022" }).locator(".kind")).toHaveText("Event");
+  await expect(page.locator("#voyage-list li", { hasText: "Oaxaca" }).locator(".kind")).toHaveCount(0);
+});
