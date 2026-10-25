@@ -1,0 +1,97 @@
+---
+// Event gallery: a recurring event (Westminster, NYCC) with one group per edition. Same layout as the Place
+// gallery (Figma: GALLERIES / Place); events are not in Figma yet.
+import Base from "../../layouts/Base.astro";
+import Navbar from "../../components/Navbar.astro";
+import ChapterNav from "../../components/ChapterNav.astro";
+import GalleryHero from "../../components/GalleryHero.astro";
+import MetaStrip from "../../components/MetaStrip.astro";
+import GalleryGroup from "../../components/GalleryGroup.astro";
+import NextBlock from "../../components/NextBlock.astro";
+import { loadHomeData } from "../../lib/home-data";
+import { seriesInfo } from "../../lib/catalog";
+import { deriveEvents, fmtN, fmtSpan, goldenShare, heroImage, pickPhotos, topSetting } from "../../lib/voyages";
+
+export const prerender = false;
+
+const { slug = "" } = Astro.params;
+const { nav, data } = await loadHomeData();
+const { voyages, shots, images } = data;
+const events = deriveEvents(voyages, seriesInfo);
+const at = events.findIndex((e) => e.slug === slug);
+const event = events[at];
+if (!event) Astro.response.status = 404;
+else Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
+
+const order = event ? [...event.editions].sort((a, b) => voyages[b].start - voyages[a].start) : [];
+const mine = event ? shots.filter((s) => event.editions.includes(s.v)) : [];
+const top = topSetting(mine);
+const facts = event
+  ? [
+      { label: "Photographs", value: fmtN(event.count) },
+      { label: "Editions", value: String(event.editions.length) },
+      { label: "Dates", value: fmtSpan(event.start, event.end) },
+      { label: "Most often", value: top ? `${top.focal}mm f/${top.f}` : "—" },
+      { label: "Golden hour", value: `${Math.round(goldenShare(mine) * 100)}%` },
+    ]
+  : [];
+const groups = order.map((vi, k) => ({
+  voyage: voyages[vi],
+  count: voyages[vi].count,
+  shots: pickPhotos(shots, images, vi, k % 2 === 0 ? 3 : 2),
+  anchor: voyages[vi].title.toLowerCase().replace(/\s+/g, "-"), // the Events index links to #westminster-2020
+}));
+const next = event && events.length > 1 ? events[(at + 1) % events.length] : undefined;
+const hero = event ? images[heroImage(images, event.cover)] : undefined;
+---
+
+<Base title={event ? `${event.name} — nykelab` : "Not found — nykelab"} description={event ? `${event.name}: ${fmtN(event.count)} photographs from ${event.editions.length} editions, ${fmtSpan(event.start, event.end)}.` : "Nothing here."} image={hero?.src}>
+  <Navbar surface="media" collections={nav} />
+  {
+    !event ? (
+      <main class="empty">
+        <p class="eyebrow">Nothing here.</p>
+        <a class="eyebrow" href="/events">← Events</a>
+      </main>
+    ) : (
+      <main>
+        <GalleryHero title={event.name} subtitle={`${event.about} · ${fmtN(event.count)} photographs`} crumb={{ label: "Events", href: "/events" }} image={hero} />
+        <section class="facts"><MetaStrip facts={facts} /></section>
+        {groups.map((g) => <GalleryGroup {...g} images={images} />)}
+        {next && <div class="next-wrap"><NextBlock eyebrow="Next event" title={next.name} meta={`${next.editions.length} editions · ${fmtN(next.count)} photographs`} href={`/events/${next.slug}`} image={images[next.cover]} /></div>}
+      </main>
+    )
+  }
+  <ChapterNav />
+</Base>
+
+<script>
+  import { initPhotos } from "../../scripts/photos";
+  document.addEventListener("astro:page-load", initPhotos);
+</script>
+
+<style>
+  .facts {
+    padding: 96px var(--margin) 0;
+  }
+  .next-wrap {
+    padding-top: var(--section-gap);
+    padding-bottom: 120px;
+  }
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 100vh;
+  }
+  @media (max-width: 767px) {
+    .facts {
+      padding-top: 48px;
+    }
+    .next-wrap {
+      padding-bottom: 72px;
+    }
+  }
+</style>

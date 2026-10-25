@@ -1,6 +1,6 @@
 ---
 // Year gallery (Figma: GALLERIES / Year). The year is a huge numeral over the cover.
-// PROTOTYPE: built from the sample voyage metadata, like /years.
+// Built from the voyages, like /years.
 import Base from "../../layouts/Base.astro";
 import Navbar from "../../components/Navbar.astro";
 import ChapterNav from "../../components/ChapterNav.astro";
@@ -9,13 +9,13 @@ import MetaStrip from "../../components/MetaStrip.astro";
 import MonthBars from "../../components/MonthBars.astro";
 import GalleryGroup from "../../components/GalleryGroup.astro";
 import NextBlock from "../../components/NextBlock.astro";
-import { loadSample } from "../../lib/sample-home";
-import { deriveYears, goldenShare, heroImage, pickPhotos } from "../../lib/voyages";
+import { loadHomeData } from "../../lib/home-data";
+import { deriveYears, fmtN, goldenShare, heroImage, pickPhotos } from "../../lib/voyages";
 
 export const prerender = false;
 
 const { year: param = "" } = Astro.params;
-const { nav, data } = await loadSample();
+const { nav, data } = await loadHomeData();
 const { voyages, shots, images } = data;
 const years = deriveYears(voyages, shots, images.length);
 const at = years.findIndex((y) => String(y.year) === param);
@@ -29,7 +29,7 @@ const order = y ? [...y.voyages].sort((a, b) => voyages[b].start - voyages[a].st
 const n = (k: number, one: string, many: string) => `${k} ${k === 1 ? one : many}`;
 const facts = y
   ? [
-      { label: "Photographs", value: String(y.count) },
+      { label: "Photographs", value: fmtN(y.count) },
       { label: "Voyages", value: String(y.voyages.length) },
       { label: "Countries", value: String(y.countries.length) },
       { label: "Most often", value: y.top ? `${y.top.focal}mm f/${y.top.f}` : "—" },
@@ -44,7 +44,7 @@ const next = y && years.length > 1 ? years[(at + 1) % years.length] : undefined;
 const hero = y ? images[heroImage(images, y.photos[0] ?? 0)] : undefined;
 ---
 
-<Base title={y ? `${y.year} — nykelab` : "Not found — nykelab"} description={y ? `${y.year}: ${y.count} photographs from ${n(y.voyages.length, "voyage", "voyages")}.` : "Nothing here."} image={hero?.src}>
+<Base title={y ? `${y.year} — nykelab` : "Not found — nykelab"} description={y ? `${y.year}: ${fmtN(y.count)} photographs from ${n(y.voyages.length, "voyage", "voyages")}.` : "Nothing here."} image={hero?.src}>
   <Navbar surface="media" collections={nav} />
   {
     !y ? (
@@ -54,11 +54,11 @@ const hero = y ? images[heroImage(images, y.photos[0] ?? 0)] : undefined;
       </main>
     ) : (
       <main>
-        <GalleryHero title={String(y.year)} numeral subtitle={`${y.count} photographs · ${n(y.voyages.length, "voyage", "voyages")} · ${n(y.countries.length, "country", "countries")}`} crumb={{ label: "Years", href: "/years" }} image={hero} />
+        <GalleryHero title={String(y.year)} numeral subtitle={`${fmtN(y.count)} photographs · ${n(y.voyages.length, "voyage", "voyages")} · ${n(y.countries.length, "country", "countries")}`} crumb={{ label: "Years", href: "/years" }} image={hero} />
         <section class="facts"><MetaStrip facts={facts} /></section>
         <section class="months"><MonthBars counts={y.monthCounts} voyageByMonth={y.monthVoyage} voyages={voyages} max={max} year={y.year} bw={56} label /></section>
         {groups.map((g) => <GalleryGroup {...g} images={images} />)}
-        {next && <div class="next-wrap"><NextBlock eyebrow="Next year" title={String(next.year)} meta={`${next.count} photographs · ${n(next.voyages.length, "voyage", "voyages")}`} href={`/years/${next.year}`} image={images[next.photos[0]]} /></div>}
+        {next && <div class="next-wrap"><NextBlock eyebrow="Next year" title={String(next.year)} meta={`${fmtN(next.count)} photographs · ${n(next.voyages.length, "voyage", "voyages")}`} href={`/years/${next.year}`} image={images[next.photos[0]]} /></div>}
       </main>
     )
   }

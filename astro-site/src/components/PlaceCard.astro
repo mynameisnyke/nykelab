@@ -1,6 +1,6 @@
 ---
 // Figma: PlaceCard (Default / Hot / Dim)
-import { fmtSpan, type Place, type PreviewImage } from "../lib/voyages";
+import { fmtN, fmtSpan, type Place, type PreviewImage } from "../lib/voyages";
 
 interface Props {
   place: Place;
@@ -15,7 +15,7 @@ const { place, image } = Astro.props;
   </div>
   <div class="caption">
     <span class="name">{place.name}</span>
-    <span class="meta">{place.country} · {place.count} photographs</span>
+    <span class="meta">{place.country} · {fmtN(place.count)} photographs</span>
     <span class="meta">{fmtSpan(place.start, place.end)}</span>
   </div>
 </a>

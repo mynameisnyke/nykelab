@@ -1,13 +1,14 @@
 ---
-// Figma: ArchiveTabs — Voyages · Places · Years
+// Figma: ArchiveTabs — Voyages · Places · Years (Events added in code; not in Figma yet)
 interface Props {
-  active: "voyages" | "places" | "years";
+  active: "voyages" | "places" | "years" | "events";
 }
 const { active } = Astro.props;
 const tabs = [
   { id: "voyages", label: "Voyages", href: "/" },
   { id: "places", label: "Places", href: "/places" },
   { id: "years", label: "Years", href: "/years" },
+  { id: "events", label: "Events", href: "/events" },
 ] as const;
 ---
 
@@ -40,5 +41,17 @@ const tabs = [
     border-color: var(--border-strong);
     background: var(--fill-ring-soft);
     color: var(--text-primary);
+  }
+  /* Four tabs: tighten on phones so they fit one row at 360px; wrap rather than clip if a narrower screen needs it. */
+  @media (max-width: 767px) {
+    .tabs {
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    a {
+      padding: 8px 12px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+    }
   }
 </style>

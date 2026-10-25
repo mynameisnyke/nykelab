@@ -1,6 +1,6 @@
 ---
-// Places index (Figma: ARCHIVE / Places). PROTOTYPE: places are derived from the sample voyage
-// metadata (src/lib/voyages.ts); real ones come from EXIF GPS + reverse geocoding.
+// Places index (Figma: ARCHIVE / Places). Places are derived from the voyages
+// (src/lib/voyages.ts; data from the Lightroom catalog).
 import Base from "../layouts/Base.astro";
 import Navbar from "../components/Navbar.astro";
 import ChapterNav from "../components/ChapterNav.astro";
@@ -8,15 +8,15 @@ import ArchiveHeader from "../components/ArchiveHeader.astro";
 import PlacesMap from "../components/PlacesMap.astro";
 import PlaceCard from "../components/PlaceCard.astro";
 import Pill from "../components/Pill.astro";
-import { loadSample } from "../lib/sample-home";
-import { derivePlaces, words } from "../lib/voyages";
+import { loadHomeData } from "../lib/home-data";
+import { derivePlaces, fmtN, words } from "../lib/voyages";
 
 export const prerender = false;
 Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
 
-const { nav, data } = await loadSample();
+const { nav, data } = await loadHomeData();
 const { voyages, shots, images } = data;
-const places = derivePlaces(voyages);
+const places = derivePlaces(voyages, (v) => v.kind !== "event"); // events (Westminster, NYCC) stay off the map
 places.forEach((p) => (p.available = p.voyages.some((i) => voyages[i].available)));
 const countries = [...new Set(places.map((p) => p.country))];
 const years = shots.map((s) => new Date(s.t).getUTCFullYear());
@@ -25,10 +25,10 @@ const to = Math.max(...years);
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 ---
 
-<Base title="Places — nykelab" description={`${shots.length} photographs from ${places.length} places in ${countries.length} countries.`}>
+<Base title="Places — nykelab" description={`${fmtN(shots.length)} photographs from ${places.length} places in ${countries.length} countries.`}>
   <Navbar collections={nav} />
   <main data-archive>
-    <ArchiveHeader title="Places" subtitle={`${cap(words(places.length))} places in ${words(countries.length)} countries, ${from}–${to}.`} active="places" />
+    <ArchiveHeader title="Places" subtitle={`${cap(words(places.length))} places in ${words(countries.length)} countries, ${from}–${to}.`} active="places" sample={data.sample} />
 
     <section class="map" aria-label="Map of places">
       <PlacesMap places={places} />
@@ -43,7 +43,7 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
       {places.map((p) => <PlaceCard place={p} image={images[p.cover]} />)}
     </section>
 
-    <p class="totals">{shots.length} photographs · {places.length} places · {countries.length} countries</p>
+    <p class="totals">{fmtN(shots.length)} photographs · {places.length} places · {countries.length} countries</p>
   </main>
   <ChapterNav />
 </Base>

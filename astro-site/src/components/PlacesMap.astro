@@ -13,12 +13,16 @@ const { places } = Astro.props;
 const TOP = 72;
 const BOTTOM = -43;
 const VIEWS = {
-  desktop: { lonMin: -180, lonMax: 180, base: 3, k: 0.8, labels: true },
-  mobile: { lonMin: -130, lonMax: 150, base: 2, k: 0.5, labels: false },
+  desktop: { lonMin: -180, lonMax: 180, base: 3, k: 0.4, labels: true },
+  mobile: { lonMin: -130, lonMax: 150, base: 2, k: 0.3, labels: false },
 } as const;
 // Where the label sits relative to its pin (hand-tuned for the sample places; a real
 // version would do collision avoidance).
-const SIDE: Record<string, string> = { wyoming: "left-up", arizona: "left-down", "new-york": "right", iceland: "below", lofoten: "below", kyoto: "below" };
+const SIDE: Record<string, string> = { medellin: "left-down", cartagena: "right", texas: "right", "new-york": "right", norway: "right", wyoming: "left-up", arizona: "left-down" };
+
+// ~30 pins would collide, so only the biggest places carry a printed label; every pin shows its chip on hover/focus.
+const LABELLED = 5;
+const labelled = new Set([...places].sort((a, b) => b.count - a.count).slice(0, LABELLED).map((p) => p.slug));
 
 const d = (land as [number, number][]).map(([lon, lat]) => `M${lon} ${-lat}h0`).join("");
 const pos = (p: Place, v: (typeof VIEWS)[keyof typeof VIEWS]) => ({
@@ -45,7 +49,7 @@ const pos = (p: Place, v: (typeof VIEWS)[keyof typeof VIEWS]) => ({
             return (
               <a class={`pin ${SIDE[p.slug] ?? "right"}`} href={`/places/${p.slug}`} data-place={p.slug} style={`left:${q.left}%;top:${q.top}%;--r:${q.r}px`} aria-label={`${p.name}, ${p.count} photographs`}>
                 <i></i>
-                <span class="label" data-chip={`${p.name} · ${p.count} photographs`}>{v.labels ? p.name : ""}</span>
+                <span class="label" data-chip={`${p.name} · ${p.count} photographs`}>{v.labels && labelled.has(p.slug) ? p.name : ""}</span>
               </a>
             );
           })}

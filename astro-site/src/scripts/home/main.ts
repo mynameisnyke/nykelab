@@ -3,10 +3,12 @@
 import {
   fmtDate,
   fmtHour,
+  fmtN,
   goldenShare,
   summarize,
   topSetting,
-  type HomeData,
+  unpackHome,
+  type PackedHome,
 } from "../../lib/voyages";
 import { createStore, type Lens } from "./store";
 // three.js (globe) and d3 (When / How) are the bulk of the page's script, so they load on demand:
@@ -14,7 +16,7 @@ import { createStore, type Lens } from "./store";
 
 export function initHome(): () => void {
   const root = document.querySelector<HTMLElement>("main.home")!;
-  const data = JSON.parse(document.getElementById("home-data")!.textContent!) as HomeData;
+  const data = unpackHome(JSON.parse(document.getElementById("home-data")!.textContent!) as PackedHome);
   const { voyages, shots, images } = data;
   const store = createStore(data);
   const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -100,6 +102,27 @@ export function initHome(): () => void {
   });
   on(reset, "click", () => store.set({ range: null, gear: null }));
 
+  // ---- numbers that depend only on the filter, not on hover ---------------------------
+  // render() runs on every pointer move; with thousands of photographs, re-scanning them each time is too slow.
+  let derivedKey = "";
+  let derived: { vis: typeof shots; counts: number[]; s: ReturnType<typeof summarize>; golden?: number; top?: ReturnType<typeof topSetting> } = {
+    vis: shots,
+    counts: [],
+    s: summarize(voyages, shots),
+  };
+  function filtered() {
+    const { range, gear } = store.state;
+    const key = `${range ? range.join() : ""}|${gear ? `${gear.focal}/${gear.f}` : ""}`;
+    if (key !== derivedKey) {
+      derivedKey = key;
+      const vis = store.visibleShots();
+      const counts: number[] = new Array(voyages.length).fill(0);
+      for (const sh of vis) counts[sh.v]++;
+      derived = { vis, counts, s: vis.length ? summarize(voyages.filter((_, i) => counts[i] > 0), vis) : summarize(voyages, shots) };
+    }
+    return derived;
+  }
+
   // ---- preview card ----------------------------------------------------------------
   const newest = voyages.reduce((a, v, i) => (v.start > voyages[a].start ? i : a), 0);
   function showImage(i: number) {
@@ -125,14 +148,14 @@ export function initHome(): () => void {
       vi = s.v;
       showImage(s.img);
       previewTitle.textContent = voyages[vi].title;
-      previewMeta.textContent = `${voyages[vi].place} · ${fmtDate(s.t)}, ${fmtHour(s.hour)} · ${s.focal}mm f/${s.f} · ISO ${s.iso} · ${s.shutter}`;
+      previewMeta.textContent = `${voyages[vi].place} · ${fmtDate(s.t)}, ${fmtHour(s.clock)} · ${s.focal}mm f/${s.f} · ISO ${s.iso} · ${s.shutter}`;
     } else {
       vi = av ?? newest;
       const v = voyages[vi];
-      const n = shots.filter((s) => s.v === vi && store.visible(s)).length;
+      const n = filtered().counts[vi];
       showImage(v.cover);
       previewTitle.textContent = v.title;
-      previewMeta.textContent = `${v.place} · ${span(v)} · ${n} photograph${n === 1 ? "" : "s"}`;
+      previewMeta.textContent = `${v.place} · ${span(v)} · ${fmtN(n)} photograph${n === 1 ? "" : "s"}`;
     }
     const v = voyages[vi];
     previewOpen.hidden = !v.available;
@@ -144,16 +167,17 @@ export function initHome(): () => void {
 
   // ---- insight line ------------------------------------------------------------------
   function renderInsight() {
-    const vis = store.visibleShots();
+    const d = filtered();
+    const vis = d.vis;
     const { lens } = store.state;
     const av = store.activeV();
     if (!vis.length) {
       insight.textContent = "No photographs match this filter.";
     } else if (lens === "when") {
-      const pct = Math.round(goldenShare(vis) * 100);
-      insight.innerHTML = `<b>${pct}%</b> of ${vis.length === shots.length ? "these photographs" : `these ${vis.length} photographs`} were made within an hour of sunrise or sunset.`;
+      const pct = Math.round((d.golden ??= goldenShare(vis)) * 100);
+      insight.innerHTML = `<b>${pct}%</b> of ${vis.length === shots.length ? "these photographs" : `these ${fmtN(vis.length)} photographs`} were made within an hour of sunrise or sunset.`;
     } else if (lens === "how") {
-      const t = topSetting(vis)!;
+      const t = (d.top ??= topSetting(vis))!;
       insight.innerHTML = `Most often <b>${t.focal}mm</b> at <b>f/${t.f}</b>, ${Math.round(t.share * 100)}% of ${vis.length === shots.length ? "everything" : `these ${vis.length}`}.`;
     } else if (av !== null) {
       insight.textContent = voyages[av].place;
@@ -166,25 +190,25 @@ export function initHome(): () => void {
   function render() {
     const av = store.activeV();
     root.toggleAttribute("data-dim", av !== null);
+    const d = filtered();
     items.forEach((li) => {
       const i = Number(li.dataset.v);
-      const n = shots.filter((s) => s.v === i && store.visible(s)).length;
+      const n = d.counts[i];
       li.classList.toggle("hot", i === av);
       li.classList.toggle("dead", n === 0);
       const el = li.querySelector(".n");
       if (el) el.textContent = String(n);
     });
     reset.hidden = !(store.state.range || store.state.gear);
-    const vis = store.visibleShots();
+    const vis = d.vis;
     const stats = $("stats");
-    const present = voyages.filter((_, i) => vis.some((x) => x.v === i));
-    const s = vis.length ? summarize(present, vis) : summarize(voyages, shots);
+    const s = d.s;
     const line = (t: string) => `<span>${t}</span>`;
     const countries = `${s.countries} ${s.countries === 1 ? "country" : "countries"}`;
     stats.innerHTML =
       vis.length === shots.length
-        ? line(`${s.photos} photographs · ${s.voyages} voyages`) + line(`${countries} · ${s.from}–${s.to}`)
-        : line(`${vis.length} of ${shots.length} photographs`) + line(`${countries} · ${s.from}–${s.to}`);
+        ? line(`${fmtN(s.photos)} photographs · ${s.voyages} voyages`) + line(`${countries} · ${s.from}–${s.to}`)
+        : line(`${fmtN(vis.length)} of ${fmtN(shots.length)} photographs`) + line(`${countries} · ${s.from}–${s.to}`);
     renderPreview();
     renderInsight();
   }
