@@ -7,7 +7,8 @@ import Navbar from "../components/Navbar.astro";
 import ChapterNav from "../components/ChapterNav.astro";
 import MediaItem from "../components/MediaItem.astro";
 import { getCollectionPage, getNav, type Photo } from "../lib/collections";
-import { placeLine } from "../lib/caption";
+import GeoCaption from "../components/GeoCaption.astro";
+import { placeText } from "../lib/caption";
 
 export const prerender = false;
 
@@ -47,9 +48,8 @@ const count = (page?.images ?? 0) + (page?.videos ?? 0);
 const subtitle = page
   ? [page.title, `${count} ${count === 1 ? "photograph" : "photographs"}`].join(" · ")
   : "";
-const lines = (s: string) => s.split("\n").filter(Boolean);
-// A written caption wins; otherwise where it was made.
-const captionOf = (m: Photo) => (m.caption ? lines(m.caption).join(" · ") : placeLine(m));
+// Something to say under it: a written caption, or where it was made.
+const hasCaption = (m: Photo) => !!(m.caption || placeText(m));
 ---
 
 <Base
@@ -82,13 +82,13 @@ const captionOf = (m: Photo) => (m.caption ? lines(m.caption).join(" · ") : pla
             <section class="full">
               <MediaItem media={b.m} fit="cover" sizes="100vw" class="reveal" />
               <div class="scrim bottom"></div>
-              {captionOf(b.m) && <p class="caption on-media reveal">{captionOf(b.m)}</p>}
+              {hasCaption(b.m) && <p class="caption on-media reveal"><GeoCaption m={b.m} /></p>}
             </section>
           ) : b.kind === "single" ? (
             <section class="inset">
               <figure class="reveal">
                 <MediaItem media={b.m} sizes="(max-width: 767px) 100vw, 1312px" />
-                {captionOf(b.m) && <figcaption class="caption">{captionOf(b.m)}</figcaption>}
+                {hasCaption(b.m) && <figcaption class="caption"><GeoCaption m={b.m} /></figcaption>}
               </figure>
             </section>
           ) : (
@@ -96,7 +96,7 @@ const captionOf = (m: Photo) => (m.caption ? lines(m.caption).join(" · ") : pla
               {b.ms.map((m) => (
                 <figure class="reveal">
                   <MediaItem media={m} sizes={`(max-width: 767px) 100vw, ${Math.round(1312 / b.ms.length)}px`} />
-                  {captionOf(m) && <figcaption class="caption">{captionOf(m)}</figcaption>}
+                  {hasCaption(m) && <figcaption class="caption"><GeoCaption m={m} /></figcaption>}
                 </figure>
               ))}
             </section>

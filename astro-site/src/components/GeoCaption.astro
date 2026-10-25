@@ -1,0 +1,36 @@
+---
+// "Oaxaca de Juárez, Mexico · 17.061° N, 96.726° W": the place, then the coordinates as a quiet link to Google Maps.
+// A written caption wins over the place. `prefix` goes first (a date, in the galleries).
+import { coordsLink, placeText } from "../lib/caption";
+import type { ApiMedia } from "../../../worker/src/types";
+
+interface Props {
+  m: Pick<ApiMedia, "place" | "geo" | "city" | "region" | "country" | "caption">;
+  prefix?: string;
+  fallback?: string;
+}
+const { m, prefix = "", fallback = "" } = Astro.props;
+const written = m.caption ? m.caption.split("\n").filter(Boolean).join(" · ") : "";
+const place = written || placeText(m) || fallback;
+const link = written ? null : coordsLink(m);
+---
+
+{[prefix, place].filter(Boolean).join(" · ")}{link && <>{place || prefix ? " · " : ""}<a class="geo" href={link.href} target="_blank" rel="noopener noreferrer" title="Open in Google Maps" aria-label={`${link.text}, open in Google Maps`}>{link.text}</a></>}
+
+<style>
+  .geo {
+    color: inherit;
+    text-decoration: underline dotted;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+    pointer-events: auto;
+    transition: text-decoration-color 0.2s ease, color 0.2s ease;
+  }
+  .geo:hover,
+  .geo:focus-visible {
+    color: var(--text-primary, #fff);
+    text-decoration-style: solid;
+    text-decoration-color: currentColor;
+  }
+</style>

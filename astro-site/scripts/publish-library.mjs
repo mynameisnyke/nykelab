@@ -60,18 +60,37 @@ const clipsAll = JSON.parse(fs.readFileSync(path.join(LIB, "subclips/manifest.js
 // --exclude-borderline also hides the similar-but-not-identical list.
 const excludedFile = JSON.parse(fs.readFileSync(new URL("../excluded-clips.json", import.meta.url), "utf8"));
 const EXCLUDED = new Set([...excludedFile.excluded, ...(a["exclude-borderline"] ? excludedFile.borderline : [])]);
-// Where each photo was made (scripts/geotag-library.mjs). Clips have no metadata, so they take the place of their collection's trip.
-const GEO = JSON.parse(fs.readFileSync(new URL("../data/library-geo.json", import.meta.url), "utf8")).photos;
-// Collections shown by place name only, never by coordinates (a private house).
-const NO_COORDS = new Set(["chiyuki_house_2025_new_jersey"]);
-// Where a collection is, when its name says it better than the catalogue's trip does (the Arizona trip is named for Sedona alone).
-// Used for photos without coordinates and for clips; photos matched to a phone photo keep their own looked-up place.
-const COLLECTION_PLACE = {
-  grand_canyon: "Grand Canyon, Arizona", phoenix: "Phoenix, Arizona", tuscon: "Tucson, Arizona", sedona: "Sedona, Arizona",
-  slc: "Salt Lake City, Utah", grand_teton: "Grand Teton National Park, Wyoming", yellowstone: "Yellowstone National Park, Wyoming",
-  new_jersey: "New Jersey", brooklyn: "Brooklyn, New York", manhattan: "Manhattan, New York", queens: "Queens, New York",
-  lyndhurst_mansion: "Lyndhurst Mansion, Tarrytown, New York", playa_blanca_finals: "Playa Blanca, Colombia",
+// Where each photo was made, and which trip (voyage) it belongs to (scripts/geotag-library.mjs). A collection on the site is a trip,
+// named as the catalogue names it ("New Jersey"), not as the Lightroom folder was ("Chiyuki House 2025 New Jersey").
+const GEOFILE = JSON.parse(fs.readFileSync(new URL("../data/library-geo.json", import.meta.url), "utf8"));
+const GEO = GEOFILE.photos;
+const TRIPS = GEOFILE.collections;
+const LANDMARKS = new Map(JSON.parse(fs.readFileSync(new URL("../data/landmarks.json", import.meta.url), "utf8")).places.map((l) => [l.name, l]));
+// Photos with no trip of their own (no shot of the catalogue near their date): the collection they sit in.
+const FALLBACK = { new_jersey: { slug: "new-jersey", place: "New Jersey" }, toko: { slug: "toko", title: "Toko", place: "", order: 999 } };
+// Which trip each clip folder belongs to, from looking at the footage (not the folder names):
+//  - "New Mexico" and phoenix_2021 are the same Grand Canyon / Arizona-rim footage: both go to the Arizona trip
+//  - uk_2023 is the Brighton seafront in 2023, not the 2017 London trip the manifest links it to
+const CLIP_TRIP = {
+  Madiera: "madeira", NY: "new-york", "New Mexico": "arizona", phoenix_2021: "arizona", newmexico_2021: "new-mexico", colorado: "colorado",
+  bogota_2023: "bogota", ecuador_2023: "ecuador", grand_teton_2022: "wyoming-2022", yellowstone_2022: "wyoming-2022", norway_2022: "norway",
+  oaxaca_2025: "oaxaca", stockholm_2022: "stockholm", texas_2021: "texas", uk_2023: "brighton", westminster_2021: "westminster-2021",
 };
+/** A named place for a clip when the footage says where it is; otherwise the trip's own place. */
+function clipLandmark(s) {
+  if (s.folder === "New Mexico" || s.folder === "phoenix_2021") return "Grand Canyon National Park, Arizona";
+  if (s.folder === "grand_teton_2022") return "Grand Teton National Park, Wyoming";
+  if (s.folder === "yellowstone_2022") return "Yellowstone National Park, Wyoming";
+  if (s.folder === "newmexico_2021" && /^C000[12]\.MP4$/.test(s.source)) return "White Sands National Park, New Mexico";
+  if (s.folder === "newmexico_2021" && s.source === "C0003.MP4") return "Rio Grande Gorge Bridge, New Mexico";
+  // by eye: banded red cliffs over a lake (Abiquiu), and moonrise over snow-patched badlands (Bisti, like the photographs from that evening)
+  if (s.folder === "newmexico_2021" && (/^C000[45]\.MP4$/.test(s.source) || s.source.startsWith("staging/"))) return "Abiquiu Lake, New Mexico";
+  if (s.folder === "newmexico_2021" && /^C000[67]\.MP4$/.test(s.source)) return "Bisti/De-Na-Zin Wilderness, New Mexico";
+  if (s.folder === "colorado") return s.source === "C0007.MP4" ? "Garden of the Gods, Colorado" : "Great Sand Dunes National Park, Colorado";
+  if (s.folder === "texas_2021" && /^C000[245]\.MP4$/.test(s.source)) return "Texas State Capitol, Austin, Texas";
+  if (s.folder === "texas_2021" && /^C00(07|09|17|19|20)\.MP4$/.test(s.source)) return "Big Bend National Park, Texas";
+  return null;
+}
 const clipsM = { ...clipsAll, subclips: clipsAll.subclips.filter((s) => !EXCLUDED.has(s.id)) };
 
 /** approvals.json from the review page: tolerate a few shapes. {id: "V"|"T"|true}, [ids], or {approved:[...]} */
@@ -86,12 +105,6 @@ function readApprovals(file) {
 }
 const approvals = readApprovals(a.approvals);
 
-// Clip folders the manifest pairs wrongly, found by looking at the footage (not the names):
-//  - "New Mexico" and phoenix_2021 are the same Grand Canyon / Arizona-rim footage (18 clips each): both belong with the
-//    grand_canyon stills, and excluded-clips.json decides which twin of each pair stays
-//  - uk_2023 is the Brighton seafront in 2023, not the 2017 London trip the manifest links it to
-const FOLDER_HOME = { "New Mexico": "grand_canyon", phoenix_2021: "grand_canyon", uk_2023: "brighton" };
-
 function plan() {
   const only = a.only ? new Set(a.only.split(",")) : null;
   const cols = new Map();
@@ -99,28 +112,20 @@ function plan() {
     const look = approvals ? approvals.get(p.id) : "voyages";
     if (!look) continue;
     const dir = p.id.split("/")[0];
-    if (only && !only.has(dir)) continue;
-    const c = cols.get(dir) ?? { dir, slug: dir.replace(/_/g, "-").toLowerCase(), title: titleCase(p.collection), name: p.collection, photos: [], clips: [], folders: p.video_folders, first: p.capture ?? "9999" };
-    if (!/^[a-z0-9][a-z0-9-]{0,39}$/.test(c.slug)) throw new Error(`bad slug ${c.slug}`);
-    c.photos.push({ ...p, use: p.looks[look], look });
-    if (p.capture && p.capture < c.first) c.first = p.capture;
-    cols.set(dir, c);
-  }
-  // each clip folder goes to exactly one of the collections that claim it: the best name match for the folder's place
-  const claim = new Map();
-  for (const c of cols.values()) for (const f of c.folders) claim.set(f, [...(claim.get(f) ?? []), c]);
-  const primary = new Map();
-  for (const [folder, cs] of claim) {
-    const place = fold(clipsM.subclips.find((s) => s.folder === folder)?.place ?? folder);
-    const ftoks = fold(folder).split(" ");
-    const score = (c) => {
-      const n = fold(c.name);
-      return (n === place ? 100 : 0) + (n.startsWith(place) ? 50 : 0) + (n.includes(place) ? 25 : 0) + (ftoks.every((t) => n.includes(t)) ? 30 : 0) + c.photos.length / 100;
+    const fb = FALLBACK[dir];
+    const slug = GEO[p.id]?.collection ?? fb?.slug ?? dir.replace(/_/g, "-").toLowerCase();
+    if (only && !only.has(slug)) continue;
+    if (!/^[a-z0-9][a-z0-9-]{0,39}$/.test(slug)) throw new Error(`bad slug ${slug}`);
+    const meta = TRIPS[slug];
+    const c = cols.get(slug) ?? {
+      slug, title: meta?.title ?? fb?.title ?? titleCase(p.collection), place: meta?.place ?? fb?.place ?? "", lat: meta?.lat ?? null, lon: meta?.lon ?? null,
+      order: meta?.order ?? fb?.order ?? 998, photos: [], clips: [],
     };
-    primary.set(folder, cs.sort((x, y) => score(y) - score(x))[0]);
+    c.photos.push({ ...p, use: p.looks[look], look });
+    cols.set(slug, c);
   }
   for (const s of clipsM.subclips) {
-    const c = s.folder in FOLDER_HOME ? cols.get(FOLDER_HOME[s.folder]) : primary.get(s.folder);
+    const c = cols.get(CLIP_TRIP[s.folder]);
     if (c) c.clips.push(s);
   }
   // interleave: photos by rank, clips by quality, clips spread evenly, rank 1 stays first
@@ -141,20 +146,9 @@ function plan() {
       c.items.push(item);
     }
   }
-  const ordered = [...cols.values()].sort((x, y) => x.first.localeCompare(y.first) || x.dir.localeCompare(y.dir));
+  const ordered = [...cols.values()].sort((x, y) => x.order - y.order || x.slug.localeCompare(y.slug));
   ordered.forEach((c, i) => (c.position = Number(a["position-base"]) + i));
   return ordered;
-}
-
-/** The trip place most of a collection's photographs belong to: what its clips are captioned with. */
-function tripPlace(c) {
-  if (COLLECTION_PLACE[c.dir]) return COLLECTION_PLACE[c.dir];
-  const n = new Map();
-  for (const p of c.photos) {
-    const t = GEO[p.id]?.trip;
-    if (t) n.set(t, (n.get(t) ?? 0) + 1);
-  }
-  return [...n].sort((x, y) => y[1] - x[1])[0]?.[0] ?? "";
 }
 
 function rowFor(c, it, position) {
@@ -162,17 +156,18 @@ function rowFor(c, it, position) {
     const id = sha(`lib:${it.id}`);
     const u = it.use;
     const g = GEO[it.id];
-    const coords = g?.lat != null && !NO_COORDS.has(c.dir);
     return {
       id, position, type: "image", orientation: it.orientation, width: u.width, height: u.height, source_id: it.id,
       files: [{ key: `${id}/orig.jpg`, file: path.join(LIB, "photos", u.file), type: "image/jpeg" }],
       key_main: `${id}/orig.jpg`, key_original: `${id}/orig.jpg`, key_poster: null,
       captured_at: it.capture ?? null, avg_colour: u.avg_colour, text_on: u.text_on, look: it.look, duration: null,
-      place: (coords ? g.place : COLLECTION_PLACE[c.dir] ?? g?.place) ?? "", geo_lat: coords ? g.lat : null, geo_lon: coords ? g.lon : null, geo_source: coords ? g.source : g ? "trip" : "",
+      place: g?.place ?? c.place, geo_lat: g ? g.lat : c.lat, geo_lon: g ? g.lon : c.lon, geo_source: g ? g.source : c.place ? "trip" : "",
     };
   }
   const id = sha(`lib:${it.id}`);
   const u = it.looks.voyages;
+  const lm = LANDMARKS.get(clipLandmark(it) ?? "");
+  const clip = lm ? { place: lm.name, lat: Math.round(lm.lat * 100) / 100, lon: Math.round(lm.lon * 100) / 100 } : { place: c.place, lat: c.place.includes(",") ? c.lat : null, lon: c.place.includes(",") ? c.lon : null }; // no pin for a whole state
   return {
     id, position, type: "video", orientation: it.orientation, width: u.width, height: u.height, source_id: it.id,
     files: [
@@ -181,7 +176,7 @@ function rowFor(c, it, position) {
     ],
     key_main: `${id}/main.mp4`, key_original: null, key_poster: `${id}/poster.jpg`,
     captured_at: null, avg_colour: u.avg_colour, text_on: u.text_on, look: "voyages", duration: u.duration,
-    place: tripPlace(c), geo_lat: null, geo_lon: null, geo_source: tripPlace(c) ? "trip" : "",
+    place: clip.place, geo_lat: clip.lat, geo_lon: clip.lon, geo_source: clip.place ? "trip" : "",
   };
 }
 
@@ -260,12 +255,13 @@ async function existingCollections() {
 const cols = plan();
 const nPhotos = cols.reduce((n, c) => n + c.photos.length, 0), nClips = cols.reduce((n, c) => n + c.clips.length, 0);
 log(`plan: ${cols.length} collections, ${nPhotos} photos, ${nClips} clips${approvals ? " (approvals applied)" : " (no approvals file: every photo, voyages look)"}`);
-for (const c of cols.slice(0, 80)) log(`  ${c.slug.padEnd(28)} ${String(c.photos.length).padStart(2)} photos ${String(c.clips.length).padStart(2)} clips  ${c.first.slice(0, 10)}  ${c.folders.length ? `(clip folders: ${c.folders.join(", ")})` : ""}`);
+for (const c of cols.slice(0, 80)) log(`  ${c.slug.padEnd(28)} ${String(c.photos.length).padStart(2)} photos ${String(c.clips.length).padStart(2)} clips  ${c.title}`);
 const unplaced = clipsM.subclips.filter((s) => !cols.some((c) => c.clips.includes(s)));
 if (!a.only && unplaced.length) log(`  WARNING: ${unplaced.length} clips belong to no published collection`);
 if (a["dry-run"]) process.exit(0);
 
 const taken = remote ? await existingCollections() : await existingCollections().catch(() => null);
+const usedSlugs = [];
 const report = { collections: 0, uploaded: 0, skipped: 0, bytes: 0, failures: [] };
 for (const c of cols) {
   const slug = await slugFor(c, taken);
@@ -284,8 +280,20 @@ for (const c of cols) {
   await sh(["d1", "execute", "DB", ...where, "--file", sql]);
   fs.rmSync(sql);
   report.collections++;
+  usedSlugs.push(slug);
   log(`✓ ${slug.padEnd(28)} ${c.photos.length} photos + ${c.clips.length} clips  uploaded ${r.uploaded} (${(r.bytes / 1048576).toFixed(0)} MB), skipped ${r.skipped}  in ${((Date.now() - t0) / 1000).toFixed(0)}s${slug !== c.slug ? `  [slug ${slug}: ${c.slug} already holds other items]` : ""}`);
 }
+// Collections an earlier run published per Lightroom folder have been folded into their trip: take the emptied ones off the site
+// (the rows stay, published = 0; anything that still holds published items, like your own uploads, is left alone).
+if (!a.only) {
+  const old = [...new Set(photosM.photos.map((p) => p.id.split("/")[0].replace(/_/g, "-").toLowerCase()))].filter((x) => !usedSlugs.includes(x));
+  const file = path.join(os.tmpdir(), "lib-retire.sql");
+  fs.writeFileSync(file, old.map((x) => `UPDATE collections SET published = 0 WHERE slug = ${q(x)} AND NOT EXISTS (SELECT 1 FROM media m WHERE m.collection = ${q(x)} AND m.published = 1);`).join("\n"));
+  await sh(["d1", "execute", "DB", ...where, "--file", file]);
+  fs.rmSync(file);
+  log(`retired up to ${old.length} per-folder collections that are now part of a trip`);
+}
+
 // hide excluded clips an earlier run published (rows stay, published = 0; files stay in R2)
 {
   const ids = [...EXCLUDED];

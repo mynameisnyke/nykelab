@@ -57,3 +57,12 @@ the site prints `placeLine()` (src/lib/caption.ts) under each item: "Oaxaca de J
 - Coordinates are rounded (3 decimals, about 100 m), photos made within about 800 m of the densest night-time spots in the Photos library (home) keep only their city,
   and `chiyuki_house_2025_new_jersey` is shown by place name only.
 - Rerun: copy Photos.sqlite to a scratch folder, extract time and coordinates (see the header of the script), then run both scripts.
+
+## One page per trip, and more specific captions (2026-10-25)
+
+- A collection on the site is now a *trip* (a catalogue voyage), named as the catalogue names it: "New Jersey", not the Lightroom folder's "Chiyuki House 2025 New Jersey".
+  Each photo joins the trip whose own shots are nearest in time (`geotag-library.mjs` writes `collection` per photo); clips follow `CLIP_TRIP` in `publish-library.mjs`.
+  The 44 per-folder collections an earlier run published were emptied and taken off the site (rows kept, `published = 0`). 68 pages became 34 (plus your own `bogota`).
+- Captions: a landmark inside the photo's coordinates or the phone's itinerary for that day (data/landmarks.json) names the spot ("White Sands National Park, New Mexico");
+  `data/photo-places.json` holds places named by eye for items with nothing else to go on. The coordinates link to Google Maps (components/GeoCaption.astro).
+- Sources now: exif, phone, phone-approx, day (where the phone spent that day, or a named place: about 1 km), trip (the trip's own pin; none for a whole country or a big state).

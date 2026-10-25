@@ -8,24 +8,8 @@ import { getNav, getPreviewPool } from "./collections";
 import { loadCatalog } from "./catalog";
 import type { HomeData } from "./voyages";
 
-/** Catalog voyages whose collection has another name, keyed "slug" or "slug@year" (the year tells apart two trips with one slug). */
-const COLLECTION_FOR: Record<string, string | string[]> = {
-  barbados: "barbadoes",
-  texas: "texas-2021",
-  colorado: "colorado-2021",
-  arizona: ["sedona", "grand-canyon", "tuscon", "phoenix"],
-  "sesame-place": "fist-time-sesame-place-2025",
-  "grand-tetons@2020": ["grand-teton", "yellowstone"],
-  "grand-tetons@2022": ["grand-teton", "yellowstone"], // photographs are from 2020; the 2022 clips live here
-  "westminster@2020": "westminster-agility-2020",
-  "westminster@2021": "westminster-2021",
-  "nycc@2021": "nycc-2021-thurs-finals",
-  "nycc@2022": "nycc-2022",
-  "new-jersey@2025": "chiyuki-house-2025-new-jersey",
-};
-
-const DAY = 86400000;
-const SLACK = 3 * DAY; // camera clocks and time zones blur the edges of a trip
+/** One page per voyage: its catalogue slug, or its title where two voyages share a slug (Wyoming 2020 / Wyoming 2022). Matches publish-library.mjs. */
+const slugify = (t: string) => t.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 export async function loadHomeData() {
   const [nav, pool] = await Promise.all([getNav(), getPreviewPool()]);
@@ -34,22 +18,19 @@ export async function loadHomeData() {
     pickFrom(theme === "city" ? (pool.city.length ? pool.city : pool.nature) : (pool.nature.length ? pool.nature : pool.city), k),
   );
   const published = new Set(nav.map((n) => n.slug));
-  const overlaps = (slug: string, from: number, to: number) => {
-    const c = pool.bySlug[slug];
-    return !!c && c.from <= to + SLACK && c.to >= from - SLACK;
-  };
+  const slugCount = new Map<string, number>();
+  for (const v of voyages) slugCount.set(v.slug, (slugCount.get(v.slug) ?? 0) + 1);
 
-  // voyage -> collection: an explicit pairing, else the collection of the same name made around the same dates
+  // voyage -> its collection: the page named for the trip. Bogotá also has your own upload collection (bogota) beside the graded one.
   voyages.forEach((v) => {
     const year = new Date(v.start).getUTCFullYear();
-    const named = COLLECTION_FOR[`${v.slug}@${year}`] ?? COLLECTION_FOR[v.slug];
-    const all = named === undefined ? [v.slug] : Array.isArray(named) ? named : [named];
-    const slug = all[0];
-    const ok = published.has(slug) && (named ? true : !pool.bySlug[slug] || overlaps(slug, v.start, v.end));
-    v.collection = ok ? slug : undefined;
-    v.collections = ok ? all.filter((c) => published.has(c)) : undefined;
+    const slug = (slugCount.get(v.slug) ?? 0) > 1 ? slugify(v.title) : v.slug;
+    const all = (slug === "bogota" ? ["bogota", "bogota-library"] : [slug]).filter((c) => published.has(c));
+    const ok = all.length > 0;
+    v.collection = ok ? all[0] : undefined;
+    v.collections = ok ? all : undefined;
     v.available = ok;
-    const c = ok ? pool.bySlug[slug] : undefined;
+    const c = ok ? pool.bySlug[all[0]] : undefined;
     v.cover = c ? (c.byYear[String(year)] ?? c.cover) : -1;
   });
   // a shot previews its voyage's collection photo from the year it was made

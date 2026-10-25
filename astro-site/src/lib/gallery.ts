@@ -1,7 +1,6 @@
 // Place, Year and Event pages: each voyage shows photographs from the collection that really holds it,
 // and the page's hero is a clip from one of those collections when there is one.
 import { getGalleryPhotos, getHeroVideos, type Photo } from "./collections";
-import { placeLine } from "./caption";
 import { fmtDate, type Voyage } from "./voyages";
 
 const yearOf = (p: Photo) => Number((p.capturedAt ?? "").slice(0, 4)) || 0;
@@ -14,10 +13,10 @@ export function pickGallery(pool: Photo[]): Photo[] {
   return pool.filter((p) => take.has(p));
 }
 
-/** "Jan 5, 2020 · Grand Teton National Park, Wyoming · 43.790° N, 110.681° W" */
-export function photoCaption(p: Photo): string {
+/** "Jan 5, 2020" from the photo's capture time ("" when it has none). */
+export function photoDate(p: Photo): string {
   const t = Date.parse(`${p.capturedAt ?? ""}Z`);
-  return [Number.isNaN(t) ? "" : fmtDate(t), placeLine(p)].filter(Boolean).join(" · ");
+  return Number.isNaN(t) ? "" : fmtDate(t);
 }
 
 export interface Gallery {

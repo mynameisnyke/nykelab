@@ -3,7 +3,8 @@
 // taken from the voyage's own collection, each captioned with its date and place.
 import GroupHeader from "./GroupHeader.astro";
 import MediaItem from "./MediaItem.astro";
-import { photoCaption } from "../lib/gallery";
+import GeoCaption from "./GeoCaption.astro";
+import { photoDate } from "../lib/gallery";
 import type { Photo } from "../lib/collections";
 import type { Voyage } from "../lib/voyages";
 
@@ -27,7 +28,7 @@ const { voyage, count, photos, anchor } = Astro.props;
             <div class="ph">
               <MediaItem media={m} fit="cover" sizes={`(max-width: 767px) 100vw, ${Math.round(1312 / Math.min(photos.length, 3))}px`} />
             </div>
-            <figcaption class="caption">{photoCaption(m) || voyage.title}</figcaption>
+            <figcaption class="caption"><GeoCaption m={m} prefix={photoDate(m)} fallback={voyage.title} /></figcaption>
           </figure>
         ))}
       </div>
