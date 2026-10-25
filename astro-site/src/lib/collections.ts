@@ -96,18 +96,23 @@ export interface PreviewPool {
   /** Indices into `images`, grouped by subject, so sample voyages get fitting covers. */
   nature: number[];
   city: number[];
+  /** Collection slug -> index into `images` of that collection's own cover (its first photo). */
+  bySlug: Record<string, number>;
 }
 
-/** Published photos used as hover previews on the home page. */
+/** One photo per published collection (its first), used as hover previews on the home page. */
 export async function getPreviewPool(): Promise<PreviewPool> {
   const { results } = await db()
     .prepare(
       `SELECT m.* FROM media m JOIN collections c ON c.slug = m.collection
         WHERE m.published = 1 AND c.published = 1 AND m.type = 'image'
-        ORDER BY c.position, m.position, m.created_at LIMIT 60`,
+          AND m.id = (SELECT m2.id FROM media m2
+                       WHERE m2.collection = c.slug AND m2.published = 1 AND m2.type = 'image'
+                       ORDER BY m2.position, m2.created_at LIMIT 1)
+        ORDER BY c.position`,
     )
     .all<MediaRow>();
-  const pool: PreviewPool = { images: [], nature: [], city: [] };
+  const pool: PreviewPool = { images: [], nature: [], city: [], bySlug: {} };
   for (const row of results) {
     const m = withWidths(toApiMedia(row));
     const srcset = m.urls.variants
@@ -122,6 +127,7 @@ export async function getPreviewPool(): Promise<PreviewPool> {
       h: m.height,
       alt: m.place || m.caption.split("\n")[0] || "",
     }) - 1;
+    pool.bySlug[m.collection] = i;
     (/westminster|new-york|city/.test(m.collection) ? pool.city : pool.nature).push(i);
   }
   return pool;
