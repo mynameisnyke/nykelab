@@ -36,7 +36,7 @@ const facts = place
   : [];
 const groups = order.map((vi, k) => ({ voyage: voyages[vi], count: voyages[vi].count, shots: pickPhotos(shots, images, vi, k % 2 === 0 ? 3 : 2) }));
 const next = place && places.length > 1 ? places[(at + 1) % places.length] : undefined;
-const hero = place ? images[heroImage(images, place.cover)] : undefined;
+const hero = place ? images[heroImage(images, place.cover, place.voyages.map((i) => voyages[i].cover))] : undefined;
 ---
 
 <Base title={place ? `${place.name} — nykelab` : "Not found — nykelab"} description={place ? `${place.name}, ${place.country}: ${fmtN(place.count)} photographs, ${fmtSpan(place.start, place.end)}.` : "Nothing here."} image={hero?.src}>

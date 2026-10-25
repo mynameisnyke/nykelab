@@ -42,7 +42,7 @@ const groups = order.map((vi, k) => ({
   anchor: voyages[vi].title.toLowerCase().replace(/\s+/g, "-"), // the Events index links to #westminster-2020
 }));
 const next = event && events.length > 1 ? events[(at + 1) % events.length] : undefined;
-const hero = event ? images[heroImage(images, event.cover)] : undefined;
+const hero = event ? images[heroImage(images, event.cover, event.editions.map((i) => voyages[i].cover))] : undefined;
 ---
 
 <Base title={event ? `${event.name} — nykelab` : "Not found — nykelab"} description={event ? `${event.name}: ${fmtN(event.count)} photographs from ${event.editions.length} editions, ${fmtSpan(event.start, event.end)}.` : "Nothing here."} image={hero?.src}>

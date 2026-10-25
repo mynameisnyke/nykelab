@@ -17,7 +17,7 @@ export const prerender = false;
 const { year: param = "" } = Astro.params;
 const { nav, data } = await loadHomeData();
 const { voyages, shots, images } = data;
-const years = deriveYears(voyages, shots, images.length);
+const years = deriveYears(voyages, shots, images.length, images);
 const at = years.findIndex((y) => String(y.year) === param);
 const y = years[at];
 if (!y) Astro.response.status = 404;
@@ -41,7 +41,7 @@ const groups = order.map((vi, k) => {
   return { voyage: voyages[vi], count: mine.length, shots: pickPhotos(inYear, images, vi, k % 2 === 1 ? 2 : 3) };
 });
 const next = y && years.length > 1 ? years[(at + 1) % years.length] : undefined;
-const hero = y ? images[heroImage(images, y.photos[0] ?? 0)] : undefined;
+const hero = y ? images[heroImage(images, y.photos[0] ?? -1, y.photos)] : undefined;
 ---
 
 <Base title={y ? `${y.year} — nykelab` : "Not found — nykelab"} description={y ? `${y.year}: ${fmtN(y.count)} photographs from ${n(y.voyages.length, "voyage", "voyages")}.` : "Nothing here."} image={hero?.src}>

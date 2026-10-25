@@ -96,22 +96,26 @@ export interface PreviewPool {
   /** Indices into `images`, grouped by subject, so sample voyages get fitting covers. */
   nature: number[];
   city: number[];
-  /** Collection slug -> index into `images` of that collection's own cover (its first photo). */
-  bySlug: Record<string, number>;
+  /** Collection slug -> its cover and its first photo of each year (indices into `images`; "" = undated), plus the dates it spans. */
+  bySlug: Record<string, { cover: number; byYear: Record<string, number>; from: number; to: number }>;
 }
 
-/** One photo per published collection (its first), used as hover previews on the home page. */
+/** One photo per published collection per year (its first that year), used as hover previews and year strips. */
 export async function getPreviewPool(): Promise<PreviewPool> {
   const { results } = await db()
     .prepare(
-      `SELECT m.* FROM media m JOIN collections c ON c.slug = m.collection
-        WHERE m.published = 1 AND c.published = 1 AND m.type = 'image'
-          AND m.id = (SELECT m2.id FROM media m2
-                       WHERE m2.collection = c.slug AND m2.published = 1 AND m2.type = 'image'
-                       ORDER BY m2.position, m2.created_at LIMIT 1)
-        ORDER BY c.position`,
+      `SELECT * FROM (
+         SELECT m.*, c.position AS cpos,
+                ROW_NUMBER() OVER (PARTITION BY m.collection ORDER BY m.position, m.created_at) AS col_rn,
+                ROW_NUMBER() OVER (PARTITION BY m.collection, SUBSTR(COALESCE(m.captured_at, ''), 1, 4) ORDER BY m.position, m.created_at) AS year_rn,
+                (SELECT MIN(m3.captured_at) FROM media m3 WHERE m3.collection = c.slug AND m3.captured_at IS NOT NULL) AS first_at,
+                (SELECT MAX(m3.captured_at) FROM media m3 WHERE m3.collection = c.slug AND m3.captured_at IS NOT NULL) AS last_at
+           FROM media m JOIN collections c ON c.slug = m.collection
+          WHERE m.published = 1 AND c.published = 1 AND m.type = 'image')
+        WHERE year_rn = 1
+        ORDER BY cpos, position, created_at`,
     )
-    .all<MediaRow>();
+    .all<MediaRow & { col_rn: number; first_at: string | null; last_at: string | null }>();
   const pool: PreviewPool = { images: [], nature: [], city: [], bySlug: {} };
   for (const row of results) {
     const m = withWidths(toApiMedia(row));
@@ -120,14 +124,25 @@ export async function getPreviewPool(): Promise<PreviewPool> {
       : m.urls.small
         ? `${m.urls.small} ${m.smallWidth}w, ${m.urls.main} ${m.mainWidth}w`
         : undefined;
+    const year = (row.captured_at ?? "").slice(0, 4);
     const i = pool.images.push({
       src: m.urls.small ?? m.urls.main,
       srcset,
       w: m.width,
       h: m.height,
       alt: m.place || m.caption.split("\n")[0] || "",
+      year: Number(year) || undefined,
     }) - 1;
-    pool.bySlug[m.collection] = i;
+    const from = Date.parse(`${row.first_at ?? ""}Z`);
+    const to = Date.parse(`${row.last_at ?? ""}Z`);
+    const c = (pool.bySlug[m.collection] ??= {
+      cover: i,
+      byYear: {},
+      from: Number.isNaN(from) ? -Infinity : from,
+      to: Number.isNaN(to) ? Infinity : to,
+    });
+    c.byYear[year] = i; // "" holds photographs without a capture date
+    if (row.col_rn === 1) c.cover = i;
     (/westminster|new-york|city/.test(m.collection) ? pool.city : pool.nature).push(i);
   }
   return pool;

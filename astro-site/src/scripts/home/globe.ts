@@ -269,7 +269,7 @@ export function createGlobe(canvas: HTMLCanvasElement, store: Store) {
     if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6) return;
     const p = pick(e.clientX, e.clientY);
     if (down.type === "touch") store.set({ pinV: p, hoverV: null, hoverShot: null });
-    else if (p !== null && voyages[p].available) location.assign(`/${voyages[p].slug}`);
+    else if (p !== null && voyages[p].available) location.assign(`/${voyages[p].collection}`);
     down = null;
   };
   canvas.addEventListener("pointermove", onMove);

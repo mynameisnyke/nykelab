@@ -31,7 +31,7 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
             const Tag = v.available ? "a" : "span";
             return (
               <li data-v={i} class:list={{ off: !v.available }}>
-                <Tag class="item" href={v.available ? `/${v.slug}` : undefined}>
+                <Tag class="item" href={v.collection ? `/${v.collection}` : undefined}>
                   <span class="dot" style={`--c:${v.color}`}></span>
                   <span class="name">{v.title}{v.kind === "event" && <span class="kind">Event</span>}</span>
                   <span class="meta">

@@ -26,7 +26,9 @@ export interface Voyage {
   count: number;
   /** A published collection with this slug exists, so the voyage links to a page. */
   available: boolean;
-  /** Index into PreviewImage[] used as the voyage's cover. */
+  /** Slug of the published collection that holds this voyage's photographs (what "Open voyage" links to). */
+  collection?: string;
+  /** Index into PreviewImage[] used as the voyage's cover; -1 when no photograph of this voyage is published. */
   cover: number;
 }
 
@@ -52,6 +54,8 @@ export interface PreviewImage {
   w: number;
   h: number;
   alt: string;
+  /** Year of the collection this photo belongs to, so previews can match the year they sit under. */
+  year?: number;
 }
 
 export interface HomeData {
@@ -215,7 +219,7 @@ export function deriveEvents(voyages: Voyage[], info: Record<string, { name: str
         count: eds.reduce((n, v) => n + v.count, 0),
         start: Math.min(...eds.map((v) => v.start)),
         end: Math.max(...eds.map((v) => v.end)),
-        cover: biggest.cover,
+        cover: coverOf(eds, biggest),
       };
     })
     .sort((a, b) => b.count - a.count);
@@ -233,6 +237,12 @@ export interface YearSummary {
   photos: number[];
   start: number;
   end: number;
+}
+
+/** The biggest voyage's cover, or the biggest cover-bearing voyage of the group; -1 when none has a photograph. */
+function coverOf(vs: Voyage[], biggest: Voyage): number {
+  if (biggest.cover >= 0) return biggest.cover;
+  return vs.filter((v) => v.cover >= 0).sort((a, b) => b.count - a.count)[0]?.cover ?? -1;
 }
 
 /** Places the voyages roll up into. `include` keeps indices into the full list (shots refer to them), e.g. to leave events off the map. */
@@ -254,14 +264,14 @@ export function derivePlaces(voyages: Voyage[], include: (v: Voyage) => boolean 
       start: Math.min(...vs.map((v) => v.start)),
       end: Math.max(...vs.map((v) => v.end)),
       voyages: idxs,
-      cover: biggest.cover,
+      cover: coverOf(vs, biggest),
       available: false,
     });
   }
   return places.sort((a, b) => b.count - a.count);
 }
 
-export function deriveYears(voyages: Voyage[], shots: Shot[], imageCount: number): YearSummary[] {
+export function deriveYears(voyages: Voyage[], shots: Shot[], imageCount: number, images: PreviewImage[] = []): YearSummary[] {
   const by = new Map<number, Shot[]>();
   for (const s of shots) {
     const y = new Date(s.t).getUTCFullYear();
@@ -278,8 +288,12 @@ export function deriveYears(voyages: Voyage[], shots: Shot[], imageCount: number
     }
     const monthVoyage = perMonthVoyage.map((mp) => (mp.size ? [...mp.entries()].sort((a, b) => b[1] - a[1])[0][0] : null));
     const vIdx = [...new Set(list.map((s) => s.v))];
-    const photos = [...new Set(list.map((s) => s.img))].slice(0, 6);
-    for (let k = 0; photos.length < Math.min(6, imageCount) && k < imageCount; k++) {
+    const photos = [...new Set(list.map((s) => s.img).filter((i) => i >= 0 && (!images[i]?.year || images[i].year === year)))].slice(0, 6);
+    // Top up from photos of the same year; only borrow other years when the pool has none for this one.
+    const sameYear = images.flatMap((im, j) => (im.year === year ? [j] : []));
+    const pool = sameYear.length || !images.some((im) => im.year) ? sameYear : [];
+    for (const j of pool) if (photos.length < 6 && !photos.includes(j)) photos.push(j);
+    for (let k = 0; !pool.length && photos.length < Math.min(6, imageCount) && k < imageCount; k++) {
       const j = (k + year * 3) % imageCount; // offset by year so strips don't all start the same
       if (!photos.includes(j)) photos.push(j);
     }
@@ -317,10 +331,10 @@ export const words = (n: number) => WORDS[n] ?? String(n);
 const isPortrait = (im: PreviewImage | undefined) => !!im && im.h > im.w;
 
 /** A landscape image for full-bleed heroes (falls back to whatever exists). */
-export function heroImage(images: PreviewImage[], preferred: number): number {
-  if (images[preferred] && !isPortrait(images[preferred])) return preferred;
-  const i = images.findIndex((im) => !isPortrait(im));
-  return i >= 0 ? i : preferred;
+export function heroImage(images: PreviewImage[], preferred: number, candidates: number[] = []): number {
+  if (!images[preferred] || !isPortrait(images[preferred])) return preferred; // -1 / missing: no hero, never someone else's
+  // The wide hero crops a portrait hard: look for a landscape among this page's own photographs only.
+  return candidates.find((i) => images[i] && !isPortrait(images[i])) ?? preferred;
 }
 
 /** Up to `n` shots from a voyage with distinct photographs, portraits first (rows are portrait tiles). */
