@@ -1,37 +1,40 @@
 ---
-// One voyage's photographs inside a Place/Year gallery: GroupHeader + a row of portrait tiles,
-// each captioned with its metadata line.
+// One voyage's photographs inside a Place/Year/Event gallery: GroupHeader + rows of portrait tiles
+// taken from the voyage's own collection, each captioned with its date and place.
 import GroupHeader from "./GroupHeader.astro";
-import { metaLine, type PreviewImage, type Shot, type Voyage } from "../lib/voyages";
+import MediaItem from "./MediaItem.astro";
+import { photoCaption } from "../lib/gallery";
+import type { Photo } from "../lib/collections";
+import type { Voyage } from "../lib/voyages";
 
 interface Props {
   voyage: Voyage;
   count: number;
-  shots: Shot[];
-  images: PreviewImage[];
+  photos: Photo[];
   /** id for deep links (#westminster-2020) */
   anchor?: string;
 }
-const { voyage, count, shots, images, anchor } = Astro.props;
+const { voyage, count, photos, anchor } = Astro.props;
 ---
 
 <section class="group" id={anchor}>
   <GroupHeader voyage={voyage} count={count} />
-  <div class={`row n${shots.length}`}>
-    {
-      shots.map((s) => {
-        const im = images[s.img];
-        return (
+  {
+    photos.length > 0 ? (
+      <div class={`row n${Math.min(photos.length, 3)}`}>
+        {photos.map((m) => (
           <figure class="reveal">
             <div class="ph">
-              <img src={im.src} srcset={im.srcset} sizes={`(max-width: 767px) 100vw, ${Math.round(1312 / shots.length)}px`} alt={im.alt || voyage.title} loading="lazy" decoding="async" />
+              <MediaItem media={m} fit="cover" sizes={`(max-width: 767px) 100vw, ${Math.round(1312 / Math.min(photos.length, 3))}px`} />
             </div>
-            <figcaption class="caption">{metaLine(s)}</figcaption>
+            <figcaption class="caption">{photoCaption(m) || voyage.title}</figcaption>
           </figure>
-        );
-      })
-    }
-  </div>
+        ))}
+      </div>
+    ) : (
+      <p class="caption none">Photographs from this voyage are not published yet.</p>
+    )
+  }
 </section>
 
 <style>
@@ -74,6 +77,9 @@ const { voyage, count, shots, images, anchor } = Astro.props;
   }
   figcaption {
     margin-top: var(--caption-gap);
+  }
+  .none {
+    margin: 8px 0 0;
   }
   @media (max-width: 767px) {
     .row.n1,

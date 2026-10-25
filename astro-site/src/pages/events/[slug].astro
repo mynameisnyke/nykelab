@@ -8,9 +8,10 @@ import GalleryHero from "../../components/GalleryHero.astro";
 import MetaStrip from "../../components/MetaStrip.astro";
 import GalleryGroup from "../../components/GalleryGroup.astro";
 import NextBlock from "../../components/NextBlock.astro";
+import { loadGalleries } from "../../lib/gallery";
 import { loadHomeData } from "../../lib/home-data";
 import { seriesInfo } from "../../lib/catalog";
-import { deriveEvents, fmtN, fmtSpan, goldenShare, heroImage, pickPhotos, topSetting } from "../../lib/voyages";
+import { deriveEvents, fmtN, fmtSpan, goldenShare, heroImage, topSetting } from "../../lib/voyages";
 
 export const prerender = false;
 
@@ -35,12 +36,7 @@ const facts = event
       { label: "Golden hour", value: `${Math.round(goldenShare(mine) * 100)}%` },
     ]
   : [];
-const groups = order.map((vi, k) => ({
-  voyage: voyages[vi],
-  count: voyages[vi].count,
-  shots: pickPhotos(shots, images, vi, k % 2 === 0 ? 3 : 2),
-  anchor: voyages[vi].title.toLowerCase().replace(/\s+/g, "-"), // the Events index links to #westminster-2020
-}));
+const { groups, heroVideo } = await loadGalleries(voyages, order);
 const next = event && events.length > 1 ? events[(at + 1) % events.length] : undefined;
 const hero = event ? images[heroImage(images, event.cover, event.editions.map((i) => voyages[i].cover))] : undefined;
 ---
@@ -55,9 +51,9 @@ const hero = event ? images[heroImage(images, event.cover, event.editions.map((i
       </main>
     ) : (
       <main>
-        <GalleryHero title={event.name} subtitle={`${event.about} · ${fmtN(event.count)} photographs`} crumb={{ label: "Events", href: "/events" }} image={hero} />
+        <GalleryHero title={event.name} subtitle={`${event.about} · ${fmtN(event.count)} photographs`} crumb={{ label: "Events", href: "/events" }} image={hero} video={heroVideo} />
         <section class="facts"><MetaStrip facts={facts} /></section>
-        {groups.map((g) => <GalleryGroup {...g} images={images} />)}
+        {groups.map((g) => <GalleryGroup {...g} count={g.voyage.count} anchor={g.voyage.title.toLowerCase().replace(/\s+/g, "-")} />)}
         {next && <div class="next-wrap"><NextBlock eyebrow="Next event" title={next.name} meta={`${next.editions.length} editions · ${fmtN(next.count)} photographs`} href={`/events/${next.slug}`} image={images[next.cover]} /></div>}
       </main>
     )

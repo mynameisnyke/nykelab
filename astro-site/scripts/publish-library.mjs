@@ -66,6 +66,13 @@ function readApprovals(file) {
 }
 const approvals = readApprovals(a.approvals);
 
+// Clip folders the manifest pairs wrongly, found by looking at the footage (not the names):
+//  - "New Mexico" is the same Grand Canyon footage as phoenix_2021 (all 18 clips match), so it is published once
+//  - phoenix_2021 is Grand Canyon / Arizona-rim footage: it belongs with the grand_canyon stills
+//  - uk_2023 is the Brighton seafront in 2023, not the 2017 London trip the manifest links it to
+const FOLDER_HOME = { phoenix_2021: "grand_canyon", uk_2023: "brighton" };
+const DUPLICATE_FOLDERS = ["New Mexico"];
+
 function plan() {
   const only = a.only ? new Set(a.only.split(",")) : null;
   const cols = new Map();
@@ -94,7 +101,8 @@ function plan() {
     primary.set(folder, cs.sort((x, y) => score(y) - score(x))[0]);
   }
   for (const s of clipsM.subclips) {
-    const c = primary.get(s.folder);
+    if (DUPLICATE_FOLDERS.includes(s.folder)) continue;
+    const c = s.folder in FOLDER_HOME ? cols.get(FOLDER_HOME[s.folder]) : primary.get(s.folder);
     if (c) c.clips.push(s);
   }
   // interleave: photos by rank, clips by quality, clips spread evenly, rank 1 stays first
@@ -217,7 +225,7 @@ const cols = plan();
 const nPhotos = cols.reduce((n, c) => n + c.photos.length, 0), nClips = cols.reduce((n, c) => n + c.clips.length, 0);
 log(`plan: ${cols.length} collections, ${nPhotos} photos, ${nClips} clips${approvals ? " (approvals applied)" : " (no approvals file: every photo, voyages look)"}`);
 for (const c of cols.slice(0, 80)) log(`  ${c.slug.padEnd(28)} ${String(c.photos.length).padStart(2)} photos ${String(c.clips.length).padStart(2)} clips  ${c.first.slice(0, 10)}  ${c.folders.length ? `(clip folders: ${c.folders.join(", ")})` : ""}`);
-const unplaced = clipsM.subclips.filter((s) => !cols.some((c) => c.clips.includes(s)));
+const unplaced = clipsM.subclips.filter((s) => !DUPLICATE_FOLDERS.includes(s.folder) && !cols.some((c) => c.clips.includes(s)));
 if (!a.only && unplaced.length) log(`  WARNING: ${unplaced.length} clips belong to no published collection`);
 if (a["dry-run"]) process.exit(0);
 
@@ -241,6 +249,14 @@ for (const c of cols) {
   fs.rmSync(sql);
   report.collections++;
   log(`✓ ${slug.padEnd(28)} ${c.photos.length} photos + ${c.clips.length} clips  uploaded ${r.uploaded} (${(r.bytes / 1048576).toFixed(0)} MB), skipped ${r.skipped}  in ${((Date.now() - t0) / 1000).toFixed(0)}s${slug !== c.slug ? `  [slug ${slug}: ${c.slug} already holds other items]` : ""}`);
+}
+// duplicates published by an earlier run are taken off the site (kept in storage, not deleted)
+if (!a.only) {
+  const sql = DUPLICATE_FOLDERS.map((f) => `UPDATE media SET published = 0 WHERE source_id LIKE ${q(`${f}/%`)};`).join("\n");
+  const file = path.join(os.tmpdir(), "lib-retire.sql");
+  fs.writeFileSync(file, sql);
+  await sh(["d1", "execute", "DB", ...where, "--file", file]);
+  fs.rmSync(file);
 }
 log(`done: ${report.collections}/${cols.length} collections, ${report.uploaded} files uploaded (${(report.bytes / 1073741824).toFixed(2)} GB), ${report.skipped} unchanged, ${report.failures.length} failures`);
 if (report.failures.length) {

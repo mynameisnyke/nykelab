@@ -32,3 +32,15 @@ Target: the staging site (`nykelab-astro.nykelab-astro.workers.dev`), built from
 - Verified live: every clip, poster and one image variant per photo answers 200/206 (2,113 URLs); all 68 collection pages load with no broken images, video errors, failed requests or horizontal scroll at 1280 and 390 px.
 - Found and fixed while verifying: the "Next chapter" row on collection pages overflowed sideways when the next title was long (`[slug].astro`: `minmax(0, 1fr)` column, wrapping heading).
 - Not done on purpose: `tmag` look, `text_on` styling, home covers from each collection's rank-1 photo, higher-resolution stills (the proofs are 1280 px).
+
+## Corrections after review (2026-10-25)
+
+- Clip folders checked by eye against the stills, not by name. Three were wrong in the manifest's pairing:
+  `New Mexico` is the same footage as `phoenix_2021` (all 18 clips identical) and it is Grand Canyon / Arizona-rim, so it is published once, under `grand-canyon`;
+  the duplicate `New Mexico/*` rows were taken off the site (`published = 0`, files kept in R2);
+  `uk_2023` is the Brighton seafront (2023), so it moved from `london` (2017) to `brighton`.
+  The loader's `FOLDER_HOME` / `DUPLICATE_FOLDERS` tables record this.
+- Place, Year and Event galleries now show the voyage's real collection photos (rank order, only from the voyage's dates),
+  not the Lightroom catalogue's per-shot rows; a trip spread over several collections (Arizona, Wyoming) draws from all of them.
+- Heroes are a landscape clip from the page's collections when one exists (vertical clips are not used: they crop to a thin band).
+- Stills remain the 1280 px proofs. On wide screens a still hero is soft; re-exporting at 2560 px and rerunning the loader replaces the same keys.

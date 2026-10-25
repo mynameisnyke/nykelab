@@ -9,8 +9,9 @@ import MetaStrip from "../../components/MetaStrip.astro";
 import MonthBars from "../../components/MonthBars.astro";
 import GalleryGroup from "../../components/GalleryGroup.astro";
 import NextBlock from "../../components/NextBlock.astro";
+import { loadGalleries } from "../../lib/gallery";
 import { loadHomeData } from "../../lib/home-data";
-import { deriveYears, fmtN, goldenShare, heroImage, pickPhotos } from "../../lib/voyages";
+import { deriveYears, fmtN, goldenShare, heroImage } from "../../lib/voyages";
 
 export const prerender = false;
 
@@ -36,10 +37,7 @@ const facts = y
       { label: "Golden hour", value: `${Math.round(goldenShare(inYear) * 100)}%` },
     ]
   : [];
-const groups = order.map((vi, k) => {
-  const mine = inYear.filter((s) => s.v === vi);
-  return { voyage: voyages[vi], count: mine.length, shots: pickPhotos(inYear, images, vi, k % 2 === 1 ? 2 : 3) };
-});
+const { groups, heroVideo } = y ? await loadGalleries(voyages, order, y.year) : { groups: [], heroVideo: undefined };
 const next = y && years.length > 1 ? years[(at + 1) % years.length] : undefined;
 const hero = y ? images[heroImage(images, y.photos[0] ?? -1, y.photos)] : undefined;
 ---
@@ -54,10 +52,10 @@ const hero = y ? images[heroImage(images, y.photos[0] ?? -1, y.photos)] : undefi
       </main>
     ) : (
       <main>
-        <GalleryHero title={String(y.year)} numeral subtitle={`${fmtN(y.count)} photographs · ${n(y.voyages.length, "voyage", "voyages")} · ${n(y.countries.length, "country", "countries")}`} crumb={{ label: "Years", href: "/years" }} image={hero} />
+        <GalleryHero title={String(y.year)} numeral subtitle={`${fmtN(y.count)} photographs · ${n(y.voyages.length, "voyage", "voyages")} · ${n(y.countries.length, "country", "countries")}`} crumb={{ label: "Years", href: "/years" }} image={hero} video={heroVideo} />
         <section class="facts"><MetaStrip facts={facts} /></section>
         <section class="months"><MonthBars counts={y.monthCounts} voyageByMonth={y.monthVoyage} voyages={voyages} max={max} year={y.year} bw={56} label /></section>
-        {groups.map((g) => <GalleryGroup {...g} images={images} />)}
+        {groups.map((g) => <GalleryGroup {...g} count={inYear.filter((s) => s.v === voyages.indexOf(g.voyage)).length} />)}
         {next && <div class="next-wrap"><NextBlock eyebrow="Next year" title={String(next.year)} meta={`${fmtN(next.count)} photographs · ${n(next.voyages.length, "voyage", "voyages")}`} href={`/years/${next.year}`} image={images[next.photos[0]]} /></div>}
       </main>
     )

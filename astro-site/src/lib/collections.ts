@@ -100,6 +100,47 @@ export interface PreviewPool {
   bySlug: Record<string, { cover: number; byYear: Record<string, number>; from: number; to: number }>;
 }
 
+const placeholders = (n: number) => Array.from({ length: n }, () => "?").join(",");
+
+/** The best photographs of each collection (rank order, up to `limit` each): the galleries on Place, Year and Event pages. */
+export async function getGalleryPhotos(collections: string[], limit = 12): Promise<Map<string, Photo[]>> {
+  const out = new Map<string, Photo[]>();
+  if (!collections.length) return out;
+  const { results } = await db()
+    .prepare(
+      `SELECT * FROM (
+         SELECT m.*, ROW_NUMBER() OVER (PARTITION BY m.collection ORDER BY m.position, m.created_at) AS rn
+           FROM media m JOIN collections c ON c.slug = m.collection
+          WHERE m.published = 1 AND c.published = 1 AND m.type = 'image' AND m.collection IN (${placeholders(collections.length)}))
+        WHERE rn <= ? ORDER BY collection, rn`,
+    )
+    .bind(...collections, limit)
+    .all<MediaRow>();
+  for (const row of results) {
+    const list = out.get(row.collection) ?? [];
+    list.push(withWidths(toApiMedia(row)));
+    out.set(row.collection, list);
+  }
+  return out;
+}
+
+/** The first landscape clip of each collection, for heroes that can move (a vertical clip would be cropped to a thin band). */
+export async function getHeroVideos(collections: string[]): Promise<Map<string, Photo>> {
+  const out = new Map<string, Photo>();
+  if (!collections.length) return out;
+  const { results } = await db()
+    .prepare(
+      `SELECT m.* FROM media m JOIN collections c ON c.slug = m.collection
+        WHERE m.published = 1 AND c.published = 1 AND m.type = 'video' AND m.width > m.height
+          AND m.collection IN (${placeholders(collections.length)})
+        ORDER BY m.collection, m.position, m.created_at`,
+    )
+    .bind(...collections)
+    .all<MediaRow>();
+  for (const row of results) if (!out.has(row.collection)) out.set(row.collection, withWidths(toApiMedia(row)));
+  return out;
+}
+
 /** One photo per published collection per year (its first that year), used as hover previews and year strips. */
 export async function getPreviewPool(): Promise<PreviewPool> {
   const { results } = await db()

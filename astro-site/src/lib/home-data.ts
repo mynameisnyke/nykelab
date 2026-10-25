@@ -9,13 +9,14 @@ import { loadCatalog } from "./catalog";
 import type { HomeData } from "./voyages";
 
 /** Catalog voyages whose collection has another name, keyed "slug" or "slug@year" (the year tells apart two trips with one slug). */
-const COLLECTION_FOR: Record<string, string> = {
+const COLLECTION_FOR: Record<string, string | string[]> = {
   barbados: "barbadoes",
   texas: "texas-2021",
   colorado: "colorado-2021",
-  arizona: "sedona",
+  arizona: ["sedona", "grand-canyon", "tuscon", "phoenix"],
   "sesame-place": "fist-time-sesame-place-2025",
-  "grand-tetons@2020": "grand-teton",
+  "grand-tetons@2020": ["grand-teton", "yellowstone"],
+  "grand-tetons@2022": ["grand-teton", "yellowstone"], // photographs are from 2020; the 2022 clips live here
   "westminster@2020": "westminster-agility-2020",
   "westminster@2021": "westminster-2021",
   "nycc@2021": "nycc-2021-thurs-finals",
@@ -42,9 +43,11 @@ export async function loadHomeData() {
   voyages.forEach((v) => {
     const year = new Date(v.start).getUTCFullYear();
     const named = COLLECTION_FOR[`${v.slug}@${year}`] ?? COLLECTION_FOR[v.slug];
-    const slug = named ?? v.slug;
+    const all = named === undefined ? [v.slug] : Array.isArray(named) ? named : [named];
+    const slug = all[0];
     const ok = published.has(slug) && (named ? true : !pool.bySlug[slug] || overlaps(slug, v.start, v.end));
     v.collection = ok ? slug : undefined;
+    v.collections = ok ? all.filter((c) => published.has(c)) : undefined;
     v.available = ok;
     const c = ok ? pool.bySlug[slug] : undefined;
     v.cover = c ? (c.byYear[String(year)] ?? c.cover) : -1;

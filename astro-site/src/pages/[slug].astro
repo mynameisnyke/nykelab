@@ -17,7 +17,9 @@ else Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60
 
 const nav = page ? await getNav() : [];
 const media = page?.media ?? [];
-const heroIdx = Math.max(0, media.findIndex((m) => m.orientation !== "portrait"));
+// The hero is the first landscape clip when the collection has one (it plays), else the first landscape still.
+const firstLandscape = (type?: "video") => media.findIndex((m) => m.orientation !== "portrait" && (!type || m.type === type));
+const heroIdx = Math.max(0, firstLandscape("video") >= 0 ? firstLandscape("video") : firstLandscape());
 const hero = media[heroIdx];
 
 // Layout rhythm: landscapes alternate full-bleed / inset; runs of portraits

@@ -28,6 +28,8 @@ export interface Voyage {
   available: boolean;
   /** Slug of the published collection that holds this voyage's photographs (what "Open voyage" links to). */
   collection?: string;
+  /** Every published collection from this trip (the first is `collection`); galleries and heroes draw from all of them. */
+  collections?: string[];
   /** Index into PreviewImage[] used as the voyage's cover; -1 when no photograph of this voyage is published. */
   cover: number;
 }

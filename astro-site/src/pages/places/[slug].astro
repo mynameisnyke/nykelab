@@ -8,8 +8,9 @@ import GalleryHero from "../../components/GalleryHero.astro";
 import MetaStrip from "../../components/MetaStrip.astro";
 import GalleryGroup from "../../components/GalleryGroup.astro";
 import NextBlock from "../../components/NextBlock.astro";
+import { loadGalleries } from "../../lib/gallery";
 import { loadHomeData } from "../../lib/home-data";
-import { derivePlaces, fmtN, fmtSpan, goldenShare, heroImage, pickPhotos, topSetting } from "../../lib/voyages";
+import { derivePlaces, fmtN, fmtSpan, goldenShare, heroImage, topSetting } from "../../lib/voyages";
 
 export const prerender = false;
 
@@ -34,7 +35,7 @@ const facts = place
       { label: "Golden hour", value: `${Math.round(goldenShare(mine) * 100)}%` },
     ]
   : [];
-const groups = order.map((vi, k) => ({ voyage: voyages[vi], count: voyages[vi].count, shots: pickPhotos(shots, images, vi, k % 2 === 0 ? 3 : 2) }));
+const { groups, heroVideo } = await loadGalleries(voyages, order);
 const next = place && places.length > 1 ? places[(at + 1) % places.length] : undefined;
 const hero = place ? images[heroImage(images, place.cover, place.voyages.map((i) => voyages[i].cover))] : undefined;
 ---
@@ -49,9 +50,9 @@ const hero = place ? images[heroImage(images, place.cover, place.voyages.map((i)
       </main>
     ) : (
       <main>
-        <GalleryHero title={place.name} subtitle={`${place.country} · ${fmtN(place.count)} photographs`} crumb={{ label: "Places", href: "/places" }} image={hero} />
+        <GalleryHero title={place.name} subtitle={`${place.country} · ${fmtN(place.count)} photographs`} crumb={{ label: "Places", href: "/places" }} image={hero} video={heroVideo} />
         <section class="facts"><MetaStrip facts={facts} /></section>
-        {groups.map((g) => <GalleryGroup {...g} images={images} />)}
+        {groups.map((g) => <GalleryGroup {...g} count={g.voyage.count} />)}
         {next && <div class="next-wrap"><NextBlock eyebrow="Next place" title={next.name} meta={`${next.country} · ${fmtN(next.count)} photographs`} href={`/places/${next.slug}`} image={images[next.cover]} /></div>}
       </main>
     )

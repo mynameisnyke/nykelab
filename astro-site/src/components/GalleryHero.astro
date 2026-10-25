@@ -1,5 +1,7 @@
 ---
 // Full-bleed cover for Place / Year galleries (Figma: GALLERIES hero). The year uses a huge numeral.
+import MediaItem from "./MediaItem.astro";
+import type { Photo } from "../lib/collections";
 import type { PreviewImage } from "../lib/voyages";
 
 interface Props {
@@ -7,13 +9,16 @@ interface Props {
   subtitle: string;
   crumb: { label: string; href: string };
   image?: PreviewImage;
+  /** A clip for the hero; it wins over the still. */
+  video?: Photo;
   numeral?: boolean;
 }
-const { title, subtitle, crumb, image, numeral = false } = Astro.props;
+const { title, subtitle, crumb, image, video, numeral = false } = Astro.props;
 ---
 
 <section class="hero">
-  {image && <img class="media" src={image.src} srcset={image.srcset} sizes="100vw" alt={image.alt} loading="eager" decoding="async" fetchpriority="high" />}
+  {video && <MediaItem media={video} eager fit="cover" sizes="100vw" />}
+  {!video && image && <img class="media" src={image.src} srcset={image.srcset} sizes="100vw" alt={image.alt} loading="eager" decoding="async" fetchpriority="high" />}
   <div class="scrim top"></div>
   <div class="scrim bottom"></div>
   <a class="crumb eyebrow" href={crumb.href}>← {crumb.label}</a>
@@ -33,6 +38,7 @@ const { title, subtitle, crumb, image, numeral = false } = Astro.props;
     overflow: hidden;
     color: #fff;
   }
+  .hero :global(.media),
   .media {
     position: absolute;
     inset: 0;
