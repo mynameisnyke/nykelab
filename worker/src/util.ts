@@ -67,6 +67,9 @@ export function toApiMedia(row: MediaRow): ApiMedia {
     placeSource: row.place_source ?? "",
     captionSource: row.caption_source ?? "",
     hasGps: row.gps_lat != null && row.gps_lon != null,
+    avgColour: /^#[0-9a-f]{6}$/i.test(row.avg_colour ?? "") ? row.avg_colour : "",
+    textOn: row.text_on === "light" || row.text_on === "dark" ? row.text_on : "",
+    duration: row.duration ?? null,
   };
 }
 

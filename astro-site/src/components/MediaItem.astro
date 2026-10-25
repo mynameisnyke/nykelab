@@ -14,6 +14,8 @@ interface Props {
 const { media: m, sizes, eager = false, fit = "natural", class: className } = Astro.props;
 const alt = m.place || m.caption.split("\n")[0] || "";
 const hasSize = m.width > 0 && m.height > 0;
+// The item's average colour shows while the file loads (validated as #rrggbb in the API, so safe in a style).
+const placeholder = m.avgColour ? `background-color:${m.avgColour}` : undefined;
 // Originals-first images list their generated widths; older rows have a small + main pair.
 const srcset = m.urls.variants
   ? m.urls.variants.map((v) => `${v.url} ${v.width}w`).join(", ")
@@ -26,6 +28,7 @@ const srcset = m.urls.variants
   m.type === "video" ? (
     <video
       class:list={["media", fit, className]}
+      style={placeholder}
       data-src={m.urls.main}
       data-eager={eager ? "" : undefined}
       poster={m.urls.poster}
@@ -51,6 +54,7 @@ const srcset = m.urls.variants
       width={hasSize ? m.width : undefined}
       height={hasSize ? m.height : undefined}
       alt={alt}
+      style={placeholder}
       loading={eager ? "eager" : "lazy"}
       decoding="async"
       fetchpriority={eager ? "high" : undefined}

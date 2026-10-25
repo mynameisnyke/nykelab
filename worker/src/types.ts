@@ -58,6 +58,12 @@ export interface MediaRow {
   gps_lat: number | null;
   gps_lon: number | null;
   meta_read_at: string | null;
+  // Graded library (migrations/0004_library.sql)
+  avg_colour: string;
+  text_on: string;
+  look: string;
+  source_id: string | null;
+  duration: number | null;
 }
 
 export interface CollectionRow {
@@ -108,4 +114,10 @@ export interface ApiMedia {
   captionSource: "photo" | "manual" | "";
   /** The file carried a GPS fix (the fix itself stays private). */
   hasGps: boolean;
+  /** Average colour as "#rrggbb": a placeholder while the file loads ("" when unknown). */
+  avgColour: string;
+  /** "light" or "dark": the text colour that reads best on top of this item ("" when unknown). */
+  textOn: "light" | "dark" | "";
+  /** Clip length in seconds (videos). */
+  duration: number | null;
 }
