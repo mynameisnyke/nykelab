@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { requireAdmin } from "./auth";
+import { EMPTY_META, readMeta, type PhotoMeta } from "./ingest";
 import type { AppEnv, CollectionRow, MediaRow } from "./types";
 import {
   ID_RE,
@@ -157,6 +158,26 @@ adminRoutes.delete("/api/admin/uploads/:id", async (c) => {
 
 // ---- Media ---------------------------------------------------------------
 
+// Columns filled from the photo's own tags. Caption and place are handled separately (typed values win).
+const META_SQL = `captured_at = ?, camera = ?, lens = ?, focal = ?, aperture = ?, iso = ?, shutter = ?,
+  city = ?, region = ?, country = ?, country_code = ?, place_lat = ?, place_lon = ?,
+  gps_lat = ?, gps_lon = ?, meta_read_at = datetime('now')`;
+const metaBinds = (m: PhotoMeta) => [
+  m.capturedAt, m.camera, m.lens, m.focal, m.aperture, m.iso, m.shutter,
+  m.city, m.region, m.country, m.countryCode, m.placeLat, m.placeLon,
+  m.gpsLat, m.gpsLon,
+];
+
+/** Read the stored original's tags; a photo with unreadable metadata just yields empty values. */
+async function metaOf(c: { env: { MEDIA: R2Bucket } }, key: string | null): Promise<PhotoMeta | null> {
+  if (!key) return null;
+  try {
+    return await readMeta(c.env.MEDIA, key);
+  } catch {
+    return null;
+  }
+}
+
 adminRoutes.get("/api/admin/media", async (c) => {
   const collection = c.req.query("collection");
   const stmt = collection
@@ -234,7 +255,15 @@ adminRoutes.post("/api/admin/media", async (c) => {
   }
 
   const position = await nextPosition(c.env.DB, b.collection);
-  await c.env.DB.prepare(
+  // Fill caption and place from the photo's own tags when they were left blank; anything typed wins.
+  const meta = b.type === "image" ? await metaOf(c, original) : null;
+  const typedCaption = caption.trim() !== "";
+  const typedPlace = place.trim() !== "";
+  const finalCaption = typedCaption ? caption : (meta?.caption ?? "");
+  const finalPlace = typedPlace ? place : (meta?.place ?? "");
+  const captionSource = typedCaption ? "manual" : meta?.caption ? "photo" : "";
+  const placeSource = typedPlace ? "manual" : meta?.place ? meta.placeSource : "";
+  const insert = c.env.DB.prepare(
     `INSERT INTO media (id, collection, type, caption, place, orientation, width, height,
                         position, published, featured, key_main, key_small, key_poster, size_bytes,
                         key_original)
@@ -244,8 +273,8 @@ adminRoutes.post("/api/admin/media", async (c) => {
       id,
       b.collection,
       b.type,
-      caption,
-      place,
+      finalCaption,
+      finalPlace,
       orientation,
       Math.max(0, intOr(b.width, 0)),
       Math.max(0, intOr(b.height, 0)),
@@ -257,8 +286,16 @@ adminRoutes.post("/api/admin/media", async (c) => {
       keys.poster,
       sizeBytes,
       original,
-    )
-    .run();
+    );
+  await c.env.DB.batch([
+    insert,
+    c.env.DB.prepare(`UPDATE media SET ${META_SQL}, caption_source = ?, place_source = ? WHERE id = ?`).bind(
+      ...metaBinds(meta ?? EMPTY_META),
+      captionSource,
+      placeSource,
+      id,
+    ),
+  ]);
 
   const row = await c.env.DB.prepare("SELECT * FROM media WHERE id = ?")
     .bind(id)
@@ -286,10 +323,12 @@ adminRoutes.patch("/api/admin/media/:id", async (c) => {
   if (b.caption !== undefined) {
     if (!isString(b.caption, 2000)) return c.json({ error: "Caption too long" }, 400);
     set("caption", b.caption);
+    set("caption_source", b.caption.trim() ? "manual" : "");
   }
   if (b.place !== undefined) {
     if (!isString(b.place, 200)) return c.json({ error: "Place too long" }, 400);
     set("place", b.place);
+    set("place_source", b.place.trim() ? "manual" : "");
   }
   if (b.orientation !== undefined) {
     if (!["landscape", "portrait", "unknown"].includes(b.orientation)) {
@@ -318,6 +357,34 @@ adminRoutes.patch("/api/admin/media/:id", async (c) => {
     .bind(id)
     .first<MediaRow>();
   return c.json({ media: toApiMedia(row!) });
+});
+
+// Re-read the tags from the stored original (for photos uploaded before this existed, or after the reader improved).
+// Caption and place are refreshed unless a person typed them; `{"overwrite": true}` replaces those too.
+adminRoutes.post("/api/admin/media/:id/read-metadata", async (c) => {
+  const id = c.req.param("id");
+  const b = (await c.req.json().catch(() => null)) ?? {};
+  const row = await c.env.DB.prepare("SELECT * FROM media WHERE id = ?").bind(id).first<MediaRow>();
+  if (!row) return c.json({ error: "Not found" }, 404);
+  if (!row.key_original) return c.json({ error: "No original stored for this item" }, 409);
+  const meta = await metaOf(c, row.key_original);
+  if (!meta) return c.json({ error: "Could not read the original" }, 502);
+
+  const overwrite = b.overwrite === true;
+  const captionOpen = overwrite || row.caption_source !== "manual";
+  const placeOpen = overwrite || row.place_source !== "manual";
+  // never blank out something that is already there when the photo has nothing to say
+  const caption = captionOpen && meta.caption ? meta.caption : row.caption;
+  const place = placeOpen && meta.place ? meta.place : row.place;
+  const captionSource = captionOpen && meta.caption ? "photo" : row.caption_source;
+  const placeSource = placeOpen && meta.place ? meta.placeSource : row.place_source;
+  await c.env.DB.prepare(
+    `UPDATE media SET ${META_SQL}, caption = ?, place = ?, caption_source = ?, place_source = ?, updated_at = datetime('now') WHERE id = ?`,
+  )
+    .bind(...metaBinds(meta), caption, place, captionSource, placeSource, id)
+    .run();
+  const out = await c.env.DB.prepare("SELECT * FROM media WHERE id = ?").bind(id).first<MediaRow>();
+  return c.json({ media: toApiMedia(out!) });
 });
 
 adminRoutes.delete("/api/admin/media/:id", async (c) => {

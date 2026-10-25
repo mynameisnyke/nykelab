@@ -51,6 +51,22 @@ export function toApiMedia(row: MediaRow): ApiMedia {
           ...(row.key_poster ? { poster: mediaUrl(row.key_poster) } : {}),
         },
     createdAt: row.created_at,
+    capturedAt: row.captured_at ?? null,
+    camera: row.camera ?? "",
+    lens: row.lens ?? "",
+    focal: row.focal ?? null,
+    aperture: row.aperture ?? null,
+    iso: row.iso ?? null,
+    shutter: row.shutter ?? "",
+    city: row.city ?? "",
+    region: row.region ?? "",
+    country: row.country ?? "",
+    countryCode: row.country_code ?? "",
+    placeLat: row.place_lat ?? null,
+    placeLon: row.place_lon ?? null,
+    placeSource: row.place_source ?? "",
+    captionSource: row.caption_source ?? "",
+    hasGps: row.gps_lat != null && row.gps_lon != null,
   };
 }
 
