@@ -104,6 +104,18 @@ npm run catalog -- /Volumes/Whiskey/photos-3plus-or-picked.csv   # rerun wheneve
 
 Layout rhythm (same idea as the Vue `CollectionView`, using the Figma sections): hero = first landscape item; remaining landscapes alternate full-bleed / inset; runs of portraits become 1–3-up rows; the next collection is shown as "Next chapter".
 
+## Going live
+
+Nothing is deployed yet (the Cloudflare account has no Workers, D1 or R2 as of 24 Oct 2026). `wrangler.jsonc` is production by default (`ENVIRONMENT: "production"`): `/admin` and `/api/admin/*` answer `503 Admin is not configured` until Access is set up, so a first deploy is safe. Local development gets `ENVIRONMENT=development` from `.dev.vars` (gitignored), which skips the admin login; if you ever create a new checkout, recreate it: `echo ENVIRONMENT=development > astro-site/.dev.vars`.
+
+1. **Account:** `npx wrangler login`; enable R2 in the dashboard (R2 needs a payment method on file); the `nykelab.nyc` zone must be on Cloudflare.
+2. **Staging deploy:** `cd astro-site && npm run deploy` (auto-provisions D1 / R2 / KV from `wrangler.jsonc`), then `npx wrangler d1 migrations apply DB --remote`. Open the `*.workers.dev` URL it prints.
+3. **Lock the admin before sharing any URL:** Zero Trust, Access, Applications, self-hosted. Destinations `nykelab.nyc/admin*` and `nykelab.nyc/api/admin/*` (plus the workers.dev host while testing), policy Allow with your email. Copy the Audience tag and team domain into `ACCESS_AUD` / `ACCESS_TEAM_DOMAIN` in `wrangler.jsonc`, deploy again. Check: logged in, `/api/admin/me` returns your email; in a private window `/admin` goes to the Access login and `/api/admin/me` is 401/403.
+4. **Photos:** upload through `/admin` (originals; sized WebP variants are generated on first request). Until photos exist the pages render with empty photo slots.
+5. **Privacy check once, with a geotagged JPEG:** upload it, then `curl -s https://<host>/m/<id>/w900.webp | exiftool -` must show no GPS. Originals are never served (only `main|small|poster` legacy keys and `w<width>.webp` variants).
+6. **Domain:** uncomment the `routes` entry in `wrangler.jsonc`, deploy.
+7. **Optional:** `CF_ACCOUNT_ID` + `wrangler secret put CF_API_TOKEN` for the admin Stats tab; push the repo to GitHub and connect Workers Builds for auto-deploys.
+
 ## Notes
 
 - `astro.config.mjs` sets `prerenderEnvironment: "node"`. With the default (`workerd`) prerendered routes returned 404 in `astro dev` when using the custom Hono entry.
@@ -116,4 +128,4 @@ Layout rhythm (same idea as the Vue `CollectionView`, using the Figma sections):
 - World (three.js walkable gallery): deliberately skipped for now. When wanted, it mounts as Vue islands like the admin does. (The admin's "In World" checkbox and the `featured` flag are kept so nothing is lost.)
 - The Figma Offset collage and Diptych sections (they need an editorial pairing field; today layout is derived from orientation).
 - Dropped on purpose: the menu overlay's voyage preview photo and sunburst (the home globe replaced the sunburst; the menu lists the main destinations). The Figma MenuOverlay and Sunburst components still show the old design. About links: GitHub, LinkedIn and Email are the real ones. There is no Instagram account, so none is linked.
-- Production deploy: needs the real D1 `database_id` / Access vars in `wrangler.jsonc`, then `npm run deploy`. Not done.
+- Production deploy: not done yet. See "Going live" below.

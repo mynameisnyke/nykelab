@@ -19,7 +19,15 @@
   "images": { "binding": "IMAGES" },
   "analytics_engine_datasets": [{ "binding": "EVENTS", "dataset": "nykelab_events" }],
   "vars": {
-    // Local only. Production needs ACCESS_TEAM_DOMAIN / ACCESS_AUD (see ../README.md).
-    "ENVIRONMENT": "development"
+    // Production by default: anything other than "development" makes /admin and /api/admin/* require a valid
+    // Cloudflare Access login (and answers 503 until the two ACCESS_ values below are set). Local development
+    // overrides this in .dev.vars (gitignored). See README, "Going live".
+    "ENVIRONMENT": "production",
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": "",
+    // Optional comma-separated allowlist of admin emails (extra check on top of Access).
+    "ADMIN_EMAILS": ""
   }
+  // Custom domain, once the nykelab.nyc zone is on Cloudflare and the first deploy works on *.workers.dev:
+  // , "routes": [{ "pattern": "nykelab.nyc", "custom_domain": true }]
 }
