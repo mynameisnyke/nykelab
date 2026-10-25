@@ -29,8 +29,9 @@
     // Cloudflare Access login (and answers 503 until the two ACCESS_ values below are set). Local development
     // overrides this in .dev.vars (gitignored). See README, "Going live".
     "ENVIRONMENT": "production",
-    "ACCESS_TEAM_DOMAIN": "",
-    "ACCESS_AUD": "",
+    // Cloudflare Access application "nykelab-astro" (identifiers, not secrets: every visitor is redirected with them).
+    "ACCESS_TEAM_DOMAIN": "throbbing-sunset-0d23.cloudflareaccess.com",
+    "ACCESS_AUD": "ce52f956a600b918ce10f711aca0f5352d44f6296aafae26a3ccedc5e151aad2",
     // Optional comma-separated allowlist of admin emails (extra check on top of Access).
     "ADMIN_EMAILS": ""
   }
