@@ -3,6 +3,7 @@
 // The overlay here is the list + footer only; the preview image and sunburst
 // from the Figma menu come with the photo pages.
 import Logo from "./Logo.astro";
+import InfinityMark from "./InfinityMark.astro";
 import { NAV_ITEMS, isHere } from "../lib/nav";
 interface Props {
   /** "media" = sits over a photo (white icons/wordmark in both themes). */
@@ -56,8 +57,14 @@ const footer = [{ label: "Email", href: "mailto:nyke@nykelab.nyc" }];
         NAV_ITEMS.map((c, i) => (
           <li>
             <span class="num">{i}</span>
-            <a href={c.href} data-astro-reload={c.href === "/" ? "" : undefined} aria-current={isHere(c.href, here) ? "page" : undefined}>
-              {c.label}
+            <a
+              href={c.href}
+              data-astro-reload={c.href === "/" || c.icon ? "" : undefined}
+              class:list={{ mark: !!c.icon }}
+              aria-current={isHere(c.href, here) ? "page" : undefined}
+              aria-label={c.icon ? c.label : undefined}
+            >
+              {c.icon === "infinity" ? <InfinityMark size={64} /> : c.label}
             </a>
           </li>
         ))
@@ -192,6 +199,15 @@ const footer = [{ label: "Email", href: "mailto:nyke@nykelab.nyc" }];
     opacity: var(--opacity-menu-inactive);
     transition: opacity 0.2s ease;
   }
+  .menu-list a.mark {
+    display: inline-flex;
+    align-items: center;
+    height: 100px;
+  }
+  .menu-list a.mark :global(svg) {
+    width: 64px;
+    height: 64px;
+  }
   .menu-list a:hover,
   .menu-list a:focus-visible,
   .menu-list a[aria-current] {
@@ -259,6 +275,13 @@ const footer = [{ label: "Email", href: "mailto:nyke@nykelab.nyc" }];
     .menu-list a {
       font-size: 40px;
       line-height: 52px;
+    }
+    .menu-list a.mark {
+      height: 52px;
+    }
+    .menu-list a.mark :global(svg) {
+      width: 40px;
+      height: 40px;
     }
     .menu-footer,
     .menu-voyages {

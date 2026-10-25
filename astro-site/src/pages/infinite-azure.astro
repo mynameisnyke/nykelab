@@ -1,0 +1,358 @@
+---
+// Infinite Azure: an endless, parallaxed scroll of photographs over the Infinite Azure loop, with its music.
+// Local branch for now (infinite-azure). The background loop, poster and music live in storage under azure/ (scripts/publish-azure.mjs).
+import Base from "../layouts/Base.astro";
+import Navbar from "../components/Navbar.astro";
+import ChapterNav from "../components/ChapterNav.astro";
+import InfinityMark from "../components/InfinityMark.astro";
+import { getAzureFeed } from "../lib/azure";
+import { getNav } from "../lib/collections";
+
+export const prerender = false;
+Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
+
+const [feed, nav] = await Promise.all([getAzureFeed(), getNav()]);
+---
+
+<Base title="Infinite Azure — nykelab" description="An endless scroll of photographs over the Infinite Azure loop and music.">
+  <video id="az-bg" class="az-bg" src="/m/azure/background.mp4" poster="/m/azure/background.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video>
+  <div class="az-scrim" aria-hidden="true"></div>
+
+  <Navbar surface="media" collections={nav} />
+
+  <main id="az-stage" class="az" aria-label="Infinite Azure: photographs, endlessly">
+    <div id="az-feed"></div>
+  </main>
+  <canvas id="az-hit" class="az-hit" aria-hidden="true"></canvas>
+  <!-- the combo counter: one hit for every photograph that lands -->
+  <div id="az-combo" class="az-combo" aria-hidden="true"><span id="az-combo-n" class="n">0</span><span class="label">Hit Combo</span></div>
+
+  <audio id="az-audio" src="/m/azure/infinite-azure.mp3" loop preload="none"></audio>
+  <button id="az-sound" class="az-sound" type="button" aria-pressed="false" aria-label="Sound off, tap to play" hidden>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4Z"></path>
+      <path class="wave" d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.8a7.5 7.5 0 0 1 0 10.4"></path>
+      <path class="mute" d="M15.5 9.5l5 5M20.5 9.5l-5 5"></path>
+    </svg>
+  </button>
+
+  <div id="az-intro" class="az-intro" role="dialog" aria-modal="false" aria-label="Infinite Azure">
+    <div class="az-intro-inner">
+      <span class="az-mark"><InfinityMark size={56} /></span>
+      <h1>Infinite Azure</h1>
+      <p class="eyebrow">Scroll. It does not end.</p>
+      <div class="az-actions">
+        <button id="az-enter" type="button">Enter with sound</button>
+        <button id="az-silent" type="button" class="quiet">Without sound</button>
+      </div>
+    </div>
+  </div>
+
+  <ChapterNav />
+  <script type="application/json" id="az-data" set:html={JSON.stringify(feed)} />
+</Base>
+
+<script>
+  import { initAzure } from "../scripts/azure";
+  let dispose: (() => void) | undefined;
+  document.addEventListener("astro:page-load", () => {
+    if (document.getElementById("az-feed")) dispose = initAzure();
+  });
+  document.addEventListener("astro:before-swap", () => {
+    dispose?.();
+    dispose = undefined;
+  });
+</script>
+
+<style>
+  :global(html.az-locked),
+  :global(html.az-locked body) {
+    overflow: hidden;
+  }
+  /* the page's own backdrop sits on <html> so the fixed video (behind everything) is not painted over by <body> */
+  :global(html:root) {
+    background: #050f18;
+  }
+  :global(body) {
+    background: transparent;
+    color: #fff;
+  }
+  .az-bg {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+    background: #07131d;
+  }
+  .az-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(to bottom, rgba(3, 12, 20, 0.35), rgba(3, 12, 20, 0.12) 40%, rgba(3, 12, 20, 0.4));
+    pointer-events: none;
+  }
+  .az {
+    position: relative;
+    z-index: 1;
+    overflow-x: clip;
+  }
+  #az-feed {
+    position: relative;
+  }
+  /* the pieces are created by the script */
+  :global(.az-scene) {
+    position: relative;
+    width: 100%;
+  }
+  :global(.az-piece) {
+    position: absolute;
+    margin: 0;
+    will-change: transform;
+  }
+  /* nothing shows (not even its shadow) until the photograph lands */
+  :global(.az-piece.landed) {
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+    background: #0b1a26;
+  }
+  :global(.az-piece img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+  }
+  :global(.az-piece.landed img) {
+    animation: az-slam 0.46s cubic-bezier(0.2, 0.9, 0.25, 1) both;
+  }
+  @keyframes az-slam {
+    0% {
+      opacity: 0;
+      transform: scale(1.2) rotate(-1.4deg);
+      filter: brightness(2.4) contrast(1.15);
+    }
+    30% {
+      opacity: 1;
+      filter: brightness(1.55);
+    }
+    100% {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(.az-piece.landed img) {
+      animation: az-fade 0.5s ease both;
+    }
+    @keyframes az-fade {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  }
+
+  .az-hit {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 15;
+    pointer-events: none;
+  }
+
+  .az-combo {
+    position: fixed;
+    left: 0;
+    top: 34vh;
+    z-index: 16;
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 6px 90px 16px var(--inset);
+    font-family: var(--font-ui);
+    font-style: italic;
+    color: #fff;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(3, 10, 18, 0.5), rgba(3, 10, 18, 0.28) 60%, rgba(3, 10, 18, 0));
+    opacity: 0;
+    transform: translateX(-28px);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.2, 0.9, 0.25, 1);
+  }
+  .az-combo.on {
+    opacity: 1;
+    transform: none;
+  }
+  .az-combo .n {
+    display: inline-block;
+    min-width: 0.6em;
+    font-weight: 800;
+    font-size: 72px;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    transform-origin: 20% 70%;
+    text-shadow: 0 0 22px rgba(255, 60, 100, 0.6), 0 2px 0 rgba(0, 0, 0, 0.45);
+  }
+  .az-combo .label {
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+  }
+  /* the red-pink bar under the text, cut on the slant */
+  .az-combo::after {
+    content: "";
+    position: absolute;
+    left: var(--inset);
+    right: 24px;
+    bottom: 6px;
+    height: 6px;
+    background: linear-gradient(90deg, #ff4a76, #c2183f 55%, rgba(194, 24, 63, 0));
+    clip-path: polygon(0 0, 100% 0, 97% 100%, 0 100%);
+    box-shadow: 0 0 14px rgba(255, 60, 100, 0.55);
+  }
+
+  .az-sound {
+    position: fixed;
+    right: var(--inset);
+    bottom: 26px;
+    z-index: 21;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    color: #fff;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    mix-blend-mode: difference;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+  }
+  .az-sound:hover,
+  .az-sound:focus-visible {
+    opacity: 1;
+  }
+  .az-sound[data-on="1"] .mute,
+  .az-sound[data-on="0"] .wave {
+    display: none;
+  }
+  .az-sound[hidden] {
+    display: none;
+  }
+
+  .az-intro {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    text-align: center;
+    background: radial-gradient(ellipse at center, rgba(4, 14, 24, 0.35), rgba(4, 14, 24, 0.78));
+    backdrop-filter: blur(3px);
+    transition: opacity 0.65s ease;
+  }
+  .az-intro.out {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .az-intro[hidden] {
+    display: none;
+  }
+  .az-intro-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .az-mark {
+    color: #fff;
+    opacity: 0.9;
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-size: 64px;
+    line-height: 72px;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  .eyebrow {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #dfe9f0;
+  }
+  .az-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-top: 18px;
+  }
+  .az-actions button {
+    font: inherit;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 999px;
+    padding: 12px 26px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  }
+  .az-actions button:hover,
+  .az-actions button:focus-visible {
+    background: #fff;
+    color: #050f18;
+  }
+  .az-actions .quiet {
+    border-color: transparent;
+    padding: 4px 8px;
+    color: #cfdbe4;
+  }
+  .az-actions .quiet:hover,
+  .az-actions .quiet:focus-visible {
+    background: transparent;
+    color: #fff;
+    text-decoration: underline;
+  }
+  @media (max-width: 767px) {
+    h1 {
+      font-size: 40px;
+      line-height: 46px;
+    }
+    .az-sound {
+      bottom: 52px; /* above the bottom nav, which runs the full width on a phone */
+      right: 16px;
+    }
+    .az-combo {
+      top: 24vh;
+      gap: 10px;
+      padding-right: 56px;
+    }
+    .az-combo .n {
+      font-size: 48px;
+    }
+    .az-combo .label {
+      font-size: 21px;
+    }
+  }
+</style>

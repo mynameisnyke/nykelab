@@ -59,6 +59,8 @@ publicRoutes.get("/api/media", async (c) => {
 // ---- R2 file serving (images + range-capable video) ---------------------
 
 const KEY_RE = /^[a-f0-9]{12}\/(main|small|poster)\.(webp|jpg|mp4|webm)$/;
+// The Infinite Azure page's own media (background loop, poster, music): fixed names, so they may be replaced in place.
+const AZURE_RE = /^azure\/[a-z0-9-]+\.(jpg|mp4|mp3)$/;
 
 function parseRange(range: R2Range, size: number) {
   let start: number;
@@ -119,7 +121,8 @@ publicRoutes.get("/m/*", async (c) => {
     });
   }
 
-  if (!KEY_RE.test(key)) return c.notFound();
+  const azure = AZURE_RE.test(key);
+  if (!azure && !KEY_RE.test(key)) return c.notFound();
 
   const isRange = c.req.header("Range") !== undefined;
 
@@ -133,8 +136,8 @@ publicRoutes.get("/m/*", async (c) => {
   obj.writeHttpMetadata(headers);
   headers.set("ETag", obj.httpEtag);
   headers.set("Accept-Ranges", "bytes");
-  // Keys are per-upload (random id), so content never changes in place.
-  headers.set("Cache-Control", "public, max-age=31536000, immutable");
+  // Keys are per-upload (random id), so content never changes in place. The azure files keep their names: a day, then revalidate.
+  headers.set("Cache-Control", azure ? "public, max-age=86400" : "public, max-age=31536000, immutable");
 
   if (!("body" in obj)) {
     return new Response(null, { status: 304, headers });
