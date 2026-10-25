@@ -5,6 +5,7 @@
 //        "home"  ongoing life in New York: one open-ended voyage, no date-cluster rules
 //        "event" a recurring event (Westminster, NYCC). Shown on the home list and Years, kept off the Places map
 // approx true = the CSV does not say where in the region; the coordinate is a stand-in (flagged in the report)
+// series  events only: the recurring event this edition belongs to (see SERIES), which gets its own page under /events
 // from/to optional date window (YYYY-MM-DD) when the same collections hold two separate trips
 // theme  "city" | "nature": only picks which preview photos stand in until real uploads exist
 // slug   the site collection page this voyage links to, if one exists (lowercase; the page need not exist yet)
@@ -13,10 +14,10 @@ const NYC = { placeSlug: "new-york", placeName: "New York", country: "United Sta
 
 export const VOYAGES = [
   // ---- events ---------------------------------------------------------------------------
-  { id: "westminster-2020", title: "Westminster 2020", kind: "event", slug: "westminster", ...NYC, place: "Piers 92/94, New York", lat: 40.7686, lon: -73.9985, theme: "city", collections: ["Westminster Agility 2020", "Westminster Selects"] },
-  { id: "westminster-2021", title: "Westminster 2021", kind: "event", slug: "westminster", placeSlug: "tarrytown", placeName: "Tarrytown", country: "United States", tz: "America/New_York", place: "Lyndhurst, Tarrytown, New York", lat: 41.0707, lon: -73.8637, theme: "city", collections: ["Westminster 2021", "W2021 Finals", "Lyndhurst Mansion"] },
-  { id: "nycc-2021", title: "NYCC 2021", kind: "event", slug: "nycc", ...NYC, place: "Javits Center, New York", lat: 40.7577, lon: -74.0021, theme: "city", collections: ["NYCC 2021 Thurs Finals", "NYCC Fri Finals", "NYCC 2021 Sat Finals", "NYCC David Panel", "NYCC The Boys"] },
-  { id: "nycc-2022", title: "NYCC 2022", kind: "event", slug: "nycc", ...NYC, place: "Javits Center, New York", lat: 40.7577, lon: -74.0021, theme: "city", collections: ["NYCC 2022", "NYCC 2022 - Cosplay", "NYCC 2022 SAT", "Teen Wolf"] }, // Teen Wolf is a panel at NYCC 2022
+  { id: "westminster-2020", title: "Westminster 2020", kind: "event", series: "westminster", slug: "westminster", ...NYC, place: "Piers 92/94, New York", lat: 40.7686, lon: -73.9985, theme: "city", collections: ["Westminster Agility 2020", "Westminster Selects"] },
+  { id: "westminster-2021", title: "Westminster 2021", kind: "event", series: "westminster", slug: "westminster", placeSlug: "tarrytown", placeName: "Tarrytown", country: "United States", tz: "America/New_York", place: "Lyndhurst, Tarrytown, New York", lat: 41.0707, lon: -73.8637, theme: "city", collections: ["Westminster 2021", "W2021 Finals", "Lyndhurst Mansion"] },
+  { id: "nycc-2021", title: "NYCC 2021", kind: "event", series: "nycc", slug: "nycc", ...NYC, place: "Javits Center, New York", lat: 40.7577, lon: -74.0021, theme: "city", collections: ["NYCC 2021 Thurs Finals", "NYCC Fri Finals", "NYCC 2021 Sat Finals", "NYCC David Panel", "NYCC The Boys"] },
+  { id: "nycc-2022", title: "NYCC 2022", kind: "event", series: "nycc", slug: "nycc", ...NYC, place: "Javits Center, New York", lat: 40.7577, lon: -74.0021, theme: "city", collections: ["NYCC 2022", "NYCC 2022 - Cosplay", "NYCC 2022 SAT", "Teen Wolf"] }, // Teen Wolf is a panel at NYCC 2022
 
   // ---- home -----------------------------------------------------------------------------
   { id: "new-york", title: "New York", kind: "home", slug: "new-york", ...NYC, place: "New York City", lat: 40.7306, lon: -73.9866, theme: "city", open: true, collections: ["NYC", "New York", "Manhattan", "Brooklyn", "Queens", "COVIDNYC", "NYC XMAS"] },
@@ -53,5 +54,11 @@ export const VOYAGES = [
   { id: "new-jersey", title: "New Jersey", kind: "trip", placeSlug: "new-jersey", placeName: "New Jersey", country: "United States", tz: "America/New_York", place: "New Jersey", lat: 40.72, lon: -74.17, approx: true, theme: "city", collections: ["Chiyuki House 2025 New Jersey", "New Jersey"] },
   { id: "sesame-place", title: "Sesame Place", kind: "trip", placeSlug: "pennsylvania", placeName: "Pennsylvania", country: "United States", tz: "America/New_York", place: "Sesame Place, Pennsylvania", lat: 40.18, lon: -74.92, approx: true, theme: "city", collections: ["Fist Time Sesame Place 2025"] },
 ];
+
+// Recurring events: one page per series, one gallery group per edition.
+export const SERIES = {
+  westminster: { name: "Westminster", about: "The Westminster Kennel Club dog show, New York" },
+  nycc: { name: "NYCC", about: "New York Comic Con, Javits Center" },
+};
 
 export const PALETTE = ["#d9a05b", "#5fa8d3", "#d9776a", "#7fbf7b", "#a98be0", "#d6c35a", "#4fbfae", "#d98bb0"];

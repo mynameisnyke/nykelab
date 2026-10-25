@@ -5,7 +5,7 @@ import ArchiveTabs from "./ArchiveTabs.astro";
 interface Props {
   title: string;
   subtitle: string;
-  active: "voyages" | "places" | "years";
+  active: "voyages" | "places" | "years" | "events";
   sample?: boolean;
 }
 const { title, subtitle, active, sample = true } = Astro.props;

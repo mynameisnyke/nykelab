@@ -10,6 +10,9 @@ export const PAGES = [
   "/westminster",
   "/places/iceland",
   "/years/2025",
+  "/events",
+  "/events/westminster",
+  "/events/nycc",
 ];
 // Pages that show the bottom chapter nav.
-export const WITH_CHAPTER_NAV = ["/", "/places", "/years", "/about", "/grand-tetons", "/westminster", "/places/iceland", "/years/2025"];
+export const WITH_CHAPTER_NAV = ["/", "/places", "/years", "/about", "/grand-tetons", "/westminster", "/places/iceland", "/years/2025", "/events", "/events/westminster", "/events/nycc"];

@@ -9,11 +9,13 @@ interface Props {
   count: number;
   shots: Shot[];
   images: PreviewImage[];
+  /** id for deep links (#westminster-2020) */
+  anchor?: string;
 }
-const { voyage, count, shots, images } = Astro.props;
+const { voyage, count, shots, images, anchor } = Astro.props;
 ---
 
-<section class="group">
+<section class="group" id={anchor}>
   <GroupHeader voyage={voyage} count={count} />
   <div class={`row n${shots.length}`}>
     {
@@ -34,6 +36,7 @@ const { voyage, count, shots, images } = Astro.props;
 
 <style>
   .group {
+    scroll-margin-top: 24px;
     padding: var(--section-gap) var(--margin) 0;
   }
   .row {

@@ -1,0 +1,75 @@
+---
+// One edition of a recurring event on the Events index: photo, name, venue, dates, photograph count.
+import { fmtN, fmtSpan, type PreviewImage, type Voyage } from "../lib/voyages";
+
+interface Props {
+  voyage: Voyage;
+  image?: PreviewImage;
+  href: string;
+}
+const { voyage, image, href } = Astro.props;
+---
+
+<a class="card" href={href}>
+  <div class="photo">
+    {image && <img src={image.src} srcset={image.srcset} sizes="(max-width: 767px) 50vw, 421px" alt={image.alt || voyage.title} loading="lazy" decoding="async" />}
+  </div>
+  <div class="caption">
+    <span class="name">{voyage.title}</span>
+    <span class="meta">{voyage.place}</span>
+    <span class="meta">{fmtSpan(voyage.start, voyage.end)} · {fmtN(voyage.count)} photographs</span>
+  </div>
+</a>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+  .photo {
+    aspect-ratio: 421 / 480;
+    background: var(--bg-surface);
+    overflow: hidden;
+    outline: 1px solid transparent;
+    outline-offset: -1px;
+    transition: outline-color 0.2s ease;
+  }
+  .card:hover .photo,
+  .card:focus-visible .photo {
+    outline-color: var(--border-strong);
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .caption {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .name {
+    font-family: var(--font-title);
+    font-size: 26px;
+    line-height: 32px;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+  @media (max-width: 767px) {
+    .name {
+      font-size: 20px;
+      line-height: 26px;
+    }
+  }
+  .meta {
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 16px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+</style>

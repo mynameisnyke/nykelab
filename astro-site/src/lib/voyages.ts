@@ -11,6 +11,8 @@ export interface Voyage {
   slug: string;
   title: string;
   kind: VoyageKind;
+  /** Events only: the recurring event this edition belongs to ("westminster", "nycc"). */
+  series?: string;
   place: string; // "Grand Teton National Park, Wyoming"
   /** The Place this voyage belongs to (several voyages can share one: Tetons + Yellowstone → Wyoming). */
   placeSlug: string;
@@ -183,6 +185,40 @@ export interface Place {
   cover: number;
   /** A gallery page exists for this place (any of its voyages has a page). */
   available: boolean;
+}
+
+/** A recurring event with its editions (voyages of kind "event"), oldest first. */
+export interface EventSeries {
+  slug: string;
+  name: string;
+  about: string;
+  editions: number[]; // indices into Voyage[]
+  count: number;
+  start: number;
+  end: number;
+  /** Index into PreviewImage[] (the cover of the largest edition). */
+  cover: number;
+}
+
+export function deriveEvents(voyages: Voyage[], info: Record<string, { name: string; about: string }>): EventSeries[] {
+  const by = new Map<string, number[]>();
+  voyages.forEach((v, i) => v.series && by.set(v.series, [...(by.get(v.series) ?? []), i]));
+  return [...by.entries()]
+    .map(([slug, idxs]) => {
+      const eds = idxs.sort((a, b) => voyages[a].start - voyages[b].start).map((i) => voyages[i]);
+      const biggest = eds.reduce((a, b) => (b.count > a.count ? b : a));
+      return {
+        slug,
+        name: info[slug]?.name ?? slug,
+        about: info[slug]?.about ?? "",
+        editions: idxs,
+        count: eds.reduce((n, v) => n + v.count, 0),
+        start: Math.min(...eds.map((v) => v.start)),
+        end: Math.max(...eds.map((v) => v.end)),
+        cover: biggest.cover,
+      };
+    })
+    .sort((a, b) => b.count - a.count);
 }
 
 export interface YearSummary {

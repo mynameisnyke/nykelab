@@ -25,7 +25,7 @@ for (const path of [...PAGES, "/admin"]) {
 }
 
 test("unknown routes are real 404s", async ({ request }) => {
-  for (const p of ["/nope", "/world", "/places/atlantis", "/years/1999", "/journal/nope"]) {
+  for (const p of ["/nope", "/world", "/places/atlantis", "/years/1999", "/journal/nope", "/events/nope"]) {
     expect((await request.get(p)).status(), p).toBe(404);
   }
 });
@@ -190,4 +190,23 @@ test("menu is keyboard-operable: focus moves in, stays in, and returns on Escape
   await page.keyboard.press("Escape");
   await expect(page.locator("#menu")).toBeHidden();
   await expect(opener).toBeFocused();
+});
+
+test("events: index lists both events and their editions; detail pages hold one group per edition", async ({ page }) => {
+  await page.goto("/events");
+  await expect(page.getByRole("heading", { level: 2 })).toHaveText(["Westminster", "NYCC"]);
+  await expect(page.locator(".card .name")).toHaveText(["Westminster 2021", "Westminster 2020", "NYCC 2022", "NYCC 2021"]);
+  // a card deep-links to its edition on the event page
+  await page.locator(".card", { hasText: "Westminster 2020" }).click();
+  await expect(page).toHaveURL(/\/events\/westminster#westminster-2020$/);
+  await expect(page.locator("section#westminster-2020")).toBeVisible();
+  await expect(page.locator("section.group")).toHaveCount(2);
+});
+
+test("archive tabs are the same four on every archive page, with the current one marked", async ({ page }) => {
+  for (const [path, on] of [["/places", "Places"], ["/years", "Years"], ["/events", "Events"]]) {
+    await page.goto(path);
+    await expect(page.locator(".tabs a")).toHaveText(["Voyages", "Places", "Years", "Events"]);
+    await expect(page.locator('.tabs a[aria-current="page"]')).toHaveText(on);
+  }
 });

@@ -13,7 +13,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { PALETTE, VOYAGES } from "./catalog/voyages.mjs";
+import { PALETTE, SERIES, VOYAGES } from "./catalog/voyages.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const csvPath = process.argv[2];
@@ -217,6 +217,7 @@ const voyagesOut = order.map((vi, n) => {
     slug: v.slug ?? v.id,
     title: v.title,
     kind: v.kind,
+    ...(v.series ? { series: v.series } : {}),
     placeSlug: v.placeSlug,
     placeName: v.placeName,
     place: v.place,
@@ -233,7 +234,7 @@ const voyagesOut = order.map((vi, n) => {
 outShots.sort((a, b) => a[1] - b[1]);
 
 fs.mkdirSync(path.join(root, "src/data"), { recursive: true });
-fs.writeFileSync(path.join(root, "src/data/catalog.json"), JSON.stringify({ source: path.basename(csvPath), voyages: voyagesOut, lenses, shots: outShots }));
+fs.writeFileSync(path.join(root, "src/data/catalog.json"), JSON.stringify({ source: path.basename(csvPath), series: SERIES, voyages: voyagesOut, lenses, shots: outShots }));
 
 // ---- report ------------------------------------------------------------------------------------
 const flippedBy = (vid) => flips.filter((f) => f.k.startsWith(vid + "|"));

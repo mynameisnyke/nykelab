@@ -1,0 +1,115 @@
+---
+// Events index: the recurring events (Westminster, NYCC) with their editions. Built from the voyages
+// of kind "event" (scripts/catalog/voyages.mjs); events stay off the Places map, this is where they live.
+import Base from "../layouts/Base.astro";
+import Navbar from "../components/Navbar.astro";
+import ChapterNav from "../components/ChapterNav.astro";
+import ArchiveHeader from "../components/ArchiveHeader.astro";
+import EventCard from "../components/EventCard.astro";
+import { loadHomeData } from "../lib/home-data";
+import { seriesInfo } from "../lib/catalog";
+import { deriveEvents, fmtN, fmtSpan, words } from "../lib/voyages";
+
+export const prerender = false;
+Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=300");
+
+const { nav, data } = await loadHomeData();
+const { voyages, images } = data;
+const series = deriveEvents(voyages, seriesInfo);
+const editions = series.reduce((n, s) => n + s.editions.length, 0);
+const photos = series.reduce((n, s) => n + s.count, 0);
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const years = series.flatMap((s) => [new Date(s.start).getUTCFullYear(), new Date(s.end).getUTCFullYear()]);
+const span = years.length ? `${Math.min(...years)}–${Math.max(...years)}` : "";
+---
+
+<Base title="Events — nykelab" description={`${fmtN(photos)} photographs from ${editions} editions of ${series.length} recurring events.`}>
+  <Navbar collections={nav} />
+  <main>
+    <ArchiveHeader title="Events" subtitle={`${cap(words(series.length))} recurring events, ${words(editions)} editions, ${span}.`} active="events" sample={data.sample} />
+
+    {
+      series.map((s) => (
+        <section class="series" aria-labelledby={`h-${s.slug}`}>
+          <header>
+            <h2 id={`h-${s.slug}`}><a href={`/events/${s.slug}`}>{s.name}</a></h2>
+            <p class="about body-bio">{s.about}</p>
+            <p class="eyebrow">{s.editions.length} editions · {fmtN(s.count)} photographs · {fmtSpan(s.start, s.end)}</p>
+          </header>
+          <div class="grid">
+            {[...s.editions]
+              .sort((a, b) => voyages[b].start - voyages[a].start)
+              .map((i) => (
+                <EventCard voyage={voyages[i]} image={images[voyages[i].cover]} href={`/events/${s.slug}#${voyages[i].title.toLowerCase().replace(/\s+/g, "-")}`} />
+              ))}
+          </div>
+        </section>
+      ))
+    }
+
+    <p class="totals">{fmtN(photos)} photographs · {editions} editions · {series.length} events</p>
+  </main>
+  <ChapterNav />
+</Base>
+
+<style>
+  .series {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 96px var(--margin) 0;
+  }
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  header > * {
+    margin: 0;
+  }
+  h2 {
+    font-family: var(--font-title);
+    font-weight: 400;
+    font-size: 64px;
+    line-height: 72px;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+  .about {
+    color: var(--text-secondary);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 48px var(--gutter);
+  }
+  .totals {
+    margin: 0;
+    padding: 96px var(--margin) 160px;
+    text-align: center;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-caption);
+  }
+  @media (max-width: 767px) {
+    .series {
+      padding-top: 64px;
+    }
+    h2 {
+      font-size: 40px;
+      line-height: 46px;
+    }
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 40px 16px;
+    }
+    .totals {
+      padding: 64px var(--margin) 96px;
+    }
+  }
+</style>

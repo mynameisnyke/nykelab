@@ -9,6 +9,7 @@ interface CatalogVoyage {
   slug: string;
   title: string;
   kind: VoyageKind;
+  series?: string;
   placeSlug: string;
   placeName: string;
   place: string;
@@ -23,12 +24,15 @@ interface CatalogVoyage {
 }
 
 const catalog = raw as unknown as {
+  series: Record<string, { name: string; about: string }>;
   voyages: CatalogVoyage[];
   lenses: string[];
   shots: [number, number, number, number, number, number, number, string, number][];
 };
 
 export const lenses = catalog.lenses;
+/** Recurring events (Westminster, NYCC): display name and one-line description, keyed by series slug. */
+export const seriesInfo = catalog.series;
 
 export function loadCatalog(imageCount: number, coverFor: (theme: Theme, i: number) => number): { voyages: Voyage[]; shots: Shot[] } {
   const voyages = catalog.voyages.map(
@@ -36,6 +40,7 @@ export function loadCatalog(imageCount: number, coverFor: (theme: Theme, i: numb
       slug: v.slug,
       title: v.title,
       kind: v.kind,
+      series: v.series,
       placeSlug: v.placeSlug,
       placeName: v.placeName,
       place: v.place,
