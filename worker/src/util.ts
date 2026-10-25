@@ -23,6 +23,13 @@ function variantsFor(id: string, width: number) {
   return out;
 }
 
+/** Rounded coordinates for the caption: the library's own (already rounded), else the photo's GPS cut to about 100 m. */
+function geoOf(row: MediaRow): ApiMedia["geo"] {
+  if (row.geo_lat != null && row.geo_lon != null) return { lat: row.geo_lat, lon: row.geo_lon, source: row.geo_source || "phone" };
+  if (row.gps_lat != null && row.gps_lon != null) return { lat: Math.round(row.gps_lat * 1000) / 1000, lon: Math.round(row.gps_lon * 1000) / 1000, source: "exif" };
+  return null;
+}
+
 export function toApiMedia(row: MediaRow): ApiMedia {
   return {
     id: row.id,
@@ -67,6 +74,7 @@ export function toApiMedia(row: MediaRow): ApiMedia {
     placeSource: row.place_source ?? "",
     captionSource: row.caption_source ?? "",
     hasGps: row.gps_lat != null && row.gps_lon != null,
+    geo: geoOf(row),
     avgColour: /^#[0-9a-f]{6}$/i.test(row.avg_colour ?? "") ? row.avg_colour : "",
     textOn: row.text_on === "light" || row.text_on === "dark" ? row.text_on : "",
     duration: row.duration ?? null,

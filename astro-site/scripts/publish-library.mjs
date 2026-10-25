@@ -60,6 +60,18 @@ const clipsAll = JSON.parse(fs.readFileSync(path.join(LIB, "subclips/manifest.js
 // --exclude-borderline also hides the similar-but-not-identical list.
 const excludedFile = JSON.parse(fs.readFileSync(new URL("../excluded-clips.json", import.meta.url), "utf8"));
 const EXCLUDED = new Set([...excludedFile.excluded, ...(a["exclude-borderline"] ? excludedFile.borderline : [])]);
+// Where each photo was made (scripts/geotag-library.mjs). Clips have no metadata, so they take the place of their collection's trip.
+const GEO = JSON.parse(fs.readFileSync(new URL("../data/library-geo.json", import.meta.url), "utf8")).photos;
+// Collections shown by place name only, never by coordinates (a private house).
+const NO_COORDS = new Set(["chiyuki_house_2025_new_jersey"]);
+// Where a collection is, when its name says it better than the catalogue's trip does (the Arizona trip is named for Sedona alone).
+// Used for photos without coordinates and for clips; photos matched to a phone photo keep their own looked-up place.
+const COLLECTION_PLACE = {
+  grand_canyon: "Grand Canyon, Arizona", phoenix: "Phoenix, Arizona", tuscon: "Tucson, Arizona", sedona: "Sedona, Arizona",
+  slc: "Salt Lake City, Utah", grand_teton: "Grand Teton National Park, Wyoming", yellowstone: "Yellowstone National Park, Wyoming",
+  new_jersey: "New Jersey", brooklyn: "Brooklyn, New York", manhattan: "Manhattan, New York", queens: "Queens, New York",
+  lyndhurst_mansion: "Lyndhurst Mansion, Tarrytown, New York", playa_blanca_finals: "Playa Blanca, Colombia",
+};
 const clipsM = { ...clipsAll, subclips: clipsAll.subclips.filter((s) => !EXCLUDED.has(s.id)) };
 
 /** approvals.json from the review page: tolerate a few shapes. {id: "V"|"T"|true}, [ids], or {approved:[...]} */
@@ -134,15 +146,29 @@ function plan() {
   return ordered;
 }
 
+/** The trip place most of a collection's photographs belong to: what its clips are captioned with. */
+function tripPlace(c) {
+  if (COLLECTION_PLACE[c.dir]) return COLLECTION_PLACE[c.dir];
+  const n = new Map();
+  for (const p of c.photos) {
+    const t = GEO[p.id]?.trip;
+    if (t) n.set(t, (n.get(t) ?? 0) + 1);
+  }
+  return [...n].sort((x, y) => y[1] - x[1])[0]?.[0] ?? "";
+}
+
 function rowFor(c, it, position) {
   if (it.kind === "photo") {
     const id = sha(`lib:${it.id}`);
     const u = it.use;
+    const g = GEO[it.id];
+    const coords = g?.lat != null && !NO_COORDS.has(c.dir);
     return {
       id, position, type: "image", orientation: it.orientation, width: u.width, height: u.height, source_id: it.id,
       files: [{ key: `${id}/orig.jpg`, file: path.join(LIB, "photos", u.file), type: "image/jpeg" }],
       key_main: `${id}/orig.jpg`, key_original: `${id}/orig.jpg`, key_poster: null,
       captured_at: it.capture ?? null, avg_colour: u.avg_colour, text_on: u.text_on, look: it.look, duration: null,
+      place: (coords ? g.place : COLLECTION_PLACE[c.dir] ?? g?.place) ?? "", geo_lat: coords ? g.lat : null, geo_lon: coords ? g.lon : null, geo_source: coords ? g.source : g ? "trip" : "",
     };
   }
   const id = sha(`lib:${it.id}`);
@@ -155,6 +181,7 @@ function rowFor(c, it, position) {
     ],
     key_main: `${id}/main.mp4`, key_original: null, key_poster: `${id}/poster.jpg`,
     captured_at: null, avg_colour: u.avg_colour, text_on: u.text_on, look: "voyages", duration: u.duration,
+    place: tripPlace(c), geo_lat: null, geo_lon: null, geo_source: tripPlace(c) ? "trip" : "",
   };
 }
 
@@ -208,13 +235,16 @@ function sqlFor(c, slug, rows) {
 ON CONFLICT(slug) DO UPDATE SET title = excluded.title, position = excluded.position;`];
   for (const r of rows) {
     out.push(`INSERT INTO media (id, collection, type, caption, place, orientation, width, height, position, published, featured,
-  key_main, key_small, key_poster, size_bytes, key_original, captured_at, avg_colour, text_on, look, source_id, duration)
-VALUES (${q(r.id)}, ${q(slug)}, ${q(r.type)}, '', '', ${q(r.orientation)}, ${r.width}, ${r.height}, ${r.position}, 1, 0,
-  ${q(r.key_main)}, NULL, ${q(r.key_poster)}, ${r.files.reduce((n, f) => n + (f.size ?? 0), 0)}, ${q(r.key_original)}, ${q(r.captured_at)}, ${q(r.avg_colour)}, ${q(r.text_on)}, ${q(r.look)}, ${q(r.source_id)}, ${q(r.duration)})
+  key_main, key_small, key_poster, size_bytes, key_original, captured_at, avg_colour, text_on, look, source_id, duration,
+  geo_lat, geo_lon, geo_source)
+VALUES (${q(r.id)}, ${q(slug)}, ${q(r.type)}, '', ${q(r.place)}, ${q(r.orientation)}, ${r.width}, ${r.height}, ${r.position}, 1, 0,
+  ${q(r.key_main)}, NULL, ${q(r.key_poster)}, ${r.files.reduce((n, f) => n + (f.size ?? 0), 0)}, ${q(r.key_original)}, ${q(r.captured_at)}, ${q(r.avg_colour)}, ${q(r.text_on)}, ${q(r.look)}, ${q(r.source_id)}, ${q(r.duration)},
+  ${q(r.geo_lat)}, ${q(r.geo_lon)}, ${q(r.geo_source)})
 ON CONFLICT(id) DO UPDATE SET collection = excluded.collection, position = excluded.position, width = excluded.width,
   height = excluded.height, orientation = excluded.orientation, key_main = excluded.key_main, key_poster = excluded.key_poster,
   key_original = excluded.key_original, size_bytes = excluded.size_bytes, captured_at = excluded.captured_at,
   avg_colour = excluded.avg_colour, text_on = excluded.text_on, look = excluded.look, duration = excluded.duration, published = 1,
+  place = excluded.place, geo_lat = excluded.geo_lat, geo_lon = excluded.geo_lon, geo_source = excluded.geo_source,
   updated_at = datetime('now');`);
   }
   return out.join("\n");

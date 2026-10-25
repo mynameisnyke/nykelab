@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar.astro";
 import ChapterNav from "../components/ChapterNav.astro";
 import MediaItem from "../components/MediaItem.astro";
 import { getCollectionPage, getNav, type Photo } from "../lib/collections";
+import { placeLine } from "../lib/caption";
 
 export const prerender = false;
 
@@ -47,6 +48,8 @@ const subtitle = page
   ? [page.title, `${count} ${count === 1 ? "photograph" : "photographs"}`].join(" · ")
   : "";
 const lines = (s: string) => s.split("\n").filter(Boolean);
+// A written caption wins; otherwise where it was made.
+const captionOf = (m: Photo) => (m.caption ? lines(m.caption).join(" · ") : placeLine(m));
 ---
 
 <Base
@@ -79,13 +82,13 @@ const lines = (s: string) => s.split("\n").filter(Boolean);
             <section class="full">
               <MediaItem media={b.m} fit="cover" sizes="100vw" class="reveal" />
               <div class="scrim bottom"></div>
-              {b.m.caption && <p class="caption on-media reveal">{lines(b.m.caption).join(" · ")}</p>}
+              {captionOf(b.m) && <p class="caption on-media reveal">{captionOf(b.m)}</p>}
             </section>
           ) : b.kind === "single" ? (
             <section class="inset">
               <figure class="reveal">
                 <MediaItem media={b.m} sizes="(max-width: 767px) 100vw, 1312px" />
-                {b.m.caption && <figcaption class="caption">{lines(b.m.caption).join(" · ")}</figcaption>}
+                {captionOf(b.m) && <figcaption class="caption">{captionOf(b.m)}</figcaption>}
               </figure>
             </section>
           ) : (
@@ -93,7 +96,7 @@ const lines = (s: string) => s.split("\n").filter(Boolean);
               {b.ms.map((m) => (
                 <figure class="reveal">
                   <MediaItem media={m} sizes={`(max-width: 767px) 100vw, ${Math.round(1312 / b.ms.length)}px`} />
-                  {m.caption && <figcaption class="caption">{lines(m.caption).join(" · ")}</figcaption>}
+                  {captionOf(m) && <figcaption class="caption">{captionOf(m)}</figcaption>}
                 </figure>
               ))}
             </section>

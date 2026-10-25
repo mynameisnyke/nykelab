@@ -44,3 +44,16 @@ Target: the staging site (`nykelab-astro.nykelab-astro.workers.dev`), built from
   not the Lightroom catalogue's per-shot rows; a trip spread over several collections (Arizona, Wyoming) draws from all of them.
 - Heroes are a landscape clip from the page's collections when one exists (vertical clips are not used: they crop to a thin band).
 - Stills remain the 1280 px proofs. On wide screens a still hero is soft; re-exporting at 2560 px and rerunning the loader replaces the same keys.
+
+## Where it was made (captions)
+
+`scripts/geotag-library.mjs` writes `data/library-geo.json`; `publish-library.mjs` stores it as `place`, `geo_lat`, `geo_lon`, `geo_source` (migration 0005);
+the site prints `placeLine()` (src/lib/caption.ts) under each item: "Oaxaca de Juárez, Mexico · 17.061° N, 96.726° W".
+
+- `exif` the original's own GPS (13 stills). `phone` matched to a phone photo within minutes after finding the camera's clock error against the
+  Photos library (194). `phone-approx` the clock error is only probable (large events), so coordinates are rounded to 2 decimals (159).
+  `trip` no coordinates: the place of the trip, or of the collection where its name says it better (662 stills, all 197 clips: their sources carry no metadata).
+- Offsets are only trusted when the episode backs them overwhelmingly, or the same camera has the same clock error elsewhere within about a year.
+- Coordinates are rounded (3 decimals, about 100 m), photos made within about 800 m of the densest night-time spots in the Photos library (home) keep only their city,
+  and `chiyuki_house_2025_new_jersey` is shown by place name only.
+- Rerun: copy Photos.sqlite to a scratch folder, extract time and coordinates (see the header of the script), then run both scripts.
