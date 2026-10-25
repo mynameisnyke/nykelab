@@ -104,6 +104,25 @@ npm run catalog -- /Volumes/Whiskey/photos-3plus-or-picked.csv   # rerun wheneve
 
 Layout rhythm (same idea as the Vue `CollectionView`, using the Figma sections): hero = first landscape item; remaining landscapes alternate full-bleed / inset; runs of portraits become 1–3-up rows; the next collection is shown as "Next chapter".
 
+## Video (branch `video-support`, local dev only, not deployed)
+
+Video is for short, silent background clips (10–30 s, like the New York Times' interactive features): muted, inline, looping, playing only while on screen.
+
+**Drop a clip, get a web clip.** The watcher converts anything a camera or phone makes to a web-friendly H.264 MP4 and uploads it to the admin:
+
+```bash
+npm run dev                         # the site + admin on localhost:4322 (no login in dev)
+npm run video:watch                 # in a second terminal; Ctrl-C to stop
+npm run video:watch -- --once       # convert what is there now and exit
+npm run video:watch -- --no-upload  # only convert (files land in the out folder)
+```
+
+Folders: `<watch>/<collection>/<clip>.mov` (the folder name is the collection: `bogota` creates "Bogota" at `/bogota`; clips directly in the watch folder go to `--collection`, default `videos`). Default watch folder `/Volumes/Whiskey/Exports/video-in` (or `~/Movies/nykelab-video-in`; override with `--watch` or `NYKELAB_VIDEO_WATCH`); converted files and posters go to a sibling `video-out/`. A file is converted once it has stopped growing (finished copying) and is remembered in `video-out/.video-state.json`; a changed file is converted again. Options: `--max-edge 1920 --crf 23 --max-seconds 0 --keep-audio --api URL --interval 3`.
+
+What the conversion does (`scripts/video/convert.mjs`): H.264 High, yuv420p, `+faststart`, **no audio**, longest edge capped at 1920 (never enlarged), 30 fps cap, bit rate capped at 8 Mbit/s, a keyframe every second, HDR (iPhone HLG / PQ) tone-mapped to SDR, portrait kept portrait, plus a poster JPEG. A phone clip's own GPS and capture time fill in its place like a photo's (`worker/src/admin.ts`, `videoMeta`). To upload to a deployed site later, set `CF_ACCESS_CLIENT_ID` / `CF_ACCESS_CLIENT_SECRET` (an Access service token) and pass `--api`.
+
+On the page (`src/scripts/video.ts`): the file is not requested until the clip is about a screen away, it plays while a quarter of it is visible and pauses when scrolled out or the tab is hidden, and with "reduce motion" or Data Saver on nothing plays or downloads (the poster stays). Needs `ffmpeg` / `ffprobe` on the PATH (`FFMPEG` / `FFPROBE` env to override). Tests: `tests/video.spec.ts` (generates real clips, runs the converter, the watcher end to end, and the browser behaviour).
+
 ## Upload metadata (caption and place filled in automatically)
 
 When a photo is uploaded the Worker reads its own tags from the stored original (`worker/src/ingest.ts`, EXIF / IPTC / XMP via `exifr`) and fills in what you left blank; anything you type wins and is remembered as typed.

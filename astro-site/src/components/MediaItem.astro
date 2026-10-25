@@ -1,6 +1,7 @@
 ---
 // One photo or video from the media table. Sizes come from the DB so the
 // browser reserves space (no layout shift) and can pick the small variant.
+// Videos are muted, inline loops; their src is attached and play/pause handled by src/scripts/video.ts.
 import type { Photo } from "../lib/collections";
 
 interface Props {
@@ -25,15 +26,17 @@ const srcset = m.urls.variants
   m.type === "video" ? (
     <video
       class:list={["media", fit, className]}
-      src={m.urls.main}
+      data-src={m.urls.main}
+      data-eager={eager ? "" : undefined}
       poster={m.urls.poster}
       width={hasSize ? m.width : undefined}
       height={hasSize ? m.height : undefined}
-      autoplay
       loop
       muted
       playsinline
-      preload={eager ? "auto" : "metadata"}
+      disablepictureinpicture
+      disableRemotePlayback
+      preload="none"
       aria-label={alt || undefined}
       data-media
       data-id={m.id}

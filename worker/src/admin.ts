@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { requireAdmin } from "./auth";
-import { EMPTY_META, readMeta, type PhotoMeta } from "./ingest";
+import { EMPTY_META, metaFromRaw, readMeta, type PhotoMeta } from "./ingest";
 import type { AppEnv, CollectionRow, MediaRow } from "./types";
 import {
   ID_RE,
@@ -168,6 +168,22 @@ const metaBinds = (m: PhotoMeta) => [
   m.gpsLat, m.gpsLon,
 ];
 
+/** Videos carry no readable EXIF here, so the uploader (the video watcher) sends what the clip recorded:
+ *  `{ capturedAt: "2023-05-12T12:02:11", lat, lon }`. The place is derived exactly like a photo's GPS place. */
+function videoMeta(h: unknown): PhotoMeta | null {
+  if (!h || typeof h !== "object") return null;
+  const m = h as { capturedAt?: unknown; lat?: unknown; lon?: unknown };
+  const at = typeof m.capturedAt === "string" ? /^(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)/.exec(m.capturedAt) : null;
+  const lat = typeof m.lat === "number" ? m.lat : undefined;
+  const lon = typeof m.lon === "number" ? m.lon : undefined;
+  if (!at && lat === undefined) return null;
+  return metaFromRaw({
+    DateTimeOriginal: at ? `${at[1]}:${at[2]}:${at[3]} ${at[4]}:${at[5]}:${at[6]}` : undefined,
+    latitude: lat,
+    longitude: lon,
+  });
+}
+
 /** Read the stored original's tags; a photo with unreadable metadata just yields empty values. */
 async function metaOf(c: { env: { MEDIA: R2Bucket } }, key: string | null): Promise<PhotoMeta | null> {
   if (!key) return null;
@@ -256,7 +272,7 @@ adminRoutes.post("/api/admin/media", async (c) => {
 
   const position = await nextPosition(c.env.DB, b.collection);
   // Fill caption and place from the photo's own tags when they were left blank; anything typed wins.
-  const meta = b.type === "image" ? await metaOf(c, original) : null;
+  const meta = b.type === "image" ? await metaOf(c, original) : videoMeta(b.meta);
   const typedCaption = caption.trim() !== "";
   const typedPlace = place.trim() !== "";
   const finalCaption = typedCaption ? caption : (meta?.caption ?? "");

@@ -22,7 +22,7 @@
           class="field w-full"
           @blur="save(m, 'place')"
         />
-        <p v-if="m.type === 'image'" class="text-[11px] leading-4 text-white/45">
+        <p class="text-[11px] leading-4 text-white/45">
           <span v-if="m.placeSource === 'gps'">Place from the photo's GPS (shown as the city only).</span>
           <span v-else-if="m.placeSource === 'tags'">Place from the photo's location tags.</span>
           <span v-else-if="m.placeSource === 'manual'">Place typed by you.</span>
