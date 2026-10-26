@@ -23,6 +23,10 @@ const { values: a } = parseArgs({
 const where = a.target === "remote" ? ["--remote"] : ["--local", "--persist-to", ".wrangler/state"];
 
 const poster = path.join(os.tmpdir(), "azure-background.jpg");
+// The song as delivered ("if azure.mp3") is an AAC stream in a *fragmented* MP4 (80 segments, no overall index), which a browser has to
+// scan before it can start. Remux it (the audio is copied, not re-encoded) into an ordinary MP4 audio file with the index up front.
+const song = path.join(os.tmpdir(), "azure-song.m4a");
+execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", a.music, "-vn", "-c:a", "copy", "-movflags", "+faststart", song]);
 execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-ss", "3", "-i", a.video, "-frames:v", "1", "-vf", "scale=1920:-2", "-q:v", "4", poster]);
 
 // only the six clips chosen for this page (hit_01 .. hit_06); the folder holds more
@@ -32,10 +36,11 @@ if (hitFiles.length !== 6) throw new Error(`expected hit_01..hit_06 in ${a.hits}
 for (const [key, file, type] of [
   ["azure/background.mp4", a.video, "video/mp4"],
   ["azure/background.jpg", poster, "image/jpeg"],
-  ["azure/infinite-azure.mp3", a.music, "audio/mpeg"],
+  ["azure/infinite-azure.m4a", song, "audio/mp4"],
   ...hitFiles.map((f, i) => [`azure/hit-${i + 1}.wav`, path.join(a.hits, f), "audio/wav"]),
 ]) {
   execFileSync("npx", ["wrangler", "r2", "object", "put", `${a.bucket}/${key}`, "--file", file, "--content-type", type, ...where], { stdio: "pipe" });
   console.log(`${a.target}: ${key}  ${(fs.statSync(file).size / 1048576).toFixed(1)} MB`);
 }
 fs.rmSync(poster);
+fs.rmSync(song);

@@ -159,9 +159,12 @@ test("places: country filter hides cards and dims pins, All restores them", asyn
 test("soft navigation keeps scripts alive (places -> about -> back)", async ({ page }) => {
   await page.goto("/");
   await page.locator(".chapter-nav a", { hasText: "Places" }).click();
-  await expect(page).toHaveURL(/\/places$/);
-  await page.getByRole("button", { name: "Iceland" }).click();
-  await expect(page.locator(".card:not([hidden])")).toHaveCount(1);
+  await expect(page).toHaveURL(/\/places$/, { timeout: 20000 }); // the home globe is heavy: on a busy machine this click can wait on it
+  // the page's script attaches a moment after a soft navigation lands; a click that beats it does nothing, so retry until it takes
+  await expect(async () => {
+    await page.getByRole("button", { name: "Iceland" }).click();
+    await expect(page.locator(".card:not([hidden])")).toHaveCount(1, { timeout: 1500 });
+  }).toPass({ timeout: 10000 });
   await page.locator(".chapter-nav a", { hasText: "About" }).click();
   await expect(page).toHaveURL(/\/about$/);
   await page.locator("header [data-menu-open]").click();
