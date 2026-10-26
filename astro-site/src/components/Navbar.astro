@@ -71,8 +71,8 @@ const footer = [{ label: "Email", href: "mailto:nyke@nykelab.nyc" }];
       }
     </ol>
   </nav>
-  <nav class="menu-voyages" aria-label="Voyages" data-fill={fill ? "" : undefined} hidden={!fill && voyages.length === 0}>
-    <span class="eyebrow-ui">Voyages</span>
+  <nav class="menu-voyages" aria-label="Galleries" data-fill={fill ? "" : undefined} hidden={!fill && voyages.length === 0}>
+    <span class="eyebrow-ui">Galleries</span>
     {voyages.map((v) => <a href={v.href} aria-current={isHere(v.href, here) ? "page" : undefined}>{v.label}</a>)}
   </nav>
   <nav class="menu-footer" aria-label="Site links">

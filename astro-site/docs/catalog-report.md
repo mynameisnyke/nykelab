@@ -43,7 +43,7 @@ Source: `photos-3plus-or-picked.csv`. Regenerate: `npm run catalog -- <csv>`. Ov
 | Bogotá | trip | 231 | 2023-05-12 to 2023-05-14 | Bogotá, Colombia |  |
 | Oaxaca | trip | 77 | 2025-02-19 to 2025-02-26 | Oaxaca, Mexico |  |
 | New Jersey | trip | 70 | 2025-04-26 to 2025-05-25 | New Jersey (**approximate**) |  |
-| Sesame Place | trip | 4 | 2025-06-29 to 2025-06-29 | Sesame Place, Pennsylvania (**approximate**) |  |
+| Pennsylvania | trip | 4 | 2025-06-29 to 2025-06-29 | Sesame Place, Pennsylvania (**approximate**) |  |
 
 ## Clock: groups flipped by 12 hours (same date)
 

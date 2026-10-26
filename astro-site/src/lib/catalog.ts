@@ -10,6 +10,7 @@ interface CatalogVoyage {
   title: string;
   kind: VoyageKind;
   series?: string;
+  hidden?: boolean;
   placeSlug: string;
   placeName: string;
   place: string;
@@ -35,8 +36,11 @@ export const lenses = catalog.lenses;
 export const seriesInfo = catalog.series;
 
 export function loadCatalog(imageCount: number, coverFor: (theme: Theme, i: number) => number): { voyages: Voyage[]; shots: Shot[] } {
-  const voyages = catalog.voyages.map(
-    (v, vi): Voyage => ({
+  // A hidden voyage stays in the catalogue file but is left off the site entirely; the rest keep their order and shots are re-pointed.
+  const at = new Map<number, number>();
+  catalog.voyages.forEach((v, i) => !v.hidden && at.set(i, at.size));
+  const voyages = catalog.voyages.flatMap((v, vi): Voyage[] => v.hidden ? [] : [{
+      id: v.id,
       slug: v.slug,
       title: v.title,
       kind: v.kind,
@@ -53,24 +57,21 @@ export function loadCatalog(imageCount: number, coverFor: (theme: Theme, i: numb
       count: v.count,
       available: false,
       cover: coverFor(v.theme, vi),
-    }),
-  );
-  const shots = catalog.shots.map(
-    (r, i): Shot => ({
+    }]);
+  const shots = catalog.shots.flatMap((r, i): Shot[] => !at.has(r[0]) ? [] : [{
       id: String(i),
-      v: r[0],
+      v: at.get(r[0])!,
       t: r[1] * 60000,
       hour: r[2] / 100,
       clock: r[3] / 100,
-      lat: voyages[r[0]].lat,
-      lon: voyages[r[0]].lon,
+      lat: voyages[at.get(r[0])!].lat,
+      lon: voyages[at.get(r[0])!].lon,
       focal: r[4],
       f: r[5],
       iso: r[6],
       shutter: r[7],
       lens: catalog.lenses[r[8]] ?? "",
       img: coverFor(catalog.voyages[r[0]].theme, r[0] * 100000 + i) % Math.max(1, imageCount),
-    }),
-  );
+    }]);
   return { voyages, shots };
 }

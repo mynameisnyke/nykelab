@@ -73,6 +73,9 @@ const GEO = GEOFILE.photos;
 const TRIPS = GEOFILE.collections;
 const LANDMARKS = new Map(JSON.parse(fs.readFileSync(new URL("../data/landmarks.json", import.meta.url), "utf8")).places.map((l) => [l.name, l]));
 // Photos with no trip of their own (no shot of the catalogue near their date): the collection they sit in.
+// Galleries are places. A subject that is not a place (Toko, a dog) is kept in storage but not shown: its collection is created with published = 0
+// and a rerun never turns it back on (the upsert below leaves `published` alone). Turn one on in /admin when wanted.
+const HIDDEN = new Set(["toko"]);
 const FALLBACK = { new_jersey: { slug: "new-jersey", place: "New Jersey" }, toko: { slug: "toko", title: "Toko", place: "", order: 999 } };
 // Which trip each clip folder belongs to, from looking at the footage (not the folder names):
 //  - "New Mexico" and phoenix_2021 are the same Grand Canyon / Arizona-rim footage: both go to the Arizona trip
@@ -234,7 +237,7 @@ async function slugFor(c, taken) {
 }
 
 function sqlFor(c, slug, rows) {
-  const out = [`INSERT INTO collections (slug, title, position, published) VALUES (${q(slug)}, ${q(c.title)}, ${c.position}, 1)
+  const out = [`INSERT INTO collections (slug, title, position, published) VALUES (${q(slug)}, ${q(c.title)}, ${c.position}, ${HIDDEN.has(slug) ? 0 : 1})
 ON CONFLICT(slug) DO UPDATE SET title = excluded.title, position = excluded.position;`];
   for (const r of rows) {
     out.push(`INSERT INTO media (id, collection, type, caption, place, orientation, width, height, position, published, featured,

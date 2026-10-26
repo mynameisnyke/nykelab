@@ -19,11 +19,11 @@ const stats = summarize(voyages, shots);
 const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages[a].start);
 ---
 
-<Base title="nykelab — photographs by Nyke Harewood" description={`${fmtN(stats.photos)} photographs from ${stats.voyages} voyages, ${stats.from}–${stats.to}.`}>
+<Base title="nykelab — photographs by Nyke Harewood" description={`${fmtN(stats.photos)} photographs from ${stats.voyages} galleries, ${stats.from}–${stats.to}.`}>
   <Navbar collections={nav} />
   <main class="home" data-lens="where">
-    <aside class="list" aria-label="Voyages">
-      <p class="eyebrow">Voyages {data.sample && <span class="proto">Sample metadata</span>}</p>
+    <aside class="list" aria-label="Galleries">
+      <p class="eyebrow">Galleries {data.sample && <span class="proto">Sample metadata</span>}</p>
       <ol id="voyage-list">
         {
           order.map((i) => {
@@ -38,10 +38,10 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
                     <span class="board" aria-hidden="true">
                       {v.title.toUpperCase().split(" ").map((w) => <span class="word">{[...w].map((c) => <span class="flap">{c}</span>)}</span>)}
                     </span>
-                    {v.kind === "event" && <span class="kind">Event</span>}
                   </span>
                   <span class="meta">
-                    {fmtMonthYear(v.start)} · <span class="n">{v.count}</span>
+                    <span class="when">{fmtMonthYear(v.start)} · <span class="n">{v.count}</span></span>
+                    {v.kind === "event" && <span class="kind">Event</span>}
                   </span>
                 </Tag>
               </li>
@@ -50,7 +50,7 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
         }
       </ol>
       <p class="stats" id="stats">
-        <span>{fmtN(stats.photos)} photographs · {stats.voyages} voyages</span>
+        <span>{fmtN(stats.photos)} photographs · {stats.voyages} galleries</span>
         <span>{stats.countries} countries · {stats.from}–{stats.to}</span>
       </p>
     </aside>
@@ -75,7 +75,7 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
           <span id="preview-meta" class="caption"></span>
         </figcaption>
       </figure>
-      <a id="preview-open" class="open eyebrow" hidden>Open voyage →</a>
+      <a id="preview-open" class="open eyebrow" hidden>Open gallery →</a>
     </aside>
   </main>
   <div class="nav-backdrop" aria-hidden="true"></div>
@@ -177,7 +177,7 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
   .board {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 12px;
+    gap: 4px 8px;
   }
   .word {
     display: flex;
@@ -185,20 +185,20 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
   }
   .flap {
     display: block;
-    width: 16px;
+    width: 15px;
     height: 26px;
     border-radius: 2px;
     background: linear-gradient(to bottom, transparent calc(50% - 0.5px), var(--bg-page) calc(50% - 0.5px), var(--bg-page) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
       color-mix(in srgb, var(--text-primary) 8%, var(--bg-page));
     font-family: var(--font-ui);
     font-weight: 600;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 26px;
     text-align: center;
     color: var(--text-primary);
   }
   .kind {
-    margin-left: 10px;
+    margin-top: 2px;
     padding: 2px 8px;
     border: 1px solid var(--border-subtle);
     border-radius: 999px;
@@ -207,10 +207,12 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
     font-size: 10px;
     line-height: 12px;
     letter-spacing: 0.1em;
-    vertical-align: 0.35em;
     color: var(--text-caption);
   }
   .meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     white-space: nowrap; /* the date and count stay together; the title wraps instead */
     font-family: var(--font-data);
     font-weight: 400;
@@ -473,6 +475,10 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
     }
     .frame {
       aspect-ratio: 3 / 2;
+    }
+    .flap {
+      width: 14px;
+      font-size: 13px;
     }
   }
 </style>

@@ -8,9 +8,6 @@ import { getNav, getPreviewPool } from "./collections";
 import { loadCatalog } from "./catalog";
 import type { HomeData } from "./voyages";
 
-/** One page per voyage: its catalogue slug, or its title where two voyages share a slug (Wyoming 2020 / Wyoming 2022). Matches publish-library.mjs. */
-const slugify = (t: string) => t.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-
 export async function loadHomeData() {
   const [nav, pool] = await Promise.all([getNav(), getPreviewPool()]);
   const pickFrom = (list: number[], k: number) => (list.length ? list[k % list.length] : 0);
@@ -24,7 +21,8 @@ export async function loadHomeData() {
   // voyage -> its collection: the page named for the trip. Bogotá also has your own upload collection (bogota) beside the graded one.
   voyages.forEach((v) => {
     const year = new Date(v.start).getUTCFullYear();
-    const slug = (slugCount.get(v.slug) ?? 0) > 1 ? slugify(v.title) : v.slug;
+    // one page per voyage: its catalogue slug, or its id where two voyages share a slug (Wyoming, Westminster, Comic Con): same ids as publish-library.mjs
+    const slug = (slugCount.get(v.slug) ?? 0) > 1 ? v.id : v.slug;
     const all = (slug === "bogota" ? ["bogota", "bogota-library"] : [slug]).filter((c) => published.has(c));
     const ok = all.length > 0;
     v.collection = ok ? all[0] : undefined;

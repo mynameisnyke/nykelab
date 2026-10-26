@@ -189,7 +189,7 @@ export function initHome(): () => void {
     } else if (av !== null) {
       insight.textContent = voyages[av].place;
     } else {
-      insight.textContent = matchMedia("(hover: none)").matches ? "Tap a voyage. Drag to turn the globe." : "Hover a voyage. Drag to turn the globe.";
+      insight.textContent = matchMedia("(hover: none)").matches ? "Tap a gallery. Drag to turn the globe." : "Hover a gallery. Drag to turn the globe.";
     }
   }
 
@@ -214,7 +214,7 @@ export function initHome(): () => void {
     const countries = `${s.countries} ${s.countries === 1 ? "country" : "countries"}`;
     stats.innerHTML =
       vis.length === shots.length
-        ? line(`${fmtN(s.photos)} photographs · ${s.voyages} voyages`) + line(`${countries} · ${s.from}–${s.to}`)
+        ? line(`${fmtN(s.photos)} photographs · ${s.voyages} galleries`) + line(`${countries} · ${s.from}–${s.to}`)
         : line(`${fmtN(vis.length)} of ${fmtN(shots.length)} photographs`) + line(`${countries} · ${s.from}–${s.to}`);
     renderPreview();
     renderInsight();

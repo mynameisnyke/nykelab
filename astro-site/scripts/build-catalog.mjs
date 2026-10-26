@@ -218,6 +218,7 @@ const voyagesOut = order.map((vi, n) => {
     title: v.title,
     kind: v.kind,
     ...(v.series ? { series: v.series } : {}),
+    ...(v.hidden ? { hidden: true } : {}),
     placeSlug: v.placeSlug,
     placeName: v.placeName,
     place: v.place,
