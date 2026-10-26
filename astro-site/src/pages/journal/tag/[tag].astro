@@ -2,11 +2,11 @@
 import Base from "../../../layouts/Base.astro";
 import Navbar from "../../../components/Navbar.astro";
 import JournalIndex from "../../../components/JournalIndex.astro";
-import { categories, getPosts, slugifyTag } from "../../../lib/journal";
+import { allTags, getPosts, slugifyTag } from "../../../lib/journal";
 
 export async function getStaticPaths() {
   const all = await getPosts();
-  return categories(all).map((cat) => ({
+  return allTags(all).map((cat) => ({
     params: { tag: slugifyTag(cat) },
     props: { cat, all, posts: all.filter((p) => p.data.tags.includes(cat)) },
   }));

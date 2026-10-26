@@ -27,6 +27,11 @@ export function categories(posts: Post[]): string[] {
   return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([t]) => t);
 }
 
+/** Every tag used by any post (a post's page links all of its tags, so each needs a page; the filter pills show only categories). */
+export function allTags(posts: Post[]): string[] {
+  return [...new Set(posts.flatMap((p) => p.data.tags))].sort((a, b) => a.localeCompare(b));
+}
+
 export function slugifyTag(tag: string): string {
   return tag.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }

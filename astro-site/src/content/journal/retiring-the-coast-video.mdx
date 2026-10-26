@@ -1,0 +1,53 @@
+---
+title: Retiring the coast video
+description: What the first nykelab was, why I shut it down, and what runs nykelab.nyc now.
+date: 2026-10-25
+tags: [Code, Cloudflare]
+cover: ../../assets/journal/old-site-coast.jpg
+coverAlt: A beach at low tide with gulls on the water. NYKE LAB and the word "coast" sit in white at the bottom left.
+---
+
+import Figure from "../../components/Figure.astro";
+import night from "../../assets/journal/old-site-night.jpg";
+import about from "../../assets/journal/old-site-about.jpg";
+
+Since December 2020, the front page of nykelab.nyc was a video of a beach. Low tide, gulls, NYKE LAB in the corner, and a label typing itself out underneath: *coast_*. This week I replaced it. Before it went offline I saved all of it, and I want to write down what it was while I still remember why I built it that way.
+
+## The old site
+
+It was a workbench, not a portfolio. The About page said so and I meant it. It was where I tried things I had no excuse to try at work.
+
+The home page was a full-screen loop. Every clip had been run through object detection, and the labels that came back were typed over the video one at a time: *ocean, tide, sea, coast* for the beach, *tower block, skyline, night* for Brooklyn. A switch in the top left corner turned on dark mode, which didn't just recolor the page. It swapped in a different video. Eighteen clips in all, nine light and nine dark.
+
+<Figure src={night} alt="A dark city skyline at night with lit windows. NYKE LAB and the word night sit at the bottom left, and a small toggle is switched on at the top left." caption="Dark mode on the old home page, with the label typing out as the video plays." />
+
+It also decided what to send you. Desktop got WebM, phones got MP4, and so did Safari, because Safari. A small encoding tool of mine did the converting, so Google could pay for the electricity instead of me. There was a second page too: my About text scrolling over another loop, one paragraph at a time. Back on the home page, my signature got smeared by Blotter.js whenever the cursor crossed it.
+
+Underneath it was Vue 2 and Bulma, with Firebase doing the rest. Firestore held the playlist and the labels, Hosting served the page, and the videos sat in Google Cloud buckets. It was my first attempt at joining a front end to a back end, and I still like it.
+
+## Why it had to go
+
+It never showed a photograph. I shoot photographs. The site I built for myself was a video toy, and everything I care about lived in Lightroom catalogs and on external drives.
+
+It was also quietly coming apart. One of the Firebase keys expired. The bucket behind the About page's two photos was deleted at some point, so those are now two broken-image icons. The labels still typed. The pictures didn't load.
+
+<Figure src={about} alt="The old About section: a bio paragraph on the right, a broken-image icon where a photograph used to be on the left, and a smeared signature reading Nyke Harewood below." caption="The About page this week. The photo on the left is gone for good." />
+
+## What runs it now
+
+The new site is built around the photographs and the trips they came from: 1,028 photographs across 35 trips, plus 197 clips. The clips started as 543, and I cut every one that looked like another one.
+
+It's mechanically simpler than the old one, which surprised me. One Cloudflare Worker serves the pages, the small API and the images. The original files sit in R2. A sized copy is made the first time someone asks for that size, then kept. Trips, captions and ordering live in a D1 database. I sign in to the admin through Cloudflare Access, so there's no password to leak. The pages are Astro, so they arrive as plain HTML first, and the heavy parts, like the globe and the endless scroll, load only where they're used.
+
+A few details I'm happy with:
+
+- **Captions.** Every photo says where it was taken. My cameras don't record GPS, so I matched each photo to an iPhone photo taken within a few minutes of it. The catch was the camera clocks. One was off by 12 hours and 45 minutes. Working out each camera's error first is what made the matching work. Where I'm not sure, the coordinates are rounded to about a kilometer and the page doesn't pretend otherwise.
+- **Heroes.** A picture that fills the screen needs about 2,560 pixels on its long edge. Anything smaller stays in the grids, and a video takes the top spot instead.
+- **Counting.** The number at the bottom right is the page views so far. No cookies, no banner.
+- **[Infinite Azure](/infinite-azure).** The closest thing to the old home page: a loop of the water at Red Hook, a song, and photographs that land one at a time with a hit spark and a combo counter. It's a lot. I wanted one thing on the site that's a lot.
+
+## The old one is saved
+
+Screenshots of every state, the eighteen videos, and the code exactly as it was served are in an archive. The buckets behind the old site still hold about 86 GB of original footage, which I should deal with at some point.
+
+If you came here from a bookmark expecting a beach, sorry. It's in the archive.
