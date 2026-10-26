@@ -304,23 +304,27 @@ export function initAzure(): () => void {
   const hitBuffers: AudioBuffer[] = [];
   let lastHitSound = -1;
   const voices: AudioBufferSourceNode[] = [];
-  /** Must be called from a click: creates the audio context and decodes the clips once. */
-  function prepareSfx() {
+  let sfxReady: Promise<unknown> = Promise.resolve();
+  /** Must be called from a click: creates the audio context and decodes the clips once. Resolves when every clip is ready. */
+  function prepareSfx(): Promise<unknown> {
     if (sfx) {
       void sfx.resume();
-      return;
+      return sfxReady;
     }
     const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AC) return;
+    if (!AC) return sfxReady;
     const ctx = (sfx = new AC());
     void ctx.resume();
-    HIT_URLS.forEach(async (url, i) => {
-      try {
-        hitBuffers[i] = await ctx.decodeAudioData(await (await fetch(url)).arrayBuffer());
-      } catch {
-        /* a missing clip just means that one never plays */
-      }
-    });
+    sfxReady = Promise.all(
+      HIT_URLS.map(async (url, i) => {
+        try {
+          hitBuffers[i] = await ctx.decodeAudioData(await (await fetch(url)).arrayBuffer());
+        } catch {
+          /* a missing clip just means that one never plays */
+        }
+      }),
+    );
+    return sfxReady;
   }
   function playHit() {
     // "sound on" = the music is playing: mute (or entering without sound) silences these too
@@ -357,11 +361,11 @@ export function initAzure(): () => void {
     soundBtn.dataset.on = on ? "1" : "0";
   };
   function fadeIn() {
-    audio.volume = 0;
+    audio.volume = 0.3; // audible at once: the song is the first thing you hear, not the last
     const t0 = performance.now();
     const step = () => {
-      const k = Math.min(1, (performance.now() - t0) / 1800);
-      audio.volume = 0.72 * k;
+      const k = Math.min(1, (performance.now() - t0) / 700);
+      audio.volume = 0.3 + 0.42 * k;
       if (k < 1 && !audio.paused) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
@@ -393,22 +397,54 @@ export function initAzure(): () => void {
   document.addEventListener("visibilitychange", onVisibility);
   cleanups.push(() => document.removeEventListener("visibilitychange", onVisibility));
 
-  function start(withSound: boolean) {
+  const sleep = (ms: number) => new Promise<void>((r) => window.setTimeout(r, ms));
+
+  /** Everything that moves and makes noise begins here, together. */
+  function go(withSound: boolean) {
     document.documentElement.classList.remove("az-locked");
     intro.classList.add("out");
     window.setTimeout(() => (intro.hidden = true), 700);
     window.scrollTo(0, 0);
+    if (bg && !reduced) {
+      bg.currentTime = 0; // the loop begins with the song
+      void bg.play().catch(() => {});
+    }
     for (let i = 0; i < 3; i++) addScene();
     onScroll();
     soundBtn.hidden = false;
-    if (withSound) void playMusic();
-    else setSoundUi();
+    if (withSound && wantSound && !audio.paused) fadeIn();
+    setSoundUi();
+  }
+
+  /**
+   * With sound, the song is the clock: it starts buffering while the title card is up, and on Enter the photographs, the loop and the
+   * hit sounds wait until the song is actually playing (and the six hit clips are decoded), then all begin in the same moment.
+   * Without sound there is nothing to wait for.
+   */
+  async function start(withSound: boolean) {
+    if (!withSound) return go(false);
+    enter.disabled = true;
+    silent.disabled = true;
+    enter.textContent = "Loading…";
+    intro.setAttribute("aria-busy", "true");
+    wantSound = true;
+    audio.volume = 0; // silent until everything else is ready; go() brings it up
+    const sfx = prepareSfx(); // inside the click, as audio requires
+    const playing = new Promise<void>((resolve) => audio.addEventListener("playing", () => resolve(), { once: true }));
+    audio.play().catch(() => (wantSound = false)); // blocked: carry on without it
+    await Promise.race([Promise.all([playing, sfx]), sleep(8000)]); // a slow connection must not trap anyone on this screen
+    intro.removeAttribute("aria-busy");
+    go(true);
   }
   document.documentElement.classList.add("az-locked");
+  if (!(navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData) {
+    audio.preload = "auto"; // buffer the song behind the title card so Enter does not have to wait for it
+    audio.load();
+  }
   const enter = document.getElementById("az-enter") as HTMLButtonElement;
   const silent = document.getElementById("az-silent") as HTMLButtonElement;
-  enter.addEventListener("click", () => start(true), { once: true });
-  silent.addEventListener("click", () => start(false), { once: true });
+  enter.addEventListener("click", () => void start(true), { once: true });
+  silent.addEventListener("click", () => void start(false), { once: true });
   enter.focus({ preventScroll: true });
 
   return () => {

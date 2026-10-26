@@ -121,6 +121,30 @@ test.describe("Infinite Azure", () => {
     expect(Number(await page.locator("#az-combo-n").textContent())).toBe(settled);
   });
 
+  test("entering with sound: the song is playing before anything else appears, and the loop starts over with it", async ({ page }) => {
+    await page.goto("/infinite-azure");
+    test.skip((await feedSize(page)) < 6, "no photographs with originals in this database");
+    // let the loop run a while behind the title card, so a restart is visible in its clock
+    await page.waitForFunction(() => (document.getElementById("az-bg") as HTMLVideoElement).currentTime > 1.5);
+    // record the music's state at the instant the first photograph is added to the page
+    await page.evaluate(() => {
+      const feed = document.getElementById("az-feed")!;
+      new MutationObserver((_, obs) => {
+        if (!feed.querySelector(".az-piece")) return;
+        const a = document.getElementById("az-audio") as HTMLAudioElement;
+        const v = document.getElementById("az-bg") as HTMLVideoElement;
+        (window as unknown as { __atFirstPiece: object }).__atFirstPiece = { musicPlaying: !a.paused && a.readyState >= 3, musicTime: a.currentTime, loopTime: v.currentTime };
+        obs.disconnect();
+      }).observe(feed, { childList: true, subtree: true });
+    });
+    await page.locator("#az-enter").click();
+    await expect(page.locator(".az-piece").first()).toBeAttached({ timeout: 15000 });
+    const at = (await page.evaluate(() => (window as unknown as { __atFirstPiece: { musicPlaying: boolean; musicTime: number; loopTime: number } }).__atFirstPiece));
+    expect(at.musicPlaying).toBe(true); // the song was already playing when the first photograph appeared
+    expect(at.loopTime).toBeLessThan(1); // and the loop had just been sent back to the start
+    expect(await page.evaluate(() => (document.getElementById("az-audio") as HTMLAudioElement).paused)).toBe(false);
+  });
+
   test("each landing plays a hit sound, but only while the sound is on", async ({ page }) => {
     // count every sound the page starts through Web Audio
     await page.addInitScript(() => {
@@ -146,8 +170,11 @@ test.describe("Infinite Azure", () => {
     expect(await count()).toBe(0);
 
     await page.locator("#az-sound").click(); // sound on
-    await page.waitForTimeout(1500); // the six clips decode
-    await scrollSome();
+    // the six clips need a moment to decode (longer on a busy machine): keep scrolling new photographs in until one is heard
+    for (let round = 0; round < 8 && (await count()) === 0; round++) {
+      await page.waitForTimeout(700);
+      await scrollSome();
+    }
     const playing = await count();
     expect(playing).toBeGreaterThan(0);
 
