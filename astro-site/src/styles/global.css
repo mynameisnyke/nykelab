@@ -2,6 +2,8 @@
 @import "@fontsource-variable/newsreader";
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource/dm-mono/latin-400.css";
+@import "@fontsource/dm-mono/latin-500.css";
 
 /* ------------------------------------------------------------------
    Tokens — mirrored from the Figma variable collections
@@ -50,6 +52,8 @@
   --font-title: "Playfair Display Variable", "Playfair Display", serif;
   --font-body: "Newsreader Variable", "Newsreader", serif;
   --font-ui: "Inter Variable", "Inter", system-ui, sans-serif;
+  /* Dates, counts, coordinates: the readouts. Titles and prose stay serif. */
+  --font-data: "DM Mono", ui-monospace, monospace;
   --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
 }
 

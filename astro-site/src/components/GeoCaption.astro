@@ -15,9 +15,13 @@ const place = written || placeText(m) || fallback;
 const link = written ? null : coordsLink(m);
 ---
 
-{[prefix, place].filter(Boolean).join(" · ")}{link && <>{place || prefix ? " · " : ""}<a class="geo" href={link.href} target="_blank" rel="noopener noreferrer" title="Open in Google Maps" aria-label={`${link.text}, open in Google Maps`}>{link.text}</a></>}
+{prefix && <span class="num">{prefix}</span>}{prefix && place && " · "}{place}{link && <>{place || prefix ? " · " : ""}<a class="geo num" href={link.href} target="_blank" rel="noopener noreferrer" title="Open in Google Maps" aria-label={`${link.text}, open in Google Maps`}>{link.text}</a></>}
 
 <style>
+  .num {
+    font-family: var(--font-data);
+    letter-spacing: 0;
+  }
   .geo {
     color: inherit;
     text-decoration: underline dotted;

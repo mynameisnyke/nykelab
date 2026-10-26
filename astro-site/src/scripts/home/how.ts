@@ -25,10 +25,10 @@ export function createHow(host: HTMLElement, store: Store) {
 
   const label = (s: d3.Selection<SVGTextElement, unknown, null, undefined>) =>
     s
-      .style("font-family", "var(--font-ui)")
-      .style("font-weight", "500")
+      .style("font-family", "var(--font-data)")
+      .style("font-weight", "400")
       .style("font-size", "10px")
-      .style("letter-spacing", "0.1em")
+      .style("letter-spacing", "0.04em")
       .style("text-transform", "uppercase")
       .style("fill", "var(--text-caption)");
 
