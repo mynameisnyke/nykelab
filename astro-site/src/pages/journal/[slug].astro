@@ -29,7 +29,7 @@ const minutes = readingMinutes(post.body);
         <p class="eyebrow">{tags.join(" · ")}</p>
         <h1>{title}</h1>
         <p class="dek body-bio">{description}</p>
-        <p class="eyebrow">Nyke Harewood · <time datetime={date.toISOString()}>{formatDate(date)}</time> · {minutes} min read</p>
+        <p class="eyebrow">Nyke Harewood · <time class="num" datetime={date.toISOString()}>{formatDate(date)}</time> · <span class="num">{minutes} min read</span></p>
         <hr />
       </header>
 
@@ -64,6 +64,11 @@ const minutes = readingMinutes(post.body);
 </Base>
 
 <style>
+  .num {
+    font-family: var(--font-data);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
   main {
     padding-bottom: 120px;
   }

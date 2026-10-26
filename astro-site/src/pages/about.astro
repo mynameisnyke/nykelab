@@ -16,24 +16,25 @@ const bio =
   "Engineer in New York. Ten years in IT and infrastructure, from post-production and newsrooms to AI, building the systems that let people get on with their work. I take photographs on the side.";
 
 // Public, short version of the resume. Numbers and client names stay out of the public page.
-const work = [
+const work: { years: string; where: string; role: string; note: string; link?: { text: string; href: string } }[] = [
   {
     years: "2026 –",
     where: "Hex",
-    role: "IT Systems Engineer",
-    note: "The one IT engineer at a data company. Identity and access as code, and a help desk where AI agents propose changes and a person approves each one.",
+    role: "Staff Systems Engineer",
+    note: "Building AI automations for all of the IT infrastructure, with Cursor and a lot of GitOps. Identity and access as code, and a help desk where AI agents propose changes and a person approves each one.",
   },
   {
     years: "2024 – 2025",
-    where: "Dotdash Meredith",
+    where: "People Inc.",
     role: "Senior Engineering Manager",
-    note: "Led the team behind IT infrastructure, identity and cloud storage for 40+ brands, including a multi-petabyte move to the cloud.",
+    note: "Joined as the company moved its on-prem content to the cloud and rebuilt its IT stack. Led the team behind IT infrastructure, identity and cloud storage for 40+ brands, and worked directly with vendors like OpenAI and Adobe on how petabytes of content get delivered for content deals.",
   },
   {
     years: "2017 – 2024",
     where: "Insider",
     role: "Infrastructure Administrator to Senior IT Solutions Manager",
-    note: "Built the Okta directory driven by HR data and automated nearly all of the employee lifecycle for 1,000+ people in the US, UK and Singapore.",
+    note: "Built the Okta directory driven by HR data and automated nearly all of the employee lifecycle for 1,000+ people in the US, UK and Singapore. In 2018 I won an award for some of the first Google Vision integrations at Business Insider, which labelled and analysed the metadata for all of our video. It got me invited to speak at Henry Stewart's DAM conference in New York.",
+    link: { text: "Speaker page, DAM New York 2020", href: "https://henrystewartconferences.com/events/events-dam-new-york-2020/course-speaker/events-speaker-nyke-harewood" },
   },
   {
     years: "2015 – 2017",
@@ -42,7 +43,7 @@ const work = [
     note: "Ran IT for a post-production facility: storage, networks and the machines editors work on.",
   },
 ];
-const stack = ["Okta", "Terraform", "AWS", "Google Cloud", "Cloudflare", "TypeScript", "Python", "Go", "Claude Code", "MCP"];
+const stack = ["Okta", "Terraform", "AWS", "Google Cloud", "Cloudflare", "TypeScript", "Python", "Go", "Cursor", "Claude Code", "MCP"];
 ---
 
 <Base title="About — nykelab" description={bio}>
@@ -75,6 +76,7 @@ const stack = ["Okta", "Terraform", "AWS", "Google Cloud", "Cloudflare", "TypeSc
                 <h2>{j.where}</h2>
                 <p class="role eyebrow">{j.role}</p>
                 <p class="note">{j.note}</p>
+                {j.link && <p class="note"><a class="more" href={j.link.href} rel="noopener">{j.link.text} ↗</a></p>}
               </div>
             </li>
           ))
@@ -86,6 +88,7 @@ const stack = ["Okta", "Terraform", "AWS", "Google Cloud", "Cloudflare", "TypeSc
     <section class="hobby" aria-labelledby="hobby-h">
       <p class="eyebrow" id="hobby-h">Photography</p>
       <p class="lede">The hobby that took over my weekends and my passport: cities, trips, dog shows and comic cons.</p>
+      <p class="note">More than 100 of my photographs have been published, and I have written for <a class="more" href="https://www.businessinsider.com/author/nyke-harewood" rel="noopener">Business Insider</a>.</p>
       <div class="links">
         <Pill label="Places" href="/places" />
         <Pill label="Years" href="/years" />
@@ -202,6 +205,12 @@ const stack = ["Okta", "Terraform", "AWS", "Google Cloud", "Cloudflare", "TypeSc
   }
   .note {
     color: var(--text-secondary);
+  }
+  .more {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
   }
   .stack {
     font-family: var(--font-ui);

@@ -2,6 +2,8 @@
 @import "@fontsource-variable/newsreader";
 @import "@fontsource-variable/inter";
 @import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource/dm-mono/latin-400.css";
+@import "@fontsource/dm-mono/latin-500.css";
 
 /* ------------------------------------------------------------------
    Tokens — mirrored from the Figma variable collections
@@ -18,6 +20,10 @@
   --border-subtle: #ffffff24;
   --border-strong: #ffffffb2;
   --fill-ring-soft: #ffffff17;
+  /* The When chart: day/night bands, voyage spans, dots. Quieter on a light page. */
+  --viz-band: #ffffff17;
+  --viz-span: 0.1;
+  --viz-dots: none;
   color-scheme: dark;
 
   /* Scale */
@@ -50,6 +56,8 @@
   --font-title: "Playfair Display Variable", "Playfair Display", serif;
   --font-body: "Newsreader Variable", "Newsreader", serif;
   --font-ui: "Inter Variable", "Inter", system-ui, sans-serif;
+  /* Dates, counts, coordinates: the readouts. Titles and prose stay serif. */
+  --font-data: "DM Mono", ui-monospace, monospace;
   --font-mono: "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
 }
 
@@ -63,6 +71,9 @@
   --border-subtle: #00000024;
   --border-strong: #000000b2;
   --fill-ring-soft: #00000017;
+  --viz-band: #0000000b;
+  --viz-span: 0.06;
+  --viz-dots: saturate(1.2) brightness(0.86);
   color-scheme: light;
 }
 

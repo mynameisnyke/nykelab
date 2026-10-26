@@ -203,7 +203,7 @@ export function createGlobe(canvas: HTMLCanvasElement, store: Store) {
     dotMat.color.copy(ink);
     dotMat.opacity = light ? 0.55 : 0.5;
     atmoMat.uniforms.uColor.value.copy(ink);
-    atmoMat.uniforms.uAlpha.value = light ? 0.14 : 0.22;
+    atmoMat.uniforms.uAlpha.value = light ? 0.035 : 0.22;
   }
   applyTheme();
   const themeObserver = new MutationObserver(applyTheme);
