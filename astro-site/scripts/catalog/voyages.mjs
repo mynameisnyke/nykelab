@@ -52,7 +52,7 @@ export const VOYAGES = [
   { id: "bogota", title: "Bogotá", kind: "trip", placeSlug: "bogota", placeName: "Bogotá", country: "Colombia", tz: "America/Bogota", place: "Bogotá, Colombia", lat: 4.71, lon: -74.07, theme: "city", collections: ["Bogota"] },
   { id: "oaxaca", title: "Oaxaca", kind: "trip", placeSlug: "oaxaca", placeName: "Oaxaca", country: "Mexico", tz: "America/Mexico_City", place: "Oaxaca, Mexico", lat: 17.07, lon: -96.73, theme: "city", collections: ["Oaxaca", "Oaxaca Web Selects"] },
   { id: "new-jersey", title: "New Jersey", kind: "trip", placeSlug: "new-jersey", placeName: "New Jersey", country: "United States", tz: "America/New_York", place: "New Jersey", lat: 40.72, lon: -74.17, approx: true, theme: "city", collections: ["Chiyuki House 2025 New Jersey", "New Jersey"] },
-  { id: "sesame-place", title: "Sesame Place", kind: "trip", placeSlug: "pennsylvania", placeName: "Pennsylvania", country: "United States", tz: "America/New_York", place: "Sesame Place, Pennsylvania", lat: 40.18, lon: -74.92, approx: true, theme: "city", collections: ["Fist Time Sesame Place 2025"] },
+  { id: "pennsylvania", title: "Pennsylvania", kind: "trip", placeSlug: "pennsylvania", placeName: "Pennsylvania", country: "United States", tz: "America/New_York", place: "Sesame Place, Pennsylvania", lat: 40.18, lon: -74.92, approx: true, theme: "city", collections: ["Fist Time Sesame Place 2025"] },
 ];
 
 // Recurring events: one page per series, one gallery group per edition.

@@ -211,7 +211,7 @@ test("events: index lists both events and their editions; detail pages hold one 
 test("archive tabs are the same four on every archive page, with the current one marked", async ({ page }) => {
   for (const [path, on] of [["/places", "Places"], ["/years", "Years"], ["/events", "Events"]]) {
     await page.goto(path);
-    await expect(page.locator(".tabs a")).toHaveText(["Voyages", "Places", "Years", "Events"]);
+    await expect(page.locator(".tabs a")).toHaveText(["Galleries", "Places", "Years", "Events"]);
     await expect(page.locator('.tabs a[aria-current="page"]')).toHaveText(on);
   }
 });

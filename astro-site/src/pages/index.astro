@@ -19,11 +19,11 @@ const stats = summarize(voyages, shots);
 const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages[a].start);
 ---
 
-<Base title="nykelab — photographs by Nyke Harewood" description={`${fmtN(stats.photos)} photographs from ${stats.voyages} voyages, ${stats.from}–${stats.to}.`}>
+<Base title="nykelab — photographs by Nyke Harewood" description={`${fmtN(stats.photos)} photographs from ${stats.voyages} galleries, ${stats.from}–${stats.to}.`}>
   <Navbar collections={nav} />
   <main class="home" data-lens="where">
-    <aside class="list" aria-label="Voyages">
-      <p class="eyebrow">Voyages {data.sample && <span class="proto">Sample metadata</span>}</p>
+    <aside class="list" aria-label="Galleries">
+      <p class="eyebrow">Galleries {data.sample && <span class="proto">Sample metadata</span>}</p>
       <ol id="voyage-list">
         {
           order.map((i) => {
@@ -50,7 +50,7 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
         }
       </ol>
       <p class="stats" id="stats">
-        <span>{fmtN(stats.photos)} photographs · {stats.voyages} voyages</span>
+        <span>{fmtN(stats.photos)} photographs · {stats.voyages} galleries</span>
         <span>{stats.countries} countries · {stats.from}–{stats.to}</span>
       </p>
     </aside>
@@ -75,7 +75,7 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
           <span id="preview-meta" class="caption"></span>
         </figcaption>
       </figure>
-      <a id="preview-open" class="open eyebrow" hidden>Open voyage →</a>
+      <a id="preview-open" class="open eyebrow" hidden>Open gallery →</a>
     </aside>
   </main>
   <div class="nav-backdrop" aria-hidden="true"></div>

@@ -29,7 +29,7 @@ const top = topSetting(mine);
 const facts = place
   ? [
       { label: "Photographs", value: fmtN(place.count) },
-      { label: "Voyages", value: String(place.voyages.length) },
+      { label: "Galleries", value: String(place.voyages.length) },
       { label: "Dates", value: fmtSpan(place.start, place.end) },
       { label: "Most often", value: top ? `${top.focal}mm f/${top.f}` : "—" },
       { label: "Golden hour", value: `${Math.round(goldenShare(mine) * 100)}%` },
