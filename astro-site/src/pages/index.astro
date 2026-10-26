@@ -375,16 +375,20 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
       min-height: 340px;
       margin-top: 48px;
     }
-    .list {
+    /* globe -> the photograph it is pointing at -> the full list. The preview used to sit below all 35 rows, out of sight
+       while you played with the globe; now it is right under the globe and its caption. */
+    .preview {
       order: 2;
       grid-column: auto;
       grid-row: auto;
-      overflow: visible;
+      margin-top: 8px;
     }
-    .preview {
+    .list {
       order: 3;
       grid-column: auto;
       grid-row: auto;
+      overflow: visible;
+      margin-top: 28px;
     }
     .frame {
       max-height: 60svh;
@@ -415,6 +419,18 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
     .name {
       font-size: 22px;
       line-height: 30px;
+    }
+  }
+
+  /* phones: a slightly smaller globe so the photograph it points at, with its title and "Open" link, shows without scrolling */
+  @media (max-width: 767px) {
+    .stage {
+      height: min(76vw, 40svh);
+      min-height: 270px;
+      margin-top: 28px;
+    }
+    .frame {
+      aspect-ratio: 3 / 2;
     }
   }
 </style>

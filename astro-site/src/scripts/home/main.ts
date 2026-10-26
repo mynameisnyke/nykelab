@@ -189,7 +189,7 @@ export function initHome(): () => void {
     } else if (av !== null) {
       insight.textContent = voyages[av].place;
     } else {
-      insight.textContent = "Hover a voyage. Drag to turn the globe.";
+      insight.textContent = matchMedia("(hover: none)").matches ? "Tap a voyage. Drag to turn the globe." : "Hover a voyage. Drag to turn the globe.";
     }
   }
 

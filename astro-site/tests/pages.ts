@@ -3,7 +3,7 @@ export const PAGES = [
   "/places",
   "/years",
   "/journal",
-  "/journal/shooting-the-tetons-on-a-70-200",
+  "/journal/retiring-the-coast-video",
   "/journal/tag/code",
   "/about",
   "/grand-tetons",

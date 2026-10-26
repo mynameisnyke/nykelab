@@ -149,7 +149,7 @@ Everything below is done for staging except steps 6 and 7. To put the site on `n
 3. **Admin:** in Zero Trust > Access > the `nykelab-astro` application, add `nykelab.nyc/admin*` and `nykelab.nyc/api/admin/*` as destinations (keep the workers.dev ones while testing). Check from a private window: `/admin` redirects to the Access login, `/api/admin/me` is 401/403.
 4. **Counter:** the view counter starts from whatever is in the `counters` table. Reset it right before launch: `npx wrangler d1 execute DB --remote --command "UPDATE counters SET n = 0 WHERE name = 'views'"`.
 5. **Analytics (optional):** the `EVENTS` binding writes every page / photo / video event to Analytics Engine. To read it in the admin Stats tab: set `CF_ACCOUNT_ID` in `wrangler.jsonc` vars and `npx wrangler secret put CF_API_TOKEN` (a token with Account Analytics: Read).
-6. **Placeholders:** delete the sample journal posts (src/content) or replace them; check `/about`.
+6. **Placeholders:** the sample journal posts are gone (the first real entry is `retiring-the-coast-video`); check `/about`.
 7. **Backup:** push the repo to GitHub (there is no remote yet) and optionally connect Workers Builds for auto-deploys.
 
 ## Notes
