@@ -7,7 +7,7 @@ Files: [`photo-quality-audit.csv`](photo-quality-audit.csv) (all 1,028 library p
 ## What I found
 
 - **598 of the 1,028 library photographs (58%) were exported far below the size of their source file.** Only 430 are at the full 2560 px long edge.
-- **Every one of the 598 has a source file of at least 3,000 px** (20–61 megapixel Sony ARW and DNG, Fuji X100S RAF). The note in the export manifest (`hero_ok: false` means the source was smaller than 2560) does not hold: these were rendered from something smaller than the files on disk, which matches your DNG-preview guess.
+- **Every one of the 598 has a source file of at least 3,900 px** (16–60 megapixel Sony ARW and DNG, Fuji X100S RAF). The note in the export manifest (`hero_ok: false` means the source was smaller than 2560) does not hold: these were rendered from something smaller than the files on disk, which matches your DNG-preview guess.
 - The export sizes cluster at two values: **1616 px (381 photos)** and **1024 px (133 photos)**, plus a few 960–1020 px and 1920–1968 px. Those are the sizes of preview renders, not of the source files.
 - It is not specific to DNGs: 423 of the 598 are Sony ARW files, 153 are DNG, 22 are Fuji RAF.
 - **The example you sent** (`/m/442b60552ddc/…`, Comic Con 2021) is `_7M30100.dng` from `2021-10-07`, a 6000×4000 file. It was exported at **1024×683 (17% of its source)**, so a full-width page shows it upscaled about 1.4× (2.8× on a retina screen).
