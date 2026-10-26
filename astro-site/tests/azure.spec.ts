@@ -212,12 +212,13 @@ test.describe("Infinite Azure", () => {
     expect(r.headers()["content-type"]).toBe("video/mp4");
     expect(r.headers()["content-range"]).toMatch(/^bytes 0-99\//);
     // the song: a plain MP4 audio file with its index at the front (it used to be a fragmented stream that browsers had to scan first)
-    const song = await request.get("/m/azure/infinite-azure.m4a", { headers: { Range: "bytes=0-1023" } });
+    const song = await request.get("/m/azure/infinite-azure-web.m4a", { headers: { Range: "bytes=0-1023" } });
     expect(song.status()).toBe(206);
     expect(song.headers()["content-type"]).toBe("audio/mp4");
     const head = await song.body();
     expect(head.subarray(4, 8).toString()).toBe("ftyp");
     expect(head.includes(Buffer.from("moov"))).toBe(true); // the index is within the first kilobyte, not at the end or in segments
+    expect(Number(/\/(\d+)$/.exec(song.headers()["content-range"] ?? "")?.[1])).toBeLessThan(8 * 1048576); // the web copy is about 6 MB, not the 16 MB original
     const hit = await request.get("/m/azure/hit-1.wav");
     expect(hit.status()).toBe(200);
     expect(hit.headers()["content-type"]).toBe("audio/wav");
