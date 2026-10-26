@@ -33,7 +33,13 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
               <li data-v={i} class:list={{ off: !v.available }}>
                 <Tag class="item" href={v.collection ? `/${v.collection}` : undefined}>
                   <span class="dot" style={`--c:${v.color}`}></span>
-                  <span class="name">{v.title}{v.kind === "event" && <span class="kind">Event</span>}</span>
+                  <span class="name">
+                    <span class="sr-only">{v.title}</span>
+                    <span class="board" aria-hidden="true">
+                      {v.title.toUpperCase().split(" ").map((w) => <span class="word">{[...w].map((c) => <span class="flap">{c}</span>)}</span>)}
+                    </span>
+                    {v.kind === "event" && <span class="kind">Event</span>}
+                  </span>
                   <span class="meta">
                     {fmtMonthYear(v.start)} · <span class="n">{v.count}</span>
                   </span>
@@ -79,9 +85,13 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
 
 <script>
   import { initHome } from "../scripts/home/main";
+  import { flipBoard } from "../scripts/home/board";
   let dispose: (() => void) | undefined;
   document.addEventListener("astro:page-load", () => {
-    if (document.querySelector("main.home")) dispose = initHome();
+    if (!document.querySelector("main.home")) return;
+    const stopHome = initHome();
+    const stopBoard = flipBoard(document.getElementById("voyage-list")!);
+    dispose = () => (stopHome(), stopBoard());
   });
   document.addEventListener("astro:before-swap", () => {
     dispose?.();
@@ -142,7 +152,7 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
   .item {
     display: grid;
     grid-template-columns: 12px 1fr auto;
-    align-items: baseline;
+    align-items: center;
     column-gap: 12px;
     padding: 6px 0;
     border-top: 1px solid var(--border-subtle);
@@ -157,12 +167,35 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
     background: var(--c);
     align-self: center;
   }
+  /* Departure board: one tile per letter, like the split-flap screens at an airport. */
   .name {
-    font-family: var(--font-title);
-    font-size: 26px;
-    line-height: 34px;
-    letter-spacing: -0.01em;
-    text-transform: uppercase;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+  }
+  .board {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+  .word {
+    display: flex;
+    gap: 2px;
+  }
+  .flap {
+    display: block;
+    width: 16px;
+    height: 26px;
+    border-radius: 2px;
+    background: linear-gradient(to bottom, transparent calc(50% - 0.5px), var(--bg-page) calc(50% - 0.5px), var(--bg-page) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+      color-mix(in srgb, var(--text-primary) 8%, var(--bg-page));
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 26px;
+    text-align: center;
+    color: var(--text-primary);
   }
   .kind {
     margin-left: 10px;
