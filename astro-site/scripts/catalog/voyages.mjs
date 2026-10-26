@@ -3,11 +3,12 @@
 //
 // kind   "trip"  somewhere you went
 //        "home"  ongoing life in New York: one open-ended voyage, no date-cluster rules
-//        "event" a recurring event (Westminster, NYCC). Shown on the home list and Years, kept off the Places map
+//        "event" a recurring event (Westminster, Comic Con). Shown on the home list and Years, kept off the Places map
 // approx true = the CSV does not say where in the region; the coordinate is a stand-in (flagged in the report)
 // series  events only: the recurring event this edition belongs to (see SERIES), which gets its own page under /events
 // from/to optional date window (YYYY-MM-DD) when the same collections hold two separate trips
 // theme  "city" | "nature": only picks which preview photos stand in until real uploads exist
+// hidden true = kept in the catalogue and in storage, but off the site (list, globe, places, years). Remove the flag to bring it back.
 // slug   the site collection page this voyage links to, if one exists (lowercase; the page need not exist yet)
 
 const NYC = { placeSlug: "new-york", placeName: "New York", country: "United States", tz: "America/New_York" };
@@ -16,8 +17,8 @@ export const VOYAGES = [
   // ---- events ---------------------------------------------------------------------------
   { id: "westminster-2020", title: "Westminster 2020", kind: "event", series: "westminster", slug: "westminster", ...NYC, place: "Piers 92/94, New York", lat: 40.7686, lon: -73.9985, theme: "city", collections: ["Westminster Agility 2020", "Westminster Selects"] },
   { id: "westminster-2021", title: "Westminster 2021", kind: "event", series: "westminster", slug: "westminster", placeSlug: "tarrytown", placeName: "Tarrytown", country: "United States", tz: "America/New_York", place: "Lyndhurst, Tarrytown, New York", lat: 41.0707, lon: -73.8637, theme: "city", collections: ["Westminster 2021", "W2021 Finals", "Lyndhurst Mansion"] },
-  { id: "nycc-2021", title: "NYCC 2021", kind: "event", series: "nycc", slug: "nycc", ...NYC, place: "Javits Center, New York", lat: 40.7577, lon: -74.0021, theme: "city", collections: ["NYCC 2021 Thurs Finals", "NYCC Fri Finals", "NYCC 2021 Sat Finals", "NYCC David Panel", "NYCC The Boys"] },
-  { id: "nycc-2022", title: "NYCC 2022", kind: "event", series: "nycc", slug: "nycc", ...NYC, place: "Javits Center, New York", lat: 40.7577, lon: -74.0021, theme: "city", collections: ["NYCC 2022", "NYCC 2022 - Cosplay", "NYCC 2022 SAT", "Teen Wolf"] }, // Teen Wolf is a panel at NYCC 2022
+  { id: "nycc-2021", title: "Comic Con 2021", kind: "event", series: "nycc", slug: "nycc", ...NYC, place: "Javits Center, New York", lat: 40.7577, lon: -74.0021, theme: "city", collections: ["NYCC 2021 Thurs Finals", "NYCC Fri Finals", "NYCC 2021 Sat Finals", "NYCC David Panel", "NYCC The Boys"] },
+  { id: "nycc-2022", title: "Comic Con 2022", kind: "event", series: "nycc", slug: "nycc", ...NYC, place: "Javits Center, New York", lat: 40.7577, lon: -74.0021, theme: "city", collections: ["NYCC 2022", "NYCC 2022 - Cosplay", "NYCC 2022 SAT", "Teen Wolf"] }, // Teen Wolf is a panel at NYCC 2022
 
   // ---- home -----------------------------------------------------------------------------
   { id: "new-york", title: "New York", kind: "home", slug: "new-york", ...NYC, place: "New York City", lat: 40.7306, lon: -73.9866, theme: "city", open: true, collections: ["NYC", "New York", "Manhattan", "Brooklyn", "Queens", "COVIDNYC", "NYC XMAS"] },
@@ -41,8 +42,8 @@ export const VOYAGES = [
   { id: "colorado", title: "Colorado", kind: "trip", placeSlug: "colorado", placeName: "Colorado", country: "United States", tz: "America/Denver", place: "Colorado", lat: 39.74, lon: -104.99, approx: true, theme: "nature", collections: ["Colorado 2021"] },
   { id: "arizona", title: "Arizona", kind: "trip", slug: "arizona", placeSlug: "arizona", placeName: "Arizona", country: "United States", tz: "America/Phoenix", place: "Sedona, Arizona", lat: 34.87, lon: -111.76, theme: "nature", collections: ["Sedona", "Grand Canyon", "Tuscon", "Phoenix"] },
   { id: "new-mexico", title: "New Mexico", kind: "trip", placeSlug: "new-mexico", placeName: "New Mexico", country: "United States", tz: "America/Denver", place: "New Mexico", lat: 35.69, lon: -105.94, approx: true, theme: "nature", collections: ["New Mexico"] },
-  { id: "wyoming-2020", title: "Wyoming 2020", kind: "trip", slug: "grand-tetons", placeSlug: "wyoming", placeName: "Wyoming", country: "United States", tz: "America/Denver", place: "Grand Teton and Yellowstone, Wyoming", lat: 43.79, lon: -110.68, theme: "nature", from: "2020-01-01", to: "2020-12-31", collections: ["Grand Teton", "Yellowstone", "SLC"] },
-  { id: "wyoming-2022", title: "Wyoming 2022", kind: "trip", slug: "grand-tetons", placeSlug: "wyoming", placeName: "Wyoming", country: "United States", tz: "America/Denver", place: "Grand Teton and Yellowstone, Wyoming", lat: 43.79, lon: -110.68, theme: "nature", from: "2022-01-01", to: "2022-12-31", collections: ["Grand Teton", "Yellowstone", "SLC"] },
+  { id: "wyoming-2020", title: "Wyoming", kind: "trip", slug: "grand-tetons", placeSlug: "wyoming", placeName: "Wyoming", country: "United States", tz: "America/Denver", place: "Grand Teton and Yellowstone, Wyoming", lat: 43.79, lon: -110.68, theme: "nature", from: "2020-01-01", to: "2020-12-31", collections: ["Grand Teton", "Yellowstone", "SLC"] },
+  { id: "wyoming-2022", title: "Wyoming", kind: "trip", slug: "grand-tetons", placeSlug: "wyoming", placeName: "Wyoming", country: "United States", tz: "America/Denver", place: "Grand Teton and Yellowstone, Wyoming", lat: 43.79, lon: -110.68, theme: "nature", from: "2022-01-01", to: "2022-12-31", collections: ["Grand Teton", "Yellowstone", "SLC"] },
   { id: "lisbon", title: "Lisbon", kind: "trip", placeSlug: "lisbon", placeName: "Lisbon", country: "Portugal", tz: "Europe/Lisbon", place: "Lisbon, Portugal", lat: 38.72, lon: -9.14, theme: "city", collections: ["Lisbon"] },
   { id: "madeira", title: "Madeira", kind: "trip", placeSlug: "madeira", placeName: "Madeira", country: "Portugal", tz: "Atlantic/Madeira", place: "Madeira, Portugal", lat: 32.65, lon: -16.91, theme: "nature", collections: ["Madeira"] },
   { id: "norway", title: "Norway", kind: "trip", placeSlug: "norway", placeName: "Norway", country: "Norway", tz: "Europe/Oslo", place: "Norway", lat: 59.91, lon: 10.75, approx: true, theme: "nature", collections: ["Norway"] },
@@ -52,13 +53,13 @@ export const VOYAGES = [
   { id: "bogota", title: "Bogotá", kind: "trip", placeSlug: "bogota", placeName: "Bogotá", country: "Colombia", tz: "America/Bogota", place: "Bogotá, Colombia", lat: 4.71, lon: -74.07, theme: "city", collections: ["Bogota"] },
   { id: "oaxaca", title: "Oaxaca", kind: "trip", placeSlug: "oaxaca", placeName: "Oaxaca", country: "Mexico", tz: "America/Mexico_City", place: "Oaxaca, Mexico", lat: 17.07, lon: -96.73, theme: "city", collections: ["Oaxaca", "Oaxaca Web Selects"] },
   { id: "new-jersey", title: "New Jersey", kind: "trip", placeSlug: "new-jersey", placeName: "New Jersey", country: "United States", tz: "America/New_York", place: "New Jersey", lat: 40.72, lon: -74.17, approx: true, theme: "city", collections: ["Chiyuki House 2025 New Jersey", "New Jersey"] },
-  { id: "pennsylvania", title: "Pennsylvania", kind: "trip", placeSlug: "pennsylvania", placeName: "Pennsylvania", country: "United States", tz: "America/New_York", place: "Sesame Place, Pennsylvania", lat: 40.18, lon: -74.92, approx: true, theme: "city", collections: ["Fist Time Sesame Place 2025"] },
+  { id: "pennsylvania", title: "Pennsylvania", kind: "trip", hidden: true, placeSlug: "pennsylvania", placeName: "Pennsylvania", country: "United States", tz: "America/New_York", place: "Sesame Place, Pennsylvania", lat: 40.18, lon: -74.92, approx: true, theme: "city", collections: ["Fist Time Sesame Place 2025"] },
 ];
 
 // Recurring events: one page per series, one gallery group per edition.
 export const SERIES = {
   westminster: { name: "Westminster", about: "The Westminster Kennel Club dog show, New York" },
-  nycc: { name: "NYCC", about: "New York Comic Con, Javits Center" },
+  nycc: { name: "New York Comic Con", about: "New York Comic Con, Javits Center" },
 };
 
 export const PALETTE = ["#d9a05b", "#5fa8d3", "#d9776a", "#7fbf7b", "#a98be0", "#d6c35a", "#4fbfae", "#d98bb0"];

@@ -199,8 +199,8 @@ test("menu is keyboard-operable: focus moves in, stays in, and returns on Escape
 
 test("events: index lists both events and their editions; detail pages hold one group per edition", async ({ page }) => {
   await page.goto("/events");
-  await expect(page.getByRole("heading", { level: 2 })).toHaveText(["Westminster", "NYCC"]);
-  await expect(page.locator(".card .name")).toHaveText(["Westminster 2021", "Westminster 2020", "NYCC 2022", "NYCC 2021"]);
+  await expect(page.getByRole("heading", { level: 2 })).toHaveText(["Westminster", "New York Comic Con"]);
+  await expect(page.locator(".card .name")).toHaveText(["Westminster 2021", "Westminster 2020", "Comic Con 2022", "Comic Con 2021"]);
   // a card deep-links to its edition on the event page
   await page.locator(".card", { hasText: "Westminster 2020" }).click();
   await expect(page).toHaveURL(/\/events\/westminster#westminster-2020$/);
@@ -219,6 +219,6 @@ test("archive tabs are the same four on every archive page, with the current one
 test("home: the four event voyages carry an Event tag, trips do not", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("#voyage-list .kind")).toHaveCount(4);
-  await expect(page.locator("#voyage-list li", { hasText: "NYCC 2022" }).locator(".kind")).toHaveText("Event");
+  await expect(page.locator("#voyage-list li", { hasText: "Comic Con 2022" }).locator(".kind")).toHaveText("Event");
   await expect(page.locator("#voyage-list li", { hasText: "Oaxaca" }).locator(".kind")).toHaveCount(0);
 });

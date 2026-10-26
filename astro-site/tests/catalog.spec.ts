@@ -55,7 +55,7 @@ test("hours are in range and camera settings are bucketed", () => {
 
 test("events are kept off the places map but stay on the home list", async ({ request }) => {
   const events = catalog.voyages.filter((v) => v.kind === "event");
-  expect(events.map((v) => v.title)).toEqual(expect.arrayContaining(["Westminster 2020", "Westminster 2021", "NYCC 2021", "NYCC 2022"]));
+  expect(events.map((v) => v.title)).toEqual(expect.arrayContaining(["Westminster 2020", "Westminster 2021", "Comic Con 2021", "Comic Con 2022"]));
   // the page's own content: the menu (outside <main>) lists every voyage, events included
   const places = ((await (await request.get("/places")).text()).match(/<main[\s\S]*<\/main>/) ?? [""])[0];
   const home = await (await request.get("/")).text();
@@ -63,4 +63,17 @@ test("events are kept off the places map but stay on the home list", async ({ re
     expect(places).not.toContain(`>${e.title}<`);
     expect(home).toContain(e.title);
   }
+});
+
+test("galleries are places: only events carry a year in their name", () => {
+  const withYear = catalog.voyages.filter((v) => /\b(19|20)\d\d\b/.test(v.title) && v.kind !== "event");
+  expect(withYear.map((v) => v.title)).toEqual([]);
+});
+
+test("a hidden gallery stays in the catalogue but is not on the site", async ({ request }) => {
+  const hidden = (catalog.voyages as { title: string; hidden?: boolean }[]).filter((v) => v.hidden);
+  expect(hidden.map((v) => v.title)).toContain("Pennsylvania");
+  const home = await (await request.get("/")).text();
+  for (const v of hidden) expect(home).not.toContain(`>${v.title.toUpperCase()}<`);
+  expect((await request.get("/places/pennsylvania")).status()).toBe(404);
 });

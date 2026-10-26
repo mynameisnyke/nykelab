@@ -8,6 +8,8 @@ export type Theme = "nature" | "city";
 export type VoyageKind = "trip" | "home" | "event";
 
 export interface Voyage {
+  /** The catalogue id ("wyoming-2020"): unique, unlike `slug` (the two Wyoming trips share one). */
+  id: string;
   slug: string;
   title: string;
   kind: VoyageKind;
