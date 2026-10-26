@@ -1,6 +1,6 @@
-# nykelab · Astro prototype (Journal + photo pages)
+# nykelab · the Astro site (nykelab.nyc)
 
-Prototype of the site in Astro, built from the Figma file ("Nyke Lab 2.0"). Every page is real HTML (SEO, link previews, RSS) with very little JavaScript. Standalone; the Vue app in the repo root is untouched.
+The live site: Astro on one Cloudflare Worker, built from the Figma file ("Nyke Lab 2.0"). Every page is real HTML (SEO, link previews, RSS) with very little JavaScript. It shares the Worker API in `../worker` with the older Vue app in the repo root, which is no longer deployed (see `../README.md`).
 
 - **Journal** (`/journal`, `/journal/<slug>`): markdown posts, prerendered.
 - **Photo pages** (`/<collection-slug>`, e.g. `/grand-tetons`) and **About** (`/about`): server-rendered from D1 on each request (short edge cache), so edits made in the admin appear without a rebuild.
@@ -104,7 +104,7 @@ npm run catalog -- /Volumes/Whiskey/photos-3plus-or-picked.csv   # rerun wheneve
 
 Layout rhythm (same idea as the Vue `CollectionView`, using the Figma sections): hero = first landscape item; remaining landscapes alternate full-bleed / inset; runs of portraits become 1–3-up rows; the next collection is shown as "Next chapter".
 
-## Video (branch `video-support`, local dev only, not deployed)
+## Video (local watcher; the converted clips are what the site serves)
 
 Video is for short, silent background clips (10–30 s, like the New York Times' interactive features): muted, inline, looping, playing only while on screen.
 
@@ -140,17 +140,16 @@ Export from Lightroom with **All Metadata** and without "Remove Location Info", 
 
 ## Going live
 
-Staging is live: https://nykelab-astro.nykelab-astro.workers.dev (since 24 Oct 2026; Infinite Azure and the view counter since 25 Oct). `wrangler.jsonc` is production by default (`ENVIRONMENT: "production"`): `/admin` and `/api/admin/*` require a valid Cloudflare Access login. Local development gets `ENVIRONMENT=development` from `.dev.vars` (gitignored); in a new checkout recreate it: `echo ENVIRONMENT=development > astro-site/.dev.vars`.
+The site has been live on https://nykelab.nyc since 25 Oct 2026 (`www` redirects to the apex; the staging address https://nykelab-astro.nykelab-astro.workers.dev stays up). Deploy with `npm run deploy` (build + `wrangler deploy`; it needs `wrangler login` as the account owner).
 
-Everything below is done for staging except steps 6 and 7. To put the site on `nykelab.nyc`:
+`wrangler.jsonc` is production by default (`ENVIRONMENT: "production"`): `/admin` and `/api/admin/*` require a valid Cloudflare Access login. Local development gets `ENVIRONMENT=development` from `.dev.vars` (gitignored); in a new checkout recreate it: `echo ENVIRONMENT=development > astro-site/.dev.vars`.
 
-1. **DNS:** in the Cloudflare dashboard for the `nykelab.nyc` zone (DNS, Records), delete the two old `A` records for the apex (151.101.1.195 and 151.101.65.195, the previous host) and the `CNAME` for `www` (pixie.porkbun.com, a Porkbun forward). Keep every `MX` and `TXT` record (Gmail, SPF, Google verification).
-2. **Domain:** uncomment the `routes` block at the bottom of `wrangler.jsonc` (apex + `www`, and `workers_dev: true` so the staging address stays up), then `npm run deploy`. Cloudflare creates the DNS records and certificates itself, and `www` redirects to the apex inside the Worker (`worker/src/redirect.ts`). It only works after step 1: with the old records still there the attach fails (error 100117, "already has externally managed DNS records"), and because declaring `routes` switches `*.workers.dev` off by default, that failure leaves nothing serving until you redeploy without them (this happened once, on 25 Oct, and was fixed in a minute).
-3. **Admin:** in Zero Trust > Access > the `nykelab-astro` application, add `nykelab.nyc/admin*` and `nykelab.nyc/api/admin/*` as destinations (keep the workers.dev ones while testing). Check from a private window: `/admin` redirects to the Access login, `/api/admin/me` is 401/403.
-4. **Counter:** the view counter starts from whatever is in the `counters` table. Reset it right before launch: `npx wrangler d1 execute DB --remote --command "UPDATE counters SET n = 0 WHERE name = 'views'"`.
-5. **Analytics (optional):** the `EVENTS` binding writes every page / photo / video event to Analytics Engine. To read it in the admin Stats tab: set `CF_ACCOUNT_ID` in `wrangler.jsonc` vars and `npx wrangler secret put CF_API_TOKEN` (a token with Account Analytics: Read).
-6. **Placeholders:** the sample journal posts are gone (the first real entry is `retiring-the-coast-video`); check `/about`.
-7. **Backup:** push the repo to GitHub (there is no remote yet) and optionally connect Workers Builds for auto-deploys.
+How the domain was attached (kept for reference):
+
+1. **DNS:** in the Cloudflare dashboard for the `nykelab.nyc` zone, delete any old `A` records for the apex and the `www` `CNAME` (the previous host). Keep every `MX` and `TXT` record (Gmail, SPF, Google verification). The `routes` attach fails while old records exist (error 100117), and because declaring `routes` switches `*.workers.dev` off by default, `workers_dev: true` stays explicit in `wrangler.jsonc`.
+2. **Admin:** in Zero Trust > Access > the `nykelab-astro` application, `nykelab.nyc/admin*` and `nykelab.nyc/api/admin/*` must be destinations. Check from a private window: `/admin` redirects to the Access login, `/api/admin/me` is 401/403.
+3. **Counter:** reset the view counter after testing on the live site: `npx wrangler d1 execute DB --remote --command "UPDATE counters SET n = 0 WHERE name = 'views'"`.
+4. **Analytics (optional):** the `EVENTS` binding writes every page / photo / video event to Analytics Engine. To read it in the admin Stats tab: set `CF_ACCOUNT_ID` in `wrangler.jsonc` vars and `npx wrangler secret put CF_API_TOKEN` (a token with Account Analytics: Read).
 
 ## Notes
 
@@ -164,4 +163,3 @@ Everything below is done for staging except steps 6 and 7. To put the site on `n
 - World (three.js walkable gallery): deliberately skipped for now. When wanted, it mounts as Vue islands like the admin does. (The admin's "In World" checkbox and the `featured` flag are kept so nothing is lost.)
 - The Figma Offset collage and Diptych sections (they need an editorial pairing field; today layout is derived from orientation).
 - Dropped on purpose: the menu overlay's voyage preview photo and sunburst (the home globe replaced the sunburst; the menu lists the main destinations). The Figma MenuOverlay and Sunburst components still show the old design. About links: GitHub, LinkedIn and Email are the real ones. There is no Instagram account, so none is linked.
-- The custom domain (nykelab.nyc): see "Going live".
