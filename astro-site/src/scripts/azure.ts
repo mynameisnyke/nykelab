@@ -305,16 +305,15 @@ export function initAzure(): () => void {
   let lastHitSound = -1;
   const voices: AudioBufferSourceNode[] = [];
   let sfxReady: Promise<unknown> = Promise.resolve();
-  /** Must be called from a click: creates the audio context and decodes the clips once. Resolves when every clip is ready. */
-  function prepareSfx(): Promise<unknown> {
-    if (sfx) {
-      void sfx.resume();
-      return sfxReady;
-    }
+  /**
+   * Creates the audio context and fetches + decodes the six clips. Safe before any click (a context starts suspended, and decoding
+   * does not need it running), so it is done behind the title card; the click only has to resume it.
+   */
+  function warmSfx() {
+    if (sfx) return;
     const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AC) return sfxReady;
+    if (!AC) return;
     const ctx = (sfx = new AC());
-    void ctx.resume();
     sfxReady = Promise.all(
       HIT_URLS.map(async (url, i) => {
         try {
@@ -324,6 +323,11 @@ export function initAzure(): () => void {
         }
       }),
     );
+  }
+  /** Must be called from a click: lets the context run. Resolves when every clip is ready. */
+  function prepareSfx(): Promise<unknown> {
+    warmSfx();
+    void sfx?.resume();
     return sfxReady;
   }
   function playHit() {
@@ -440,6 +444,7 @@ export function initAzure(): () => void {
   if (!(navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData) {
     audio.preload = "auto"; // buffer the song behind the title card so Enter does not have to wait for it
     audio.load();
+    warmSfx(); // and have the hit sounds decoded and waiting
   }
   const enter = document.getElementById("az-enter") as HTMLButtonElement;
   const silent = document.getElementById("az-silent") as HTMLButtonElement;
