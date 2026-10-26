@@ -256,6 +256,9 @@ const order = voyages.map((_, i) => i).sort((a, b) => voyages[b].start - voyages
     opacity: 0.1;
     pointer-events: none;
   }
+  :global(:root[data-theme="light"]) .home:not([data-lens="where"]) #globe {
+    opacity: 0; /* a ghost globe behind the chart just muddies the cream */
+  }
   .chart {
     position: absolute;
     inset: 52px 424px 56px 404px; /* between the list and the preview */

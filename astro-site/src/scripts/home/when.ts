@@ -50,10 +50,10 @@ export function createWhen(host: HTMLElement, store: Store) {
     const set = (d: number) => y(sunTimes(40, d).set);
     g.append("path")
       .attr("d", d3.area<number>().x((d) => x(d)).y0(0).y1(rise)(days))
-      .style("fill", "var(--fill-ring-soft)");
+      .style("fill", "var(--viz-band)");
     g.append("path")
       .attr("d", d3.area<number>().x((d) => x(d)).y0(set).y1(h)(days))
-      .style("fill", "var(--fill-ring-soft)");
+      .style("fill", "var(--viz-band)");
     for (const f of [rise, set]) {
       g.append("path")
         .attr("d", d3.line<number>().x((d) => x(d)).y(f)(days))
@@ -85,11 +85,12 @@ export function createWhen(host: HTMLElement, store: Store) {
         .attr("width", Math.max(5, x(new Date(v.end + DAY / 2)) - x0))
         .attr("height", h)
         .attr("fill", v.color)
-        .attr("fill-opacity", 0.1);
+        .style("fill-opacity", "var(--viz-span)");
     });
 
     dots = g
       .append("g")
+      .style("filter", "var(--viz-dots)")
       .selectAll<SVGCircleElement, Shot>("circle")
       .data(shots)
       .join("circle")

@@ -20,6 +20,10 @@
   --border-subtle: #ffffff24;
   --border-strong: #ffffffb2;
   --fill-ring-soft: #ffffff17;
+  /* The When chart: day/night bands, voyage spans, dots. Quieter on a light page. */
+  --viz-band: #ffffff17;
+  --viz-span: 0.1;
+  --viz-dots: none;
   color-scheme: dark;
 
   /* Scale */
@@ -67,6 +71,9 @@
   --border-subtle: #00000024;
   --border-strong: #000000b2;
   --fill-ring-soft: #00000017;
+  --viz-band: #0000000b;
+  --viz-span: 0.06;
+  --viz-dots: saturate(1.2) brightness(0.86);
   color-scheme: light;
 }
 
