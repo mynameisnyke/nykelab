@@ -34,7 +34,10 @@
     "ACCESS_AUD": "ce52f956a600b918ce10f711aca0f5352d44f6296aafae26a3ccedc5e151aad2",
     // Optional comma-separated allowlist of admin emails (extra check on top of Access).
     "ADMIN_EMAILS": ""
-  }
-  // Custom domain, once the nykelab.nyc zone is on Cloudflare and the first deploy works on *.workers.dev:
-  // , "routes": [{ "pattern": "nykelab.nyc", "custom_domain": true }]
+  },
+  // The live domain: NOT enabled yet. Declaring `routes` makes Wrangler switch the *.workers.dev address off by default, and the
+  // attach fails while the zone still has the old A records (error 100117), which leaves nothing serving. To enable, once those
+  // records are deleted in the Cloudflare dashboard: uncomment, then `npm run deploy`.
+  //   , "workers_dev": true,
+  //   "routes": [{ "pattern": "nykelab.nyc", "custom_domain": true }, { "pattern": "www.nykelab.nyc", "custom_domain": true }]
 }

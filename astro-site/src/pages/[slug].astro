@@ -8,7 +8,8 @@ import ChapterNav from "../components/ChapterNav.astro";
 import MediaItem from "../components/MediaItem.astro";
 import { getCollectionPage, getNav, type Photo } from "../lib/collections";
 import GeoCaption from "../components/GeoCaption.astro";
-import { pickHero } from "../lib/hero";
+import { applyPicks } from "../lib/hero";
+import picks from "../data/page-picks.json";
 import { placeText } from "../lib/caption";
 
 export const prerender = false;
@@ -20,8 +21,9 @@ else Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60
 
 const nav = page ? await getNav() : [];
 const media = page?.media ?? [];
-// The hero: a landscape clip if the collection has one, else a landscape still sharp enough to fill the screen (see lib/hero.ts).
-const { index: heroIdx } = pickHero(media);
+// The hero: hand-picked (data/page-picks.json) or, by default, a landscape clip, else a landscape still sharp enough to fill the screen (lib/hero.ts).
+const pick = (picks as Record<string, { hero?: string; next?: string }>)[slug];
+const { hero: heroIdx, next: nextIdx } = applyPicks(media, pick);
 const hero = media[heroIdx];
 
 // Layout rhythm: landscapes alternate full-bleed / inset; runs of portraits
@@ -29,7 +31,9 @@ const hero = media[heroIdx];
 type Block = { kind: "single"; style: "full" | "inset"; m: Photo } | { kind: "row"; ms: Photo[] };
 const blocks: Block[] = [];
 let landscapes = 0;
-const rest = media.filter((_, i) => i !== heroIdx);
+// a picked "next" item comes first after the hero, alone and centred
+if (nextIdx >= 0) blocks.push({ kind: "row", ms: [media[nextIdx]] });
+const rest = media.filter((_, i) => i !== heroIdx && i !== nextIdx);
 for (let i = 0; i < rest.length; ) {
   const m = rest[i];
   if (m.orientation === "portrait") {

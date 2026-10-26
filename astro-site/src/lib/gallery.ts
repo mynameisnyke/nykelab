@@ -1,6 +1,7 @@
 // Place, Year and Event pages: each voyage shows photographs from the collection that really holds it,
 // and the page's hero is a clip from one of those collections when there is one.
 import { getGalleryPhotos, getHeroVideos, type Photo } from "./collections";
+import picks from "../data/page-picks.json";
 import { fmtDate, type Voyage } from "./voyages";
 
 const yearOf = (p: Photo) => Number((p.capturedAt ?? "").slice(0, 4)) || 0;
@@ -25,7 +26,7 @@ export interface Gallery {
 }
 
 /** `order` indexes `voyages`; `year` limits each voyage to photographs made that year. */
-export async function loadGalleries(voyages: Voyage[], order: number[], year?: number) {
+export async function loadGalleries(voyages: Voyage[], order: number[], year?: number, pinHero = false) {
   const slugsOf = (v: Voyage) => v.collections ?? (v.collection ? [v.collection] : []);
   const slugs = [...new Set(order.flatMap((i) => slugsOf(voyages[i])))];
   const [photos, videos] = await Promise.all([getGalleryPhotos(slugs, 100), getHeroVideos(slugs)]);
@@ -49,5 +50,11 @@ export async function loadGalleries(voyages: Voyage[], order: number[], year?: n
   const heroPhoto = [...order]
     .sort((a, b) => voyages[b].count - voyages[a].count)
     .flatMap((i) => merged(voyages[i]).filter((p) => p.type === "image" && p.orientation !== "portrait" && p.heroOk).slice(0, 1))[0];
-  return { groups, heroVideo, heroPhoto };
+  // a hand-picked hero (data/page-picks.json) for a place wins over everything automatic
+  const pinned = pinHero
+    ? [...order]
+        .sort((x, y) => voyages[y].count - voyages[x].count)
+        .flatMap((i) => slugsOf(voyages[i]).flatMap((c) => (photos.get(c) ?? []).filter((p) => p.id === (picks as Record<string, { hero?: string }>)[c]?.hero)))[0]
+    : undefined;
+  return pinned ? { groups, heroVideo: undefined, heroPhoto: pinned } : { groups, heroVideo, heroPhoto };
 }

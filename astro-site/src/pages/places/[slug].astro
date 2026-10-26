@@ -35,7 +35,7 @@ const facts = place
       { label: "Golden hour", value: `${Math.round(goldenShare(mine) * 100)}%` },
     ]
   : [];
-const { groups, heroVideo, heroPhoto } = await loadGalleries(voyages, order);
+const { groups, heroVideo, heroPhoto } = await loadGalleries(voyages, order, undefined, true);
 const next = place && places.length > 1 ? places[(at + 1) % places.length] : undefined;
 const hero = place ? images[heroImage(images, place.cover, place.voyages.map((i) => voyages[i].cover))] : undefined;
 ---
