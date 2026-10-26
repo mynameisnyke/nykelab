@@ -160,8 +160,11 @@ test("soft navigation keeps scripts alive (places -> about -> back)", async ({ p
   await page.goto("/");
   await page.locator(".chapter-nav a", { hasText: "Places" }).click();
   await expect(page).toHaveURL(/\/places$/);
-  await page.getByRole("button", { name: "Iceland" }).click();
-  await expect(page.locator(".card:not([hidden])")).toHaveCount(1);
+  // the page's script attaches a moment after a soft navigation lands; a click that beats it does nothing, so retry until it takes
+  await expect(async () => {
+    await page.getByRole("button", { name: "Iceland" }).click();
+    await expect(page.locator(".card:not([hidden])")).toHaveCount(1, { timeout: 1500 });
+  }).toPass({ timeout: 10000 });
   await page.locator(".chapter-nav a", { hasText: "About" }).click();
   await expect(page).toHaveURL(/\/about$/);
   await page.locator("header [data-menu-open]").click();
