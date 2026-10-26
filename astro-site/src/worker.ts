@@ -8,12 +8,19 @@ import { eventRoutes } from "../../worker/src/events";
 import { adminRoutes } from "../../worker/src/admin";
 import { statsRoutes } from "../../worker/src/stats";
 import { requireAdmin } from "../../worker/src/auth";
+import { wwwRedirect } from "../../worker/src/redirect";
 import type { AppEnv } from "../../worker/src/types";
 
 const app = new Hono<AppEnv>();
 
 // `wrangler types` narrows ENVIRONMENT to a literal; the shared Env type uses string.
 const asMiddleware = (fn: unknown) => fn as MiddlewareHandler<AppEnv>;
+
+// www.<domain> goes to the bare domain, keeping the path and query.
+app.use(async (c, next) => {
+  const to = wwwRedirect(c.req.url);
+  return to ? c.redirect(to, 301) : next();
+});
 
 app.use(asMiddleware(cf()));
 

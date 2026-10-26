@@ -11,7 +11,8 @@ for (const theme of ["dark", "light"]) {
       await page.goto(path);
       await page.waitForLoadState("networkidle");
       // Contrast must be measured at rest, not mid fade-in (reveal transitions, the globe intro).
-      await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== "running"), null, { timeout: 15_000 });
+      // (endless animations, like the view counter's live dot, are meant to keep running: only wait for the finite ones)
+      await page.waitForFunction(() => document.getAnimations().every((a) => a.playState !== "running" || a.effect?.getComputedTiming().iterations === Infinity), null, { timeout: 15_000 });
       await page.waitForTimeout(500);
       const { violations } = await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
@@ -20,6 +21,9 @@ for (const theme of ["dark", "light"]) {
         // model blend modes and reports white-on-cream. Real contrast by hand, light theme: text
         // = 0.7 * |cream - white| + 0.3 * cream, about #4F5158 on #FAF3E1, roughly 7:1 inactive.
         .exclude(".chapter-nav")
+        // The view counter (bottom right) is drawn the same way, white with mix-blend-mode: difference at 0.7 opacity, so the
+        // same hand-measured contrast applies (about 7:1 on the light page).
+        .exclude(".views")
         .analyze();
       const summary = violations.map((v) => `${v.id} (${v.impact}) x${v.nodes.length}: ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(" | ")}`);
       expect(summary).toEqual([]);

@@ -9,16 +9,19 @@ interface Props {
   subtitle: string;
   crumb: { label: string; href: string };
   image?: PreviewImage;
-  /** A clip for the hero; it wins over the still. */
+  /** A clip for the hero; it wins over any still. */
   video?: Photo;
+  /** A still that is sharp enough to fill the screen (heroOk); it wins over `image`. */
+  photo?: Photo;
   numeral?: boolean;
 }
-const { title, subtitle, crumb, image, video, numeral = false } = Astro.props;
+const { title, subtitle, crumb, image, video, photo, numeral = false } = Astro.props;
 ---
 
 <section class="hero">
   {video && <MediaItem media={video} eager fit="cover" sizes="100vw" />}
-  {!video && image && <img class="media" src={image.src} srcset={image.srcset} sizes="100vw" alt={image.alt} loading="eager" decoding="async" fetchpriority="high" />}
+  {!video && photo && <MediaItem media={photo} eager fit="cover" sizes="100vw" />}
+  {!video && !photo && image && <img class="media" src={image.src} srcset={image.srcset} sizes="100vw" alt={image.alt} loading="eager" decoding="async" fetchpriority="high" />}
   <div class="scrim top"></div>
   <div class="scrim bottom"></div>
   <a class="crumb eyebrow" href={crumb.href}>← {crumb.label}</a>

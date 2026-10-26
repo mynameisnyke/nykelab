@@ -66,3 +66,12 @@ the site prints `placeLine()` (src/lib/caption.ts) under each item: "Oaxaca de J
 - Captions: a landmark inside the photo's coordinates or the phone's itinerary for that day (data/landmarks.json) names the spot ("White Sands National Park, New Mexico");
   `data/photo-places.json` holds places named by eye for items with nothing else to go on. The coordinates link to Google Maps (components/GeoCaption.astro).
 - Sources now: exif, phone, phone-approx, day (where the phone spent that day, or a named place: about 1 km), trip (the trip's own pin; none for a whole country or a big state).
+
+## 2560 px stills and hero-safe photographs (2026-10-25)
+
+- The photographs are now the 2560 px set (`photos/web2560/`, its own manifest) uploaded over the same keys (`<id>/orig.jpg`). `width`, `height`, `bytes` come from that manifest;
+  `hero_ok` (long edge 2560 px) is stored as `media.hero_ok`; for anything else (own uploads) it is derived: long edge >= 2400 px. Clips are always fine.
+- `media.rev` is the file version. A replaced photograph is asked for as `/m/<id>/w900.webp?r=2`, and its sized copies are cached under `<id>/w900-r2.webp`, so neither the browser
+  (which cached the old ones for a year) nor storage serves a picture made from the old file. The old sized copies are left in storage (nothing was deleted).
+- A hero or a full-bleed block is a landscape clip, or a landscape still with `hero_ok` (lib/hero.ts). If a collection has neither, the first landscape still is used and is soft.
+- Eight photographs were re-rendered from RAW (exposure fixed): they were replaced like the rest (all 1,028 files were uploaded, compared by size and time, not skipped).

@@ -1,5 +1,6 @@
 ---
 import { ClientRouter } from "astro:transitions";
+import ViewCounter from "../components/ViewCounter.astro";
 import "../styles/global.css";
 
 interface Props {
@@ -46,6 +47,7 @@ const ogImage = new URL(image ?? "/og.png", Astro.site);
   </head>
   <body>
     <slot />
+    <ViewCounter />
   </body>
 </html>
 

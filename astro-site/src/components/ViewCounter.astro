@@ -1,0 +1,119 @@
+---
+// A quiet, live "12,345 views" in the bottom right of every page (the total page views, bots and /admin left out).
+// Persisted across client-side navigations so it does not flicker; hidden until the first number arrives, and when counting is off.
+---
+
+<div class="views" id="views" transition:persist="views" aria-live="off">
+  <span class="dot" aria-hidden="true"></span>
+  <span class="num" id="views-n"></span>
+  <span class="word">views</span>
+</div>
+
+<script>
+  const el = document.getElementById("views");
+  const num = document.getElementById("views-n");
+  if (el && num && !el.dataset.wired) {
+    el.dataset.wired = "1";
+    let shown = 0;
+    let timer = 0;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const fmt = (n: number) => n.toLocaleString("en-US");
+
+    function show(to: number) {
+      el!.classList.add("ready");
+      el!.setAttribute("aria-label", `${fmt(to)} views`);
+      if (reduced || shown === 0 || Math.abs(to - shown) > 50) {
+        shown = to;
+        num!.textContent = fmt(to);
+        return;
+      }
+      // a few new views since the last look: tick up rather than jump
+      const from = shown;
+      const t0 = performance.now();
+      const step = () => {
+        const k = Math.min(1, (performance.now() - t0) / 700);
+        shown = Math.round(from + (to - from) * k);
+        num!.textContent = fmt(shown);
+        if (k < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    async function refresh() {
+      try {
+        const { views } = (await (await fetch("/api/views", { cache: "no-store" })).json()) as { views: number | null };
+        if (typeof views === "number") show(views);
+      } catch {
+        /* the counter just stays as it was */
+      }
+    }
+    const loop = () => {
+      clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        if (!document.hidden) void refresh();
+        loop();
+      }, 30000);
+    };
+    // right after a page view is sent, so it includes this one
+    document.addEventListener("astro:page-load", () => setTimeout(refresh, 900));
+    document.addEventListener("visibilitychange", () => !document.hidden && void refresh());
+    loop();
+  }
+</script>
+
+<style>
+  .views {
+    position: fixed;
+    right: var(--inset);
+    bottom: 32px;
+    z-index: 19;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-ui);
+    font-weight: 500;
+    font-size: 11px;
+    line-height: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    mix-blend-mode: difference; /* legible over any photo, like the bottom nav */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.8s ease;
+  }
+  .views.ready {
+    opacity: 0.7;
+  }
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+  .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: views-pulse 2.6s ease-in-out infinite;
+  }
+  @keyframes views-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dot {
+      animation: none;
+    }
+  }
+  @media (max-width: 767px) {
+    .views {
+      right: 16px;
+      bottom: 46px; /* above the bottom nav, which runs the full width on a phone */
+      font-size: 10px;
+    }
+  }
+</style>

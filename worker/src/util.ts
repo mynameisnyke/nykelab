@@ -11,13 +11,14 @@ export const mediaUrl = (key: string) => `/m/${key}`;
 // Allowed variant widths (px). A fixed list keeps the transform endpoint from being
 // used to generate arbitrary sizes. Variants never upscale past the original.
 export const VARIANT_WIDTHS = [480, 900, 1440, 2400] as const;
-export const variantUrl = (id: string, w: number) => `/m/${id}/w${w}.webp`;
+/** `rev` > 1 marks a photograph whose file was replaced: a new URL, so neither the browser nor the cache serves the old picture. */
+export const variantUrl = (id: string, w: number, rev = 1) => `/m/${id}/w${w}.webp${rev > 1 ? `?r=${rev}` : ""}`;
 
 /** Variants worth offering for an original of `width` px (0 = unknown → all). */
-function variantsFor(id: string, width: number) {
+function variantsFor(id: string, width: number, rev = 1) {
   const out: { width: number; url: string }[] = [];
   for (const w of VARIANT_WIDTHS) {
-    out.push({ width: width > 0 ? Math.min(w, width) : w, url: variantUrl(id, w) });
+    out.push({ width: width > 0 ? Math.min(w, width) : w, url: variantUrl(id, w, rev) });
     if (width > 0 && w >= width) break; // this one already serves the full original
   }
   return out;
@@ -45,10 +46,10 @@ export function toApiMedia(row: MediaRow): ApiMedia {
     featured: !!row.featured,
     urls: row.key_original
       ? (() => {
-          const variants = variantsFor(row.id, row.width);
+          const variants = variantsFor(row.id, row.width, row.rev ?? 1);
           return {
             main: variants[variants.length - 1].url,
-            small: variantUrl(row.id, 900),
+            small: variantUrl(row.id, 900, row.rev ?? 1),
             variants,
           };
         })()
@@ -75,6 +76,7 @@ export function toApiMedia(row: MediaRow): ApiMedia {
     captionSource: row.caption_source ?? "",
     hasGps: row.gps_lat != null && row.gps_lon != null,
     geo: geoOf(row),
+    heroOk: !!row.hero_ok,
     avgColour: /^#[0-9a-f]{6}$/i.test(row.avg_colour ?? "") ? row.avg_colour : "",
     textOn: row.text_on === "light" || row.text_on === "dark" ? row.text_on : "",
     duration: row.duration ?? null,

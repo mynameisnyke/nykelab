@@ -5,7 +5,7 @@
 //  - music starts from the Enter button (browsers only allow sound after a click)
 import { createHits } from "./azure-hit";
 
-type Item = [id: string, w: number, h: number, place: string, best: 0 | 1];
+type Item = [id: string, w: number, h: number, place: string, best: 0 | 1, rev: number];
 interface Piece {
   item: Item;
   x: number;
@@ -158,10 +158,12 @@ export function initAzure(): () => void {
   let nextTop = 0;
   let firstScene = true;
 
+  /** A replaced photograph (rev > 1) is asked for by its revision, so the old cached picture is never used. */
+  const variant = (item: Item, w: number) => `/m/${item[0]}/w${w}.webp${item[5] > 1 ? `?r=${item[5]}` : ""}`;
   function srcset(item: Item) {
     const out: string[] = [];
     for (const w of [480, 900, 1440, 2400]) {
-      out.push(`/m/${item[0]}/w${w}.webp ${Math.min(w, item[1])}w`);
+      out.push(`${variant(item, w)} ${Math.min(w, item[1])}w`);
       if (w >= item[1]) break;
     }
     return out.join(", ");
@@ -202,7 +204,8 @@ export function initAzure(): () => void {
       fig.className = "az-piece";
       fig.style.cssText = `left:${p.x}px;top:${p.y}px;width:${p.w}px;height:${p.h}px;z-index:${p.z}`;
       const img = document.createElement("img");
-      img.src = `/m/${p.item[0]}/w${p.w > 700 ? 1440 : 900}.webp`;
+      const want = p.w * (window.devicePixelRatio || 1); // pixels this piece needs across
+      img.src = variant(p.item, want > 1500 ? 2400 : want > 800 ? 1440 : 900);
       img.srcset = srcset(p.item);
       img.sizes = `${Math.round(p.w)}px`;
       img.width = p.item[1];

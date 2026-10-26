@@ -36,6 +36,36 @@ test.describe("Infinite Azure", () => {
     expect(await page.locator(".az-piece").count()).toBeLessThan(40);
   });
 
+  test("the loop is actually visible behind the photographs, not just playing", async ({ page }) => {
+    await page.goto("/infinite-azure");
+    test.skip((await feedSize(page)) < 6, "no photographs with originals in this database");
+    await page.waitForFunction(() => (document.getElementById("az-bg") as HTMLVideoElement).readyState >= 3);
+    await page.waitForTimeout(800);
+    // The sky in the loop is bright; a solid dark page (the video hidden under the body background) is not.
+    const shot = await page.screenshot({ clip: { x: 0, y: 80, width: 300, height: 200 } });
+    const px = await page.evaluate(async (b64) => {
+      const img = new Image();
+      img.src = "data:image/png;base64," + b64;
+      await img.decode();
+      const c = document.createElement("canvas");
+      c.width = img.width;
+      c.height = img.height;
+      const g = c.getContext("2d")!;
+      g.drawImage(img, 0, 0);
+      const d = g.getImageData(0, 0, c.width, c.height).data;
+      let sum = 0, min = 255, max = 0;
+      for (let i = 0; i < d.length; i += 4) {
+        const l = (d[i] + d[i + 1] + d[i + 2]) / 3;
+        sum += l;
+        min = Math.min(min, l);
+        max = Math.max(max, l);
+      }
+      return { mean: sum / (d.length / 4), spread: max - min };
+    }, shot.toString("base64"));
+    expect(px.mean).toBeGreaterThan(40); // the page background alone is about 5-16
+    expect(px.spread).toBeGreaterThan(30); // clouds, not a flat colour
+  });
+
   test("sound starts only when asked for", async ({ page }) => {
     await page.goto("/infinite-azure");
     test.skip((await feedSize(page)) < 6, "no photographs with originals in this database");

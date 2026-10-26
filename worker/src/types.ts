@@ -70,6 +70,9 @@ export interface MediaRow {
   geo_lat: number | null;
   geo_lon: number | null;
   geo_source: string;
+  // Hero-safe and file version (migrations/0007_hero_rev.sql)
+  hero_ok: number;
+  rev: number;
 }
 
 export interface CollectionRow {
@@ -115,6 +118,8 @@ export interface ApiMedia {
    * The exact GPS fix is never exposed.
    */
   geo: { lat: number; lon: number; source: string } | null;
+  /** Sharp enough for a full-width hero or full-bleed block (long edge of at least 2400 px, or a clip). */
+  heroOk: boolean;
   /** City-level place read from the photo. */
   city: string;
   region: string;

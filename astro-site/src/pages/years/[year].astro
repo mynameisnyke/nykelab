@@ -37,7 +37,7 @@ const facts = y
       { label: "Golden hour", value: `${Math.round(goldenShare(inYear) * 100)}%` },
     ]
   : [];
-const { groups, heroVideo } = y ? await loadGalleries(voyages, order, y.year) : { groups: [], heroVideo: undefined };
+const { groups, heroVideo, heroPhoto } = y ? await loadGalleries(voyages, order, y.year) : { groups: [], heroVideo: undefined, heroPhoto: undefined };
 const next = y && years.length > 1 ? years[(at + 1) % years.length] : undefined;
 const hero = y ? images[heroImage(images, y.photos[0] ?? -1, y.photos)] : undefined;
 ---
@@ -52,7 +52,7 @@ const hero = y ? images[heroImage(images, y.photos[0] ?? -1, y.photos)] : undefi
       </main>
     ) : (
       <main>
-        <GalleryHero title={String(y.year)} numeral subtitle={`${fmtN(y.count)} photographs · ${n(y.voyages.length, "voyage", "voyages")} · ${n(y.countries.length, "country", "countries")}`} crumb={{ label: "Years", href: "/years" }} image={hero} video={heroVideo} />
+        <GalleryHero title={String(y.year)} numeral subtitle={`${fmtN(y.count)} photographs · ${n(y.voyages.length, "voyage", "voyages")} · ${n(y.countries.length, "country", "countries")}`} crumb={{ label: "Years", href: "/years" }} image={hero} video={heroVideo} photo={heroPhoto} />
         <section class="facts"><MetaStrip facts={facts} /></section>
         <section class="months"><MonthBars counts={y.monthCounts} voyageByMonth={y.monthVoyage} voyages={voyages} max={max} year={y.year} bw={56} label /></section>
         {groups.map((g) => <GalleryGroup {...g} count={inYear.filter((s) => s.v === voyages.indexOf(g.voyage)).length} />)}
