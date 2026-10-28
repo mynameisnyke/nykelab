@@ -1,6 +1,6 @@
 // Offline place lookup over src/cities.json (GeoNames cities15000, CC BY 4.0): nearest city to a GPS fix, or the
 // coordinates of a city named in a photo's IPTC/XMP tags. City-level on purpose: exact GPS never leaves the Worker.
-import data from "./cities.json";
+import data from "./cities.json" with { type: "json" }; // the worker lives in an ESM package now; Node (Playwright) requires the attribute
 
 type Row = [name: string, lat: number, lon: number, cc: number, region: number, popK: number];
 const cities = data.cities as Row[];
