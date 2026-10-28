@@ -83,9 +83,10 @@ test.describe("menu", () => {
       await page.locator("header [data-menu-open]").click();
       const menu = page.locator("#menu");
       await expect(menu).toBeVisible();
-      // five words, then the ∞ mark for Infinite Azure (it has no text, only a label)
-      await expect(menu.locator(".menu-list a")).toHaveText(["Home", "Places", "Years", "Journal", "About", ""]);
-      await expect(menu.locator(".menu-list a").last()).toHaveAttribute("aria-label", "Infinite Azure");
+      // five words, then the ∞ mark for Infinite Azure and the tape mark for Mini DV (no text, only a label)
+      await expect(menu.locator(".menu-list a")).toHaveText(["Home", "Places", "Years", "Journal", "About", "", ""]);
+      await expect(menu.locator(".menu-list a").nth(5)).toHaveAttribute("aria-label", "Infinite Azure");
+      await expect(menu.locator(".menu-list a").last()).toHaveAttribute("aria-label", "Mini DV");
       await expect(menu.getByRole("link", { name: "Email" })).toHaveAttribute("href", /^mailto:/);
       await expect(menu.getByRole("link", { name: "Instagram" })).toHaveCount(0);
       await page.keyboard.press("Escape");

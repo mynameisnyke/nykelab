@@ -3,7 +3,7 @@
 // The overlay here is the list + footer only; the preview image and sunburst
 // from the Figma menu come with the photo pages.
 import Logo from "./Logo.astro";
-import InfinityMark from "./InfinityMark.astro";
+import NavLabel from "./NavLabel.astro";
 import { NAV_ITEMS, isHere } from "../lib/nav";
 interface Props {
   /** "media" = sits over a photo (white icons/wordmark in both themes). */
@@ -64,7 +64,7 @@ const footer = [{ label: "Email", href: "mailto:nyke@nykelab.nyc" }];
               aria-current={isHere(c.href, here) ? "page" : undefined}
               aria-label={c.icon ? c.label : undefined}
             >
-              {c.icon === "infinity" ? <InfinityMark size={64} /> : c.label}
+              <NavLabel label={c.label} icon={c.icon} size={64} />
             </a>
           </li>
         ))
