@@ -4,6 +4,7 @@ import mdx from "@astrojs/mdx";
 import vue from "@astrojs/vue";
 import tailwindcss from "@tailwindcss/vite";
 import sitemap from "@astrojs/sitemap";
+import { minidvLocal } from "./scripts/dev/minidv-local.mjs";
 
 // Adds `data-title` / `data-lang` to code fences so CSS can draw the
 // filename + language header from the Figma CodeBlock component.
@@ -26,7 +27,7 @@ export default defineConfig({
   server: { port: 4322 },
   adapter: cloudflare({ prerenderEnvironment: "node" }),
   integrations: [mdx(), sitemap(), vue()],
-  vite: { plugins: [tailwindcss()] },
+  vite: { plugins: [tailwindcss(), minidvLocal()] },
   markdown: {
     shikiConfig: {
       themes: { dark: "github-dark-default", light: "github-light-default" },

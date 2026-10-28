@@ -1,0 +1,15 @@
+---
+// How a top-level destination (src/lib/nav.ts) is written: its label, or the mark that stands in for it.
+// The menu overlay and the bottom chapter nav both use this, so a new mark is added in one place.
+import InfinityMark from "./InfinityMark.astro";
+import MiniDvMark from "./MiniDvMark.astro";
+import type { NavIcon } from "../lib/nav";
+interface Props {
+  label: string;
+  icon?: NavIcon;
+  size: number;
+}
+const { label, icon, size } = Astro.props;
+---
+
+{icon === "infinity" ? <InfinityMark size={size} /> : icon === "minidv" ? <MiniDvMark size={size} /> : label}
