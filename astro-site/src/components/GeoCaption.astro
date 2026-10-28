@@ -2,7 +2,7 @@
 // "Oaxaca de Juárez, Mexico · 17.061° N, 96.726° W": the place, then the coordinates as a quiet link to Google Maps.
 // A written caption wins over the place. `prefix` goes first (a date, in the galleries).
 import { coordsLink, placeText } from "../lib/caption";
-import type { ApiMedia } from "../../../worker/src/types";
+import type { ApiMedia } from "../../worker/src/types";
 
 interface Props {
   m: Pick<ApiMedia, "place" | "geo" | "city" | "region" | "country" | "caption">;

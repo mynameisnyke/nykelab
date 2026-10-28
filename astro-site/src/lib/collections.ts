@@ -1,8 +1,8 @@
 // The only place the photo pages touch data. Today it reads D1 directly; if the
 // source changes (KV snapshot, another API) only this file needs to change.
 import { env } from "cloudflare:workers";
-import type { ApiMedia, Env, MediaRow } from "../../../worker/src/types";
-import { RESERVED_SLUGS, SLUG_RE, toApiMedia } from "../../../worker/src/util";
+import type { ApiMedia, Env, MediaRow } from "../../worker/src/types";
+import { RESERVED_SLUGS, SLUG_RE, toApiMedia } from "../../worker/src/util";
 import { cached } from "./cache";
 
 const db = () => (env as unknown as Env).DB;

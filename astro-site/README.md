@@ -1,11 +1,11 @@
 # nykelab · the Astro site (nykelab.nyc)
 
-The live site: Astro on one Cloudflare Worker, built from the Figma file ("Nyke Lab 2.0"). Every page is real HTML (SEO, link previews, RSS) with very little JavaScript. It shares the Worker API in `../worker` with the older Vue app in the repo root, which is no longer deployed (see `../README.md`).
+The live site: Astro on one Cloudflare Worker, built from the Figma file ("Nyke Lab 2.0"). Every page is real HTML (SEO, link previews, RSS) with very little JavaScript. The Hono API, the D1 migrations and the photo-ingest code live in `worker/`; `src/worker.ts` mounts them in front of the pages.
 
 - **Journal** (`/journal`, `/journal/<slug>`): markdown posts, prerendered.
 - **Photo pages** (`/<collection-slug>`, e.g. `/grand-tetons`) and **About** (`/about`): server-rendered from D1 on each request (short edge cache), so edits made in the admin appear without a rebuild.
 - **Admin** (`/admin`): the existing Vue admin as an Astro page with a Vue island (`client:only`), styled with Tailwind 4 scoped to that page. Guarded by Cloudflare Access plus the Worker's fail-closed `requireAdmin` (503 until `ACCESS_*` are set outside development).
-- **One Worker** (`src/worker.ts`): static assets → the existing Hono API (`../worker/src`, shared unchanged: `/api/*`, `/m/*` media from R2, analytics) → Astro pages.
+- **One Worker** (`src/worker.ts`): static assets → the Hono API (`worker/src`: `/api/*`, `/m/*` media from R2, analytics) → Astro pages.
 
 ```bash
 cd astro-site
@@ -142,7 +142,7 @@ Export from Lightroom with **All Metadata** and without "Remove Location Info", 
 
 The site has been live on https://nykelab.nyc since 25 Oct 2026 (`www` redirects to the apex; the staging address https://nykelab-astro.nykelab-astro.workers.dev stays up). Deploy with `npm run deploy` (build + `wrangler deploy`; it needs `wrangler login` as the account owner).
 
-`wrangler.jsonc` is production by default (`ENVIRONMENT: "production"`): `/admin` and `/api/admin/*` require a valid Cloudflare Access login. Local development gets `ENVIRONMENT=development` from `.dev.vars` (gitignored); in a new checkout recreate it: `echo ENVIRONMENT=development > astro-site/.dev.vars`.
+`wrangler.jsonc` is production by default (`ENVIRONMENT: "production"`): `/admin` and `/api/admin/*` require a valid Cloudflare Access login. Local development gets `ENVIRONMENT=development` from `.dev.vars` (gitignored); in a new checkout copy it from `.dev.vars.example`.
 
 How the domain was attached (kept for reference):
 
@@ -156,7 +156,6 @@ How the domain was attached (kept for reference):
 - `astro.config.mjs` sets `prerenderEnvironment: "node"`. With the default (`workerd`) prerendered routes returned 404 in `astro dev` when using the custom Hono entry.
 - `wrangler.jsonc` sets `html_handling: "drop-trailing-slash"` so `/journal` is served without a redirect.
 - The adapter also auto-adds a `SESSION` KV binding and an `IMAGES` binding (Cloudflare Images). Neither is used yet; `IMAGES` is how responsive image variants could replace the browser-side resizing in the admin uploader.
-- `hono` and `jose` are installed here and in the repo root, because `src/worker.ts` imports `../worker/src/*`. They would be one copy once the Vue app is retired.
 
 ## Not done yet
 

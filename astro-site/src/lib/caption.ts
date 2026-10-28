@@ -1,7 +1,7 @@
 // The line under a photograph or clip: where it was made, with GPS coordinates when we have them.
 //   "Oaxaca de Juárez, Mexico · 17.061° N, 96.726° W"       exact: from the photo, or matched to a phone photo taken at the same time
 //   "New Jersey · 40.79° N, 74.00° W"                           approximate (two decimals, about a kilometre)
-import type { ApiMedia } from "../../../worker/src/types";
+import type { ApiMedia } from "../../worker/src/types";
 
 type Geo = NonNullable<ApiMedia["geo"]>;
 

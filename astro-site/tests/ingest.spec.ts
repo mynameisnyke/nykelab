@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import fs from "node:fs";
-import { metaFromRaw, parseMeta, usableCaption } from "../../worker/src/ingest";
-import { countryCode, findCity, nearestCity } from "../../worker/src/places";
+import { metaFromRaw, parseMeta, usableCaption } from "../worker/src/ingest";
+import { countryCode, findCity, nearestCity } from "../worker/src/places";
 
 // Photo files with known tags (tests/fixtures, made with exiftool; see README "Upload metadata").
 const read = (n: string) => parseMeta(fs.readFileSync(`tests/fixtures/${n}.jpg`));

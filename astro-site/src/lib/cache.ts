@@ -1,7 +1,7 @@
 // Short-lived cache for the data every page needs (menu, home previews) so D1 is not re-scanned on each request.
 // Only in production: locally (and in tests) edits show immediately. Entries expire on their own; KV's minimum is 60 s.
 import { env } from "cloudflare:workers";
-import type { Env } from "../../../worker/src/types";
+import type { Env } from "../../worker/src/types";
 
 export async function cached<T>(key: string, ttlSeconds: number, load: () => Promise<T>): Promise<T> {
   const e = env as unknown as Env;

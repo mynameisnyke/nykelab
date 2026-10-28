@@ -1,15 +1,15 @@
 // Worker entry. Order matters: static assets → existing Hono API → Astro pages.
-// The API modules are shared with the Vue app's Worker (../worker/src) unchanged.
+// The API modules are in worker/src.
 import { Hono, type MiddlewareHandler } from "hono";
 import { cf } from "@astrojs/cloudflare/hono";
 import { middleware, pages } from "astro/hono";
-import { publicRoutes } from "../../worker/src/public";
-import { eventRoutes } from "../../worker/src/events";
-import { adminRoutes } from "../../worker/src/admin";
-import { statsRoutes } from "../../worker/src/stats";
-import { requireAdmin } from "../../worker/src/auth";
-import { wwwRedirect } from "../../worker/src/redirect";
-import type { AppEnv } from "../../worker/src/types";
+import { publicRoutes } from "../worker/src/public";
+import { eventRoutes } from "../worker/src/events";
+import { adminRoutes } from "../worker/src/admin";
+import { statsRoutes } from "../worker/src/stats";
+import { requireAdmin } from "../worker/src/auth";
+import { wwwRedirect } from "../worker/src/redirect";
+import type { AppEnv } from "../worker/src/types";
 
 const app = new Hono<AppEnv>();
 

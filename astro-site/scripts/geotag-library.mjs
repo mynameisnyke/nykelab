@@ -34,7 +34,7 @@ const MIN = 60000, HOUR = 3600000, DAY = 86400000;
 const photos = JSON.parse(fs.readFileSync(path.join(a.library, "photos/manifest.json"), "utf8")).photos;
 const catalog = JSON.parse(fs.readFileSync(new URL("../src/data/catalog.json", import.meta.url), "utf8"));
 const voyages = catalog.voyages;
-const cityData = JSON.parse(fs.readFileSync(new URL("../../worker/src/cities.json", import.meta.url), "utf8"));
+const cityData = JSON.parse(fs.readFileSync(new URL("../worker/src/cities.json", import.meta.url), "utf8"));
 const phoneRaw = JSON.parse(fs.readFileSync(a.phone, "utf8"));
 const phone = phoneRaw.map((p) => ({ ms: (p.t + (p.tz ?? 0)) * 1000, lat: p.lat, lon: p.lon })).sort((x, y) => x.ms - y.ms);
 
