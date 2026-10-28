@@ -713,5 +713,13 @@
   "norway_2022/C0011_s1": "norway_2022/C0012_s1",
   "norway_2022/C0015_s2": "norway_2022/C0022_s2",
   "texas_2021/C0013_s1": "texas_2021/C0011_s1"
+ },
+ "quality": {
+  "norway_2022/C0021_s1": "2.7 s of a concrete wall in heavy motion blur",
+  "norway_2022/DJI_0282_s1": "dull, soft top-down dock; the last two seconds drift to empty dark water",
+  "grand_teton_2022/DJI_0398_s1": "muddy, flat brown low-level ground footage; no grade rescues it",
+  "grand_teton_2022/DJI_0398_s2": "near-uniform brown frame, no usable content",
+  "yellowstone_2022/DJI_0399_s1": "dark, flat murky canyon floor",
+  "yellowstone_2022/DJI_0399_s2": "dark, flat, purple-grey murky frame"
  }
 }

@@ -1,4 +1,5 @@
 {
   "note": "Hand-picked layout for a collection page, by media id. `hero` is the photograph (or clip) that fills the top of the page; `next` is the item shown right after it, alone and centred. Anything not listed here follows the automatic rules (lib/hero.ts).",
-  "colorado": { "hero": "c9a71bb4d7f7", "next": "4c3cdbac50c7" }
+  "colorado": { "hero": "c9a71bb4d7f7", "next": "4c3cdbac50c7" },
+  "eureka": { "hero": "0c72f850e162" }
 }

@@ -9,8 +9,9 @@ interface Props {
   image?: string;
   type?: "website" | "article";
   published?: Date;
+  noindex?: boolean;
 }
-const { title, description, image, type = "website", published } = Astro.props;
+const { title, description, image, type = "website", published, noindex = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 // Pages without their own image share the logo card (public/og.png, source in scripts/og.html).
 const ogImage = new URL(image ?? "/og.png", Astro.site);
@@ -23,6 +24,7 @@ const ogImage = new URL(image ?? "/og.png", Astro.site);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title="nykelab journal" href="/journal/rss.xml" />

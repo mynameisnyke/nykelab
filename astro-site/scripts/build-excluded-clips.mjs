@@ -22,5 +22,8 @@ const out = {
   borderline: [...new Set(bl.flatMap((g) => g.drop))].sort(),
   keptFor,
 };
+// `quality` is kept by hand (clips that are unusable on their own: heavy blur, dull, empty); regenerating must not drop it
+const prev = fs.existsSync(new URL("../excluded-clips.json", import.meta.url)) ? JSON.parse(fs.readFileSync(new URL("../excluded-clips.json", import.meta.url), "utf8")) : {};
+if (prev.quality) out.quality = prev.quality;
 fs.writeFileSync(new URL("../excluded-clips.json", import.meta.url), JSON.stringify(out, null, 1) + "\n");
 console.log(`excluded ${out.excluded.length}, borderline ${out.borderline.length}`);

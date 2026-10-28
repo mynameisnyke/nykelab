@@ -4,6 +4,19 @@ Which published photographs are soft because they were exported small, and where
 
 Files: [`photo-quality-audit.csv`](photo-quality-audit.csv) (all 1,028 library photos, one row each, sorted by gallery) · [`photo-quality-re-export-list.txt`](photo-quality-re-export-list.txt) (the 598 source file paths to re-export). Read-only: nothing in `/Volumes/Whiskey` or Lightroom was changed.
 
+## Fixed (26 Oct 2026)
+
+- **Cause:** the grading pipeline (`photos/pipeline/stills.py`, `load_jpeg_linear`) read the camera's *embedded preview JPEG* as the source: 1616 px on the Sony ARW files, 1024 px on the DNGs. The 2560 px set was those previews, upscaled.
+- **Fix:** `photos/pipeline/render_web_fromraw.py` re-renders from the RAW data (same crop and orientation). It matches the RAW's tone and white balance to the approved preview, then applies the **unchanged per-photo grade fits**, so the look is the same with real 2560 px detail. Photos graded from a small preview are the only ones touched.
+- **Result:** 600 photographs re-rendered (598 were listed here; two more turned out to be under 2560 px in the manifest). 598 of them are now 2560 px on the long edge; 14 that were cropped frames were re-done at full decode size. **Two stay smaller** (Costa Rica `DSCF6707.RAF`, `DSCF6958.RAF`, about 1500 px and 1400 px): heavy crops of a 4896 px Fuji file, so the source really is that small; they are not hero-safe (`hero_ok = 0`).
+- **Published** to the live site the same day: the 600 replaced files uploaded (the other 822 skipped as unchanged), and their `rev` is now **3**, so URLs are `/m/<id>/w1440.webp?r=3` (new sized copies; the `r=2` copies are left in storage). Checked live: all 600 answer 200 at their full width, e.g. the Comic Con 2021 example `442b60552ddc` now serves 2400 px wide where it served 1024 px.
+- Not changed: the 430 photos that were already 2560 px (kept at rev 2). Lightroom-only edits (healing, local adjustments) are still not in these renders, as before.
+- **Second pass (26 Oct, after review of the live site):**
+  - *Washed-out photos:* 69 stills had a grade fit that started out of range (exposure pulled 1.5-2 stops, flat output, or a near-black / blown-out frame). `photos/pipeline/refit_hazy.py` re-fits tone from the RAW with exposure normalised first (white balance, tint and chroma kept), same method as `revisit.py`. Old fits are in `photos/work/params_before_refit/`, old renders in `photos/work/web2560_before_refit/`. Published as rev 4 (43 are live; the rest are curated near-duplicates, hidden).
+  - *Soft frames as covers:* a frame can be full size and still out of focus (the Cartagena cover `DSC06432.ARW` had its AF point in the sky, so the whole group is soft in the RAW). `photos/pipeline/sharpness.py` scores focus for every still (finest detail vs mid band on the most detailed tiles; stored as `sharp` in the manifest by `finalize_web.py`). `hero_ok` is now size **and** sharpness >= 0.40, so a soft frame is never picked automatically as a page hero or cover (it stays in the grids). The score also catches silhouettes; pick those by hand in `src/data/page-picks.json` if wanted.
+  - Cartagena's cover is now `DSC06434.ARW` (the sharp neighbour of the soft frame), through `data/gallery-curation.json` (soft frame hidden, sharp one restored and made the gallery cover). Checked live: all 34 collection pages use a clip or a hero-eligible still as their hero.
+- Everything below is the audit as it stood **before** the fix; the CSV is likewise the "before" state.
+
 ## What I found
 
 - **598 of the 1,028 library photographs (58%) were exported far below the size of their source file.** Only 430 are at the full 2560 px long edge.
@@ -105,7 +118,7 @@ File name, capture date, export size, published id (`/m/<id>/w1440.webp?r=2`). T
 
 `_7M39276.dng` 2022-08-19 (683x1024) `999fd648ca61`
 
-## How to use this
+## How to use this (superseded: done by `render_web_fromraw.py`; kept for the manual route)
 
 1. In Lightroom, find a photo by file name and capture date (the CSV has the Lightroom collection and the full path). The 598 paths in the re-export list can be pasted into a script or used to build a collection by file name.
 2. Export them from the **source file** (not the previews) at 2560 px on the long edge, JPEG, into the web2560 folder structure the publisher reads, then rerun `scripts/publish-library.mjs` (it replaces by id and bumps `rev` so caches refresh).

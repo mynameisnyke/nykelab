@@ -24,6 +24,8 @@ export interface CollectionPage {
   videos: number;
   /** Next collection in nav order, with a cover image for the "next chapter" block. */
   next?: NavItem & { cover?: Photo };
+  /** Reachable only by its address (collections.published = 2): not in the menu, the home page, Places / Years or any feed, and asks search engines to skip it. */
+  unlisted?: boolean;
 }
 
 const MAIN_EDGE = 2400; // keep in sync with src/lib/imageVariants.ts
@@ -71,7 +73,18 @@ export async function getCollectionPage(slug: string): Promise<CollectionPage | 
   if (!isCollectionSlug(slug)) return null;
   const nav = await getNav();
   const idx = nav.findIndex((n) => n.slug === slug);
-  if (idx < 0) return null;
+  if (idx < 0) {
+    // An unlisted collection (published = 2): every listing query filters on published = 1, so it appears nowhere but here.
+    const un = await db().prepare("SELECT slug, title FROM collections WHERE slug = ? AND published = 2").bind(slug).first<NavItem>();
+    if (!un) return null;
+    const rows = await db()
+      .prepare("SELECT m.* FROM media m WHERE m.published = 1 AND m.collection = ? ORDER BY m.position, m.created_at LIMIT 500")
+      .bind(slug)
+      .all<MediaRow>();
+    const um = rows.results.map(toApiMedia).map(withWidths);
+    if (!um.length) return null;
+    return { slug, title: un.title, media: um, images: um.filter((m) => m.type === "image").length, videos: um.filter((m) => m.type === "video").length, unlisted: true };
+  }
 
   const media = (await mediaFor(slug)).map(toApiMedia).map(withWidths);
   const nextItem = nav[(idx + 1) % nav.length];
