@@ -1,7 +1,7 @@
 // The Infinite Azure page: every published photograph that has an original (so sized variants exist), with the best of each
 // trip marked. The page front-loads those and then shuffles the rest.
 import { env } from "cloudflare:workers";
-import type { Env } from "../../../worker/src/types";
+import type { Env } from "../../worker/src/types";
 import { cached } from "./cache";
 
 /** [id, width, height, place, best (1 = one of its collection's top three), rev (file version, for the cache)] */

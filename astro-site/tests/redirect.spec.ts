@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { wwwRedirect } from "../../worker/src/redirect";
+import { wwwRedirect } from "../worker/src/redirect";
 
 test("www goes to the bare domain, keeping path and query; everything else is left alone", () => {
   expect(wwwRedirect("https://www.nykelab.nyc/")).toBe("https://nykelab.nyc/");

@@ -1,5 +1,5 @@
 {
-  // Prototype: one Worker = Hono API (shared with ../worker/src) + Astro pages.
+  // One Worker: the Hono API (worker/src) in front of the Astro pages.
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "nykelab-astro",
   "main": "./src/worker.ts",
@@ -11,14 +11,14 @@
     {
       "binding": "DB",
       "database_name": "nykelab",
-      "migrations_dir": "../worker/migrations"
+      "migrations_dir": "worker/migrations"
     }
   ],
   "r2_buckets": [{ "binding": "MEDIA", "bucket_name": "nykelab-media" }],
   // Astro sessions (the adapter adds this binding itself; naming the existing namespace stops wrangler
   // from trying to create a second one on every deploy).
   "kv_namespaces": [{ "binding": "SESSION", "id": "c6e0df0f085f44c981dbd72aae7ed382" }],
-  // Sized WebP variants are generated from originals on demand (see ../worker/src/public.ts).
+  // Sized WebP variants are generated from originals on demand (see worker/src/public.ts).
   "images": { "binding": "IMAGES" },
   // Event tracking: every page / photo / video event is written here (worker/src/events.ts); the admin Stats tab reads it back.
   // If a deploy ever fails with error 10089, Analytics Engine is not enabled on the account (dashboard > Storage & databases >

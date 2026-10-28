@@ -1,0 +1,25 @@
+name: check
+
+# Type-checks and builds the site on every push and pull request. The Playwright suite is not run here: it needs a seeded
+# local D1 / R2 (npm run seed) and the installed Chrome, so it stays a local step (npm test in astro-site).
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: astro-site
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: astro-site/package-lock.json
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build
