@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { PAGES, WITH_CHAPTER_NAV } from "./pages";
-import catalog from "../src/data/catalog.json";
+import catalog from "../src/data/catalog.json" with { type: "json" };
 
 const errorsOf = (page: Page) => {
   const errors: string[] = [];
