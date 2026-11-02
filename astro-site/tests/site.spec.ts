@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { PAGES, WITH_CHAPTER_NAV } from "./pages";
+import catalog from "../src/data/catalog.json";
 
 const errorsOf = (page: Page) => {
   const errors: string[] = [];
@@ -216,9 +217,10 @@ test("archive tabs are the same four on every archive page, with the current one
   }
 });
 
-test("home: the four event voyages carry an Event tag, trips do not", async ({ page }) => {
+test("home: the catalog's events carry an Event tag, trips do not", async ({ page }) => {
+  const events = catalog.voyages.filter((v) => v.kind === "event");
   await page.goto("/");
-  await expect(page.locator("#voyage-list .kind")).toHaveCount(4);
+  await expect(page.locator("#voyage-list .kind")).toHaveCount(events.length);
   await expect(page.locator("#voyage-list li", { hasText: "Comic Con 2022" }).locator(".kind")).toHaveText("Event");
   await expect(page.locator("#voyage-list li", { hasText: "Oaxaca" }).locator(".kind")).toHaveCount(0);
 });
