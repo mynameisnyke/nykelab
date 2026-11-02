@@ -1,7 +1,8 @@
-// Behaviour for photo pages: fade items in/out on scroll, and report views.
+// Behaviour for photo pages: fade items in/out on scroll, report views, and the click-to-enlarge lightbox.
 // Replaces GSAP fades + useMediaTracking from the Vue components.
 import { track } from "../lib/track";
 import { initVideos } from "./video";
+import { initLightbox } from "./lightbox";
 
 const VIEW_DWELL_MS = 1000;
 const MILESTONES = [25, 50, 75];
@@ -41,7 +42,15 @@ export function initPhotos() {
   document.querySelectorAll<HTMLElement>("[data-media]").forEach((el) => seen.observe(el));
 
   const stopVideos = initVideos();
-  document.addEventListener("astro:before-swap", () => stopVideos(), { once: true });
+  const stopLightbox = initLightbox();
+  document.addEventListener(
+    "astro:before-swap",
+    () => {
+      stopVideos();
+      stopLightbox();
+    },
+    { once: true },
+  );
 }
 
 function watchVideo(v: HTMLVideoElement, extra: { id: string; collection?: string }) {

@@ -4,6 +4,7 @@
 import Base from "../../layouts/Base.astro";
 import Navbar from "../../components/Navbar.astro";
 import ChapterNav from "../../components/ChapterNav.astro";
+import Lightbox from "../../components/Lightbox.astro";
 import GalleryHero from "../../components/GalleryHero.astro";
 import MetaStrip from "../../components/MetaStrip.astro";
 import MonthBars from "../../components/MonthBars.astro";
@@ -60,6 +61,7 @@ const hero = y ? images[heroImage(images, y.photos[0] ?? -1, y.photos)] : undefi
       </main>
     )
   }
+  <Lightbox />
   <ChapterNav />
 </Base>
 

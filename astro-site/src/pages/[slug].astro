@@ -11,6 +11,7 @@ import GeoCaption from "../components/GeoCaption.astro";
 import { applyPicks } from "../lib/hero";
 import picks from "../data/page-picks.json";
 import { placeText } from "../lib/caption";
+import Lightbox from "../components/Lightbox.astro";
 
 export const prerender = false;
 
@@ -133,6 +134,7 @@ const hasCaption = (m: Photo) => !!(m.caption || placeText(m));
           )
         }
       </main>
+      <Lightbox />
       <ChapterNav />
     )
   }

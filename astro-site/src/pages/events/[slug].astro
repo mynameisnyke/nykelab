@@ -4,6 +4,7 @@
 import Base from "../../layouts/Base.astro";
 import Navbar from "../../components/Navbar.astro";
 import ChapterNav from "../../components/ChapterNav.astro";
+import Lightbox from "../../components/Lightbox.astro";
 import GalleryHero from "../../components/GalleryHero.astro";
 import MetaStrip from "../../components/MetaStrip.astro";
 import GalleryGroup from "../../components/GalleryGroup.astro";
@@ -58,6 +59,7 @@ const hero = event ? images[heroImage(images, event.cover, event.editions.map((i
       </main>
     )
   }
+  <Lightbox />
   <ChapterNav />
 </Base>
 

@@ -104,6 +104,10 @@ npm run catalog -- /Volumes/Whiskey/photos-3plus-or-picked.csv   # rerun wheneve
 
 Layout rhythm (same idea as the Vue `CollectionView`, using the Figma sections): hero = first landscape item; remaining landscapes alternate full-bleed / inset; runs of portraits become 1–3-up rows; the next collection is shown as "Next chapter".
 
+### Lightbox
+
+Click or tap a photograph to enlarge it (`src/scripts/lightbox.ts`, markup in `src/components/Lightbox.astro`, started from `initPhotos()` and torn down on `astro:before-swap`). It flies from its place on the page to the centre over a black backdrop (transform + clip-path, so a cover-cropped tile opens up into the full frame); ← → or a swipe step through the page, Esc / × / the backdrop / a swipe down close it. The page's own file shows first and the largest `srcset` variant replaces it once decoded. The address gets `#<media id>` through Astro's `navigate()` — pushing the hash any other way makes the next Back a full page swap — so Back closes it and a shared link opens that photograph.
+
 ## Video (local watcher; the converted clips are what the site serves)
 
 Video is for short, silent background clips (10–30 s, like the New York Times' interactive features): muted, inline, looping, playing only while on screen.
