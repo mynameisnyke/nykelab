@@ -54,6 +54,11 @@ export const VOYAGES = [
   { id: "oaxaca", title: "Oaxaca", kind: "trip", placeSlug: "oaxaca", placeName: "Oaxaca", country: "Mexico", tz: "America/Mexico_City", place: "Oaxaca, Mexico", lat: 17.07, lon: -96.73, theme: "city", collections: ["Oaxaca", "Oaxaca Web Selects"] },
   { id: "new-jersey", title: "New Jersey", kind: "trip", placeSlug: "new-jersey", placeName: "New Jersey", country: "United States", tz: "America/New_York", place: "New Jersey", lat: 40.72, lon: -74.17, approx: true, theme: "city", collections: ["Chiyuki House 2025 New Jersey", "New Jersey"] },
   { id: "pennsylvania", title: "Pennsylvania", kind: "trip", hidden: true, placeSlug: "pennsylvania", placeName: "Pennsylvania", country: "United States", tz: "America/New_York", place: "Sesame Place, Pennsylvania", lat: 40.18, lon: -74.92, approx: true, theme: "city", collections: ["Fist Time Sesame Place 2025"] },
+  // Hex's Series D at the Nasdaq MarketSite (29 Oct 2026): a one-off event, no series page. The Lightroom collection was still empty when the
+  // catalogue was rebuilt, so its 33 frames were appended to the CSV by hand (photos-3plus-or-picked+hex.csv) from the catalog's own metadata.
+  // Halloween 2026 (30 Oct 2026, morning): a one-off event, no series page; its 34 frames were appended to the CSV from the catalog (the Lightroom collection was empty).
+  { id: "halloween-2026", title: "Halloween 2026", kind: "event", ...NYC, place: "New York", lat: 40.73, lon: -73.99, approx: true, theme: "city", collections: ["Halloween 2026"] },
+  { id: "hex-series-d", title: "Hex Series D", kind: "event", ...NYC, place: "Times Square, New York", lat: 40.757, lon: -73.986, theme: "city", collections: ["Hex Series D"] },
 ];
 
 // Recurring events: one page per series, one gallery group per edition.

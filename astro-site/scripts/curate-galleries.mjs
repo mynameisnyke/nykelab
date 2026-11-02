@@ -29,12 +29,12 @@ const q = (s) => `'${String(s).replace(/'/g, "''")}'`;
 
 function run(sql) {
   if (a["dry-run"]) return console.log(sql);
-  const tmp = path.join(os.tmpdir(), "curate-galleries.sql");
-  fs.writeFileSync(tmp, sql);
+  if (!sql.trim()) return;
+  // as one --command: in wrangler 4.15x a --file goes through the import API, which takes the database offline and fails on long scripts
   return new Promise((resolve, reject) => {
-    const p = spawn("npx", ["wrangler", "d1", "execute", "DB", ...where, "--file", tmp], { stdio: ["ignore", "inherit", "inherit"] });
+    const p = spawn("npx", ["wrangler", "d1", "execute", "DB", ...where, "--command", sql], { stdio: ["ignore", "inherit", "inherit"] });
     p.on("close", (code) => (code === 0 ? resolve() : reject(new Error(`wrangler failed (${code})`))));
-  }).finally(() => fs.rmSync(tmp, { force: true }));
+  });
 }
 
 const sql = [];

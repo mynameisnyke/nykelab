@@ -10,8 +10,10 @@ interface Props {
   surface?: "page" | "media";
   /** Collections from the database; the static list below is only a fallback. */
   collections?: { slug: string; title: string }[];
+  /** "hexify": the header's theme button becomes the HEX wordmark + "ify", which swaps the page's photographs to their film-look twins (pages/[slug].astro). */
+  feature?: "hexify";
 }
-const { surface = "page", collections } = Astro.props;
+const { surface = "page", collections, feature } = Astro.props;
 // Prerendered pages (the journal) can't read D1 at build time: their voyages group starts empty
 // and the script below fills it from /api/collections when the menu first opens.
 const fill = collections === undefined;
@@ -21,12 +23,21 @@ const footer = [{ label: "Email", href: "mailto:nyke@nykelab.nyc" }];
 ---
 
 <header class:list={["navbar", { media: surface === "media" }]}>
-  <button class="icon-btn" type="button" data-theme-toggle aria-label="Toggle light / dark theme">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M19.5 14.2A8 8 0 0 1 9.8 4.5a8 8 0 1 0 9.7 9.7Z"></path>
-      <path d="M18 2.5v4M16 4.5h4"></path>
-    </svg>
-  </button>
+  {
+    feature === "hexify" ? (
+      <button class="icon-btn hexify" type="button" data-hexify aria-pressed="false" aria-label="HEXify: show the photographs in the Hex film look">
+        <span class="hex-mark" aria-hidden="true" />
+        <span class="ify" aria-hidden="true">ify</span>
+      </button>
+    ) : (
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Toggle light / dark theme">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M19.5 14.2A8 8 0 0 1 9.8 4.5a8 8 0 1 0 9.7 9.7Z" />
+          <path d="M18 2.5v4M16 4.5h4" />
+        </svg>
+      </button>
+    )
+  }
   <a class="wordmark" href="/" data-astro-reload><Logo /></a>
   <button class="icon-btn" type="button" data-menu-open aria-label="Open menu" aria-expanded="false" aria-controls="menu">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
@@ -140,6 +151,32 @@ const footer = [{ label: "Email", href: "mailto:nyke@nykelab.nyc" }];
   .icon-btn {
     width: 32px;
     height: 32px;
+  }
+  /* HEXify: the HEX wordmark (public/hex/hex-white.png as a mask, so it takes the icon colour: white over a photo) followed by "ify". */
+  .icon-btn.hexify {
+    width: auto;
+    gap: 1px;
+    padding: 0 2px;
+    justify-self: start;
+    transition: color 0.3s ease;
+  }
+  .hex-mark {
+    display: inline-block;
+    width: 46px;
+    height: 19px;
+    background: currentColor;
+    -webkit-mask: url("/hex/hex-white.png") center / contain no-repeat;
+    mask: url("/hex/hex-white.png") center / contain no-repeat;
+  }
+  .ify {
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .hexify[aria-pressed="true"] {
+    color: #f5c0c0;
   }
   .wordmark {
     display: inline-flex;

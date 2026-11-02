@@ -1,8 +1,8 @@
 # Catalog build report
 
-Source: `photos-3plus-or-picked.csv`. Regenerate: `npm run catalog -- <csv>`. Overrides: `scripts/catalog/clock-overrides.json`.
+Source: `photos-3plus-or-picked+hex.csv`. Regenerate: `npm run catalog -- <csv>`. Overrides: `scripts/catalog/clock-overrides.json`.
 
-- 7393 rows -> **6678 photographs** in **35 voyages**
+- 7613 rows -> **6898 photographs** in **37 voyages**
 - dropped: 70 rejects, 644 duplicates (same photo in several collections), 0 without a capture date, 1 not near any voyage's dates
 
 ## Voyages
@@ -19,7 +19,7 @@ Source: `photos-3plus-or-picked.csv`. Regenerate: `npm run catalog -- <csv>`. Ov
 | São Paulo | trip | 35 | 2019-02-26 to 2019-03-03 | São Paulo, Brazil |  |
 | Mexico City | trip | 50 | 2019-05-03 to 2019-05-05 | Mexico City |  |
 | Costa Rica | trip | 7 | 2019-12-11 to 2019-12-12 | Costa Rica (**approximate**) |  |
-| Wyoming 2020 | trip | 123 | 2020-01-05 to 2020-01-08 | Grand Teton and Yellowstone, Wyoming |  |
+| Wyoming | trip | 123 | 2020-01-05 to 2020-01-08 | Grand Teton and Yellowstone, Wyoming |  |
 | Medellín | trip | 1051 | 2020-01-28 to 2020-01-31 | Medellín, Colombia | 733 photos in 4 group(s) |
 | Cartagena | trip | 986 | 2020-01-29 to 2020-02-02 | Cartagena, Colombia | 928 photos in 1 group(s) |
 | Westminster 2020 | event | 135 | 2020-02-08 to 2020-02-08 | Piers 92/94, New York | 135 photos in 1 group(s) |
@@ -29,21 +29,23 @@ Source: `photos-3plus-or-picked.csv`. Regenerate: `npm run catalog -- <csv>`. Ov
 | Texas | trip | 758 | 2021-02-06 to 2021-02-09 | Texas (**approximate**) | 453 photos in 3 group(s) |
 | Westminster 2021 | event | 468 | 2021-06-10 to 2021-06-12 | Lyndhurst, Tarrytown, New York | 263 photos in 2 group(s) |
 | Colorado | trip | 361 | 2021-08-05 to 2021-08-07 | Colorado (**approximate**) |  |
-| NYCC 2021 | event | 69 | 2021-10-06 to 2021-10-08 | Javits Center, New York | 68 photos in 2 group(s) |
+| Comic Con 2021 | event | 69 | 2021-10-06 to 2021-10-08 | Javits Center, New York | 68 photos in 2 group(s) |
 | Arizona | trip | 154 | 2021-11-17 to 2021-11-20 | Sedona, Arizona | 56 photos in 1 group(s) |
 | New Mexico | trip | 138 | 2021-12-17 to 2021-12-18 | New Mexico (**approximate**) |  |
 | Lisbon | trip | 37 | 2022-04-02 to 2022-04-02 | Lisbon, Portugal |  |
 | Madeira | trip | 227 | 2022-04-04 to 2022-04-05 | Madeira, Portugal |  |
 | Stockholm | trip | 12 | 2022-09-01 to 2022-09-09 | Stockholm, Sweden |  |
 | Norway | trip | 289 | 2022-09-03 to 2022-09-07 | Norway (**approximate**) |  |
-| Wyoming 2022 | trip | 194 | 2022-09-23 to 2022-09-26 | Grand Teton and Yellowstone, Wyoming |  |
-| NYCC 2022 | event | 120 | 2022-10-06 to 2022-10-08 | Javits Center, New York |  |
+| Wyoming | trip | 194 | 2022-09-23 to 2022-09-26 | Grand Teton and Yellowstone, Wyoming |  |
+| Comic Con 2022 | event | 120 | 2022-10-06 to 2022-10-08 | Javits Center, New York |  |
 | Brighton | trip | 7 | 2023-05-07 to 2023-05-07 | Brighton, England |  |
 | Ecuador | trip | 162 | 2023-05-09 to 2023-05-12 | Ecuador (refined from 13 GPS photos) |  |
 | Bogotá | trip | 231 | 2023-05-12 to 2023-05-14 | Bogotá, Colombia |  |
 | Oaxaca | trip | 77 | 2025-02-19 to 2025-02-26 | Oaxaca, Mexico |  |
 | New Jersey | trip | 70 | 2025-04-26 to 2025-05-25 | New Jersey (**approximate**) |  |
 | Pennsylvania | trip | 4 | 2025-06-29 to 2025-06-29 | Sesame Place, Pennsylvania (**approximate**) |  |
+| Hex Series D | event | 33 | 2026-10-29 to 2026-10-29 | Times Square, New York |  |
+| Halloween 2026 | event | 187 | 2026-10-30 to 2026-10-30 | New York (**approximate**) |  |
 
 ## Clock: groups flipped by 12 hours (same date)
 

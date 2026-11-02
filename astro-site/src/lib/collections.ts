@@ -103,6 +103,25 @@ export async function getCollectionPage(slug: string): Promise<CollectionPage | 
   };
 }
 
+/**
+ * The film-look twins of a collection's photographs: a storage-only sibling collection (collections.published = 0) whose rows carry the same
+ * catalog id under another folder (`hex_series_d/123` ↔ `hex_series_d_film/123`). Main media id → the twin, for a page that swaps looks in place.
+ */
+export async function getAltLooks(slug: string, altSlug: string): Promise<Map<string, Photo>> {
+  const { results } = await db()
+    .prepare(
+      `SELECT main.id AS main_id, alt.* FROM media alt JOIN media main
+          ON main.collection = ? AND main.type = 'image' AND main.source_id IS NOT NULL
+         AND substr(main.source_id, instr(main.source_id, '/') + 1) = substr(alt.source_id, instr(alt.source_id, '/') + 1)
+        WHERE alt.collection = ? AND alt.published = 1 AND alt.type = 'image' AND alt.source_id IS NOT NULL`,
+    )
+    .bind(slug, altSlug)
+    .all<MediaRow & { main_id: string }>();
+  const out = new Map<string, Photo>();
+  for (const row of results) out.set(row.main_id, withWidths(toApiMedia(row)));
+  return out;
+}
+
 // ---- Home visualization ---------------------------------------------------------
 
 export interface PreviewPool {

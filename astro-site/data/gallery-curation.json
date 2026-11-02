@@ -1,363 +1,4584 @@
 {
  "note": "Photos hidden from their gallery for being near-duplicates of a neighbour (not deleted: files and rows stay). Hidden = media.published 0. 'like' is the kept photo it resembles; 'n' is its place in the gallery before hiding. Undo one: delete its entry (or run scripts/curate-galleries.mjs --restore <id|gallery>), then rerun the publisher or the script. 'covers' puts one photo first in a gallery (was = its old position).",
- "covers": {"nycc-2022": {"id": "c4ed90ce01be", "was": 14}, "cartagena": {"id": "0f7e813bf74c", "was": 85}},
+ "covers": {
+  "nycc-2022": {
+   "id": "c4ed90ce01be",
+   "was": 14
+  },
+  "cartagena": {
+   "id": "0f7e813bf74c",
+   "was": 85
+  }
+ },
  "hidden": [
-  {"id": "1d63097de311", "gallery": "japan", "n": 11, "like": "3537ea53ef00"},
-  {"id": "322c558ae08d", "gallery": "japan", "n": 14, "like": "132e3c04655e"},
-  {"id": "13704932e89b", "gallery": "japan", "n": 15, "like": "132e3c04655e"},
-  {"id": "5a237d289043", "gallery": "amsterdam", "n": 5, "like": "e8eb39de0256"},
-  {"id": "8061af18105e", "gallery": "iceland", "n": 5, "like": "2ee026edc5ad"},
-  {"id": "81672bbc654a", "gallery": "iceland", "n": 9, "like": "2514ed72568c"},
-  {"id": "6a04807dbaea", "gallery": "iceland", "n": 11, "like": "f75a33eea283"},
-  {"id": "4de6fde2e8a1", "gallery": "iceland", "n": 17, "like": "8ed54d8fafdf"},
-  {"id": "367b3038962d", "gallery": "iceland", "n": 19, "like": "853e4fb34196"},
-  {"id": "30230c04e0b2", "gallery": "barbados", "n": 9, "like": "7917b4abb34d"},
-  {"id": "e24c30734768", "gallery": "rio", "n": 10, "like": "40c7788f2424"},
-  {"id": "3d79482ebb75", "gallery": "sao-paulo", "n": 2, "like": "9cb155c525b5"},
-  {"id": "dec40e44c86f", "gallery": "sao-paulo", "n": 12, "like": "da0adc774e70"},
-  {"id": "bd9673c6078e", "gallery": "sao-paulo", "n": 19, "like": "9dc07953a37b"},
-  {"id": "7533005d6139", "gallery": "mexico-city", "n": 10, "like": "9bb30d4a392d"},
-  {"id": "df42d948c2d9", "gallery": "mexico-city", "n": 15, "like": "0f3de77a3927"},
-  {"id": "bf4a091b8726", "gallery": "mexico-city", "n": 20, "like": "62d0c3ccf58b"},
-  {"id": "9e46d1de7d00", "gallery": "costa-rica", "n": 6, "like": "ab2af5528ebc"},
-  {"id": "84a44aa71bfe", "gallery": "medellin", "n": 6, "like": "a240288adf06"},
-  {"id": "fe3321c773c1", "gallery": "medellin", "n": 9, "like": "a240288adf06"},
-  {"id": "366850976339", "gallery": "medellin", "n": 10, "like": "a473e94a111c"},
-  {"id": "baa06e52f97b", "gallery": "medellin", "n": 12, "like": "ab357fcae081"},
-  {"id": "ec4a8af999d4", "gallery": "medellin", "n": 13, "like": "2ab3f934193f"},
-  {"id": "9fee18878801", "gallery": "medellin", "n": 24, "like": "059fa7107fd4"},
-  {"id": "58a06fc1b3c3", "gallery": "medellin", "n": 25, "like": "5bf464df1085"},
-  {"id": "69d8d88d29cc", "gallery": "medellin", "n": 30, "like": "a45cb91f5d8d"},
-  {"id": "7b59c8952fb0", "gallery": "medellin", "n": 33, "like": "ed533827de9e"},
-  {"id": "f2491968a24c", "gallery": "medellin", "n": 36, "like": "29293d5231c2"},
-  {"id": "b683fbbd6ab0", "gallery": "medellin", "n": 37, "like": "3b99f66463dc"},
-  {"id": "ab018e05429a", "gallery": "medellin", "n": 39, "like": "2ab3f934193f"},
-  {"id": "c85c93558d87", "gallery": "medellin", "n": 43, "like": "612a2ea4125d"},
-  {"id": "0324ade8309a", "gallery": "medellin", "n": 45, "like": "0531206f5808"},
-  {"id": "64118c0844ba", "gallery": "medellin", "n": 47, "like": "26a5d3eb6392"},
-  {"id": "8800c5c55b0c", "gallery": "medellin", "n": 49, "like": "26a5d3eb6392"},
-  {"id": "d85e7fadf1a9", "gallery": "medellin", "n": 50, "like": "26a5d3eb6392"},
-  {"id": "7196d52e94cb", "gallery": "cartagena", "n": 7, "like": "a325614882af"},
-  {"id": "c670a60ce042", "gallery": "cartagena", "n": 9, "like": "e41c8b8e2fa4"},
-  {"id": "f82470bb2bd7", "gallery": "cartagena", "n": 13, "like": "b58bd55b2828"},
-  {"id": "841ede719db5", "gallery": "cartagena", "n": 18, "like": "5719ed629bd3"},
-  {"id": "81cd85e6776c", "gallery": "cartagena", "n": 19, "like": "c593d02efeaf"},
-  {"id": "b36e08d39b53", "gallery": "cartagena", "n": 21, "like": "e41c8b8e2fa4"},
-  {"id": "615cdbf52dcf", "gallery": "cartagena", "n": 26, "like": "5719ed629bd3"},
-  {"id": "d3473dd1cf30", "gallery": "cartagena", "n": 29, "like": "4ea29399548c"},
-  {"id": "94a557237ded", "gallery": "cartagena", "n": 37, "like": "779a57d9d18b"},
-  {"id": "6f41dab61c95", "gallery": "cartagena", "n": 45, "like": "5719ed629bd3"},
-  {"id": "8ec0805f5c6e", "gallery": "cartagena", "n": 48, "like": "5091f63b9ff0"},
-  {"id": "7b7e35736e5d", "gallery": "cartagena", "n": 53, "like": "a08892570670"},
-  {"id": "552a62a6fa98", "gallery": "cartagena", "n": 56, "like": "2c878167d885"},
-  {"id": "e77706c3c03c", "gallery": "cartagena", "n": 58, "like": "08f6725696c9"},
-  {"id": "960aea9f71c4", "gallery": "cartagena", "n": 60, "like": "3b196d4bc0d8"},
-  {"id": "fcd392752612", "gallery": "cartagena", "n": 64, "like": "fd7d8967178d"},
-  {"id": "2f8889d820a8", "gallery": "cartagena", "n": 65, "like": "e41c8b8e2fa4"},
-  {"id": "e33a0b4433b3", "gallery": "cartagena", "n": 67, "like": "6ed3e2804281"},
-  {"id": "6ccf086b589c", "gallery": "cartagena", "n": 71, "like": "7ba40c4c752f"},
-  {"id": "a5fdb8175e4e", "gallery": "cartagena", "n": 72, "like": "93f60217ee99"},
-  {"id": "b0476a193934", "gallery": "cartagena", "n": 73, "like": "5719ed629bd3"},
-  {"id": "3e5e3e592f6a", "gallery": "cartagena", "n": 74, "like": "e41c8b8e2fa4"},
-  {"id": "f6dc09f2da13", "gallery": "cartagena", "n": 75, "like": "2c878167d885"},
-  {"id": "635b9a2985d1", "gallery": "cartagena", "n": 76, "like": "e41c8b8e2fa4"},
-  {"id": "c0f6b073a0fd", "gallery": "cartagena", "n": 77, "like": "4ea29399548c"},
-  {"id": "f40046501388", "gallery": "cartagena", "n": 79, "like": "5c05e97834fa"},
-  {"id": "872f26c73edd", "gallery": "cartagena", "n": 85, "like": null, "why": "almost black frame"},
-  {"id": "18485cac3cbb", "gallery": "cartagena", "n": 90, "like": "a325614882af"},
-  {"id": "b5ff0819193f", "gallery": "cartagena", "n": 92, "like": "6ed3e2804281"},
-  {"id": "341c901a41b9", "gallery": "westminster-2020", "n": 10, "like": "c523ac92d74d"},
-  {"id": "d0a8e7fa7797", "gallery": "westminster-2020", "n": 12, "like": "ae4ceaee15d4"},
-  {"id": "0117880754be", "gallery": "westminster-2020", "n": 14, "like": "a7a29ff2893d"},
-  {"id": "2fa03a334c83", "gallery": "westminster-2020", "n": 16, "like": "499baae19488"},
-  {"id": "f918b0b24927", "gallery": "westminster-2020", "n": 18, "like": "2e7facf26eaf"},
-  {"id": "f4d54e6ea821", "gallery": "westminster-2020", "n": 26, "like": "bb11c60c9481"},
-  {"id": "801e61c54d4e", "gallery": "westminster-2020", "n": 30, "like": "01b6965470fb"},
-  {"id": "28cd8915c1e7", "gallery": "westminster-2020", "n": 34, "like": "56ca831ab13f"},
-  {"id": "c7cba519dc50", "gallery": "westminster-2020", "n": 38, "like": "b93d3e1d5c37"},
-  {"id": "c0b349537631", "gallery": "westminster-2020", "n": 39, "like": "ee3eb803e85e"},
-  {"id": "f8c512f31824", "gallery": "new-york", "n": 4, "like": "1dad43aa994d"},
-  {"id": "2b6217d08466", "gallery": "new-york", "n": 8, "like": "95f8a639e888"},
-  {"id": "7d2a15ef01e1", "gallery": "new-york", "n": 10, "like": "1dad43aa994d"},
-  {"id": "01f4ea267311", "gallery": "new-york", "n": 11, "like": "eb315b08853e"},
-  {"id": "13ebf0d4e7d9", "gallery": "new-york", "n": 17, "like": "eb315b08853e"},
-  {"id": "8663292554c9", "gallery": "new-york", "n": 28, "like": "46253e4cf267"},
-  {"id": "097fababd60d", "gallery": "new-york", "n": 29, "like": "0b6ece76a849"},
-  {"id": "e3fe5b67e69a", "gallery": "new-york", "n": 38, "like": "7afb60ce0adb"},
-  {"id": "3dc439532ac0", "gallery": "new-york", "n": 40, "like": "ed23360c189e"},
-  {"id": "b2725b3db949", "gallery": "new-york", "n": 43, "like": "7afb60ce0adb"},
-  {"id": "b91944ea5292", "gallery": "new-york", "n": 47, "like": "6e833239f6f9"},
-  {"id": "01fd357216c2", "gallery": "new-york", "n": 52, "like": "3d295d89f021"},
-  {"id": "2d6ad81e31bc", "gallery": "new-york", "n": 53, "like": "b381d57dd0c6"},
-  {"id": "5a0c5e79150c", "gallery": "new-york", "n": 56, "like": "0b6ece76a849"},
-  {"id": "8e04d91cc379", "gallery": "new-york", "n": 60, "like": "0b6ece76a849"},
-  {"id": "6aa173032f13", "gallery": "new-york", "n": 63, "like": "2ad16d709a39"},
-  {"id": "5cbec0de32cd", "gallery": "new-york", "n": 66, "like": "fca51028c2e6"},
-  {"id": "9d66c5a3ffe8", "gallery": "new-york", "n": 72, "like": "eb315b08853e"},
-  {"id": "1d8c64e65557", "gallery": "new-york", "n": 79, "like": "90beb81cff51"},
-  {"id": "bf4763e945a4", "gallery": "new-york", "n": 82, "like": "f1981466d843"},
-  {"id": "2ca1b9d220c1", "gallery": "new-york", "n": 85, "like": "eb315b08853e"},
-  {"id": "12f9c7b5b8d2", "gallery": "new-york", "n": 90, "like": "95f8a639e888"},
-  {"id": "5b98e0a248a5", "gallery": "texas", "n": 7, "like": "df01d1ea7fcb"},
-  {"id": "6153647c7e36", "gallery": "texas", "n": 15, "like": "30a0f8108096"},
-  {"id": "289ea57f8ae5", "gallery": "texas", "n": 16, "like": "1175c37edb8d"},
-  {"id": "91018a0b365c", "gallery": "texas", "n": 18, "like": "5264fd60eb8c"},
-  {"id": "be4dc6247c08", "gallery": "texas", "n": 19, "like": "521f0619f796"},
-  {"id": "236277f11c64", "gallery": "texas", "n": 24, "like": "521f0619f796"},
-  {"id": "666d291cd98b", "gallery": "texas", "n": 25, "like": "69225755ddb4"},
-  {"id": "6d1968b38a68", "gallery": "texas", "n": 26, "like": "922aadcf40d6"},
-  {"id": "14e9855a07c2", "gallery": "texas", "n": 30, "like": "6a41616e9c55"},
-  {"id": "1378db9b076a", "gallery": "texas", "n": 37, "like": "ed1a4ea5004f"},
-  {"id": "bbb335999a90", "gallery": "texas", "n": 38, "like": "3d18d80da33f"},
-  {"id": "d85b3659614e", "gallery": "texas", "n": 40, "like": "0a3e8e2f0485"},
-  {"id": "ea8f4e397211", "gallery": "westminster-2021", "n": 5, "like": "8702596d1c41"},
-  {"id": "afab491f0f6f", "gallery": "westminster-2021", "n": 11, "like": "3303031e0c9d"},
-  {"id": "ed38c671ba09", "gallery": "westminster-2021", "n": 18, "like": "9ef3f2134f25"},
-  {"id": "f16207fd4b89", "gallery": "westminster-2021", "n": 22, "like": "093d386c8548"},
-  {"id": "324c5793eeb8", "gallery": "westminster-2021", "n": 27, "like": "9c6a821cc4d1"},
-  {"id": "f05a1ce555d3", "gallery": "westminster-2021", "n": 28, "like": "64358849a35e"},
-  {"id": "6148ff236002", "gallery": "westminster-2021", "n": 32, "like": "87c41d6f4fc7"},
-  {"id": "3a5c2ea67b23", "gallery": "westminster-2021", "n": 35, "like": "9c6a821cc4d1"},
-  {"id": "4189779798de", "gallery": "westminster-2021", "n": 39, "like": "21c1ca986ed2"},
-  {"id": "ea1ad9ef5c28", "gallery": "westminster-2021", "n": 42, "like": "8c34d1d8506d"},
-  {"id": "bc2563400f68", "gallery": "westminster-2021", "n": 43, "like": "a690c30b4674"},
-  {"id": "184c9ab87941", "gallery": "westminster-2021", "n": 45, "like": "62f5a591e097"},
-  {"id": "943bbbea9679", "gallery": "westminster-2021", "n": 47, "like": "a690c30b4674"},
-  {"id": "64d6d3c68492", "gallery": "westminster-2021", "n": 49, "like": "fe34ca3976cf"},
-  {"id": "e64dfa0145fe", "gallery": "westminster-2021", "n": 52, "like": "21c1ca986ed2"},
-  {"id": "c42374c42d79", "gallery": "colorado", "n": 8, "like": "c9a71bb4d7f7"},
-  {"id": "9d2fc5d5c108", "gallery": "colorado", "n": 11, "like": "67d384d3a2a8"},
-  {"id": "5ae58fc3c1c5", "gallery": "colorado", "n": 15, "like": "1f5613624a2a"},
-  {"id": "067d085e85ea", "gallery": "colorado", "n": 16, "like": "67d384d3a2a8"},
-  {"id": "3949f020fa70", "gallery": "colorado", "n": 17, "like": "990efdaed0b8"},
-  {"id": "db48bea3ea63", "gallery": "colorado", "n": 18, "like": "0118a8eea237"},
-  {"id": "bc0c9dded6e0", "gallery": "colorado", "n": 19, "like": "1d7cdf0c1536"},
-  {"id": "0c20794b0b8e", "gallery": "colorado", "n": 20, "like": "1628cad856a3"},
-  {"id": "809341a3cf8e", "gallery": "colorado", "n": 26, "like": "0118a8eea237"},
-  {"id": "d650a30f46b9", "gallery": "colorado", "n": 27, "like": "39fae5dfbe33"},
-  {"id": "41638aa27c45", "gallery": "colorado", "n": 30, "like": "1628cad856a3"},
-  {"id": "4021791e43da", "gallery": "colorado", "n": 31, "like": "9ecaa060ee8c"},
-  {"id": "fb2df59643d3", "gallery": "colorado", "n": 33, "like": "5b19784512b4"},
-  {"id": "debae1dddb7e", "gallery": "nycc-2021", "n": 1, "like": "647d73a95eb6"},
-  {"id": "f0f332a607d4", "gallery": "nycc-2021", "n": 5, "like": "e52d23f5d013"},
-  {"id": "41edd51bae07", "gallery": "nycc-2021", "n": 6, "like": "7394d0ad6877"},
-  {"id": "61f4f40130d4", "gallery": "nycc-2021", "n": 14, "like": "ec3108241159"},
-  {"id": "6a0acd7fcca0", "gallery": "nycc-2021", "n": 19, "like": "52103c1a3e86"},
-  {"id": "ba0089fe4be9", "gallery": "nycc-2021", "n": 28, "like": "db8dac24a162"},
-  {"id": "c085c72b6d27", "gallery": "nycc-2021", "n": 29, "like": "647d73a95eb6"},
-  {"id": "442b60552ddc", "gallery": "nycc-2021", "n": 30, "like": "7394d0ad6877"},
-  {"id": "6a8c8fc3c7e3", "gallery": "nycc-2021", "n": 35, "like": "a01b398a058d"},
-  {"id": "765f31cfad83", "gallery": "arizona", "n": 6, "like": "317b7c1bc63b"},
-  {"id": "192cf1fa8f0f", "gallery": "arizona", "n": 8, "like": "6e350512394c"},
-  {"id": "6454eecb1dfe", "gallery": "arizona", "n": 9, "like": "4c3068fe5c35"},
-  {"id": "8a860222ed06", "gallery": "arizona", "n": 13, "like": "7efd9131716f"},
-  {"id": "22d3e80d9d03", "gallery": "arizona", "n": 23, "like": "3543805bf9f1"},
-  {"id": "f683f1a09df9", "gallery": "arizona", "n": 25, "like": "7efd9131716f"},
-  {"id": "bf92e0ddfeb2", "gallery": "arizona", "n": 27, "like": "6c3278f8556b"},
-  {"id": "401c18f89a95", "gallery": "arizona", "n": 29, "like": "4c3068fe5c35"},
-  {"id": "fc64657e8374", "gallery": "arizona", "n": 30, "like": "c19cada9178e"},
-  {"id": "f65a66ad8205", "gallery": "arizona", "n": 31, "like": "6c3278f8556b"},
-  {"id": "32027f6508d9", "gallery": "arizona", "n": 34, "like": "c19cada9178e"},
-  {"id": "bddcd881022a", "gallery": "arizona", "n": 35, "like": "6c3278f8556b"},
-  {"id": "44df9a7ce9a6", "gallery": "arizona", "n": 38, "like": "c19cada9178e"},
-  {"id": "a46ce22b75f8", "gallery": "arizona", "n": 42, "like": "6c3278f8556b"},
-  {"id": "772e0aad6fc5", "gallery": "arizona", "n": 43, "like": "8b90fbdae0a0"},
-  {"id": "d6300007e432", "gallery": "arizona", "n": 45, "like": "1172ae4ba09e"},
-  {"id": "ccde571037c0", "gallery": "arizona", "n": 46, "like": "6e350512394c"},
-  {"id": "f41f3393c585", "gallery": "arizona", "n": 47, "like": "317b7c1bc63b"},
-  {"id": "13d19941f5ee", "gallery": "arizona", "n": 48, "like": "1172ae4ba09e"},
-  {"id": "4e95b88cbc93", "gallery": "arizona", "n": 50, "like": "c19cada9178e"},
-  {"id": "defb48e2f789", "gallery": "arizona", "n": 53, "like": "c19cada9178e"},
-  {"id": "8c3ea2cabf3d", "gallery": "arizona", "n": 56, "like": "2d7cef73f89e"},
-  {"id": "74f4a3dee915", "gallery": "arizona", "n": 61, "like": "2d7cef73f89e"},
-  {"id": "1394cd2d0c57", "gallery": "arizona", "n": 64, "like": "1b3007ab1adb"},
-  {"id": "d211f54667ac", "gallery": "new-mexico", "n": 5, "like": "ac67231631ae"},
-  {"id": "926a13123b1a", "gallery": "new-mexico", "n": 15, "like": "834342aaf93d"},
-  {"id": "970c555176b9", "gallery": "new-mexico", "n": 19, "like": "834342aaf93d"},
-  {"id": "36bf64d95191", "gallery": "new-mexico", "n": 20, "like": "10bdfbd12c5b"},
-  {"id": "986af0fff2b4", "gallery": "new-mexico", "n": 21, "like": "ac67231631ae"},
-  {"id": "63bc497156cb", "gallery": "lisbon", "n": 9, "like": "795387f5bd09"},
-  {"id": "2874bf567134", "gallery": "lisbon", "n": 18, "like": "860946bc0a1b"},
-  {"id": "c987f0dba644", "gallery": "lisbon", "n": 20, "like": "c739c5ff5e89"},
-  {"id": "1d367373be19", "gallery": "madeira", "n": 8, "like": "ec6791280afe"},
-  {"id": "9478e035eaf3", "gallery": "madeira", "n": 12, "like": "fe25d3df4901"},
-  {"id": "b3159cd2ac0b", "gallery": "madeira", "n": 16, "like": "3b14c580356c"},
-  {"id": "1bd1d1fea07a", "gallery": "stockholm", "n": 5, "like": "144a52c8d1af"},
-  {"id": "ea659deb9913", "gallery": "norway", "n": 12, "like": "a10f719a144e"},
-  {"id": "21edb699055e", "gallery": "norway", "n": 17, "like": "935d1a82df80"},
-  {"id": "d8a49d92b053", "gallery": "norway", "n": 20, "like": "935d1a82df80"},
-  {"id": "703c0d1e751a", "gallery": "wyoming-2022", "n": 7, "like": "381a31c10188"},
-  {"id": "db112e943d2d", "gallery": "wyoming-2022", "n": 14, "like": "5189303f4114"},
-  {"id": "ef5421870d6f", "gallery": "wyoming-2022", "n": 20, "like": "71680c95a4d4"},
-  {"id": "48ad4a0bc279", "gallery": "wyoming-2022", "n": 24, "like": "5189303f4114"},
-  {"id": "23d9b3b0d453", "gallery": "wyoming-2022", "n": 29, "like": "f93ded623474"},
-  {"id": "d7cf5a15bd09", "gallery": "wyoming-2022", "n": 30, "like": "a35d085e0b15"},
-  {"id": "d45ffbca0a31", "gallery": "wyoming-2022", "n": 39, "like": "504ca6882e62"},
-  {"id": "9d13c8cd72e6", "gallery": "wyoming-2022", "n": 40, "like": "4ed536b4ce2d"},
-  {"id": "e9461c481c2c", "gallery": "wyoming-2022", "n": 41, "like": "fb84fae0ebb4"},
-  {"id": "d0d3b452dce9", "gallery": "nycc-2022", "n": 7, "like": "24357d7caaf6"},
-  {"id": "f2ebd172f543", "gallery": "nycc-2022", "n": 12, "like": "3009a252a778"},
-  {"id": "12b62f8a1a07", "gallery": "nycc-2022", "n": 17, "like": "ad7dc399b05e"},
-  {"id": "de5bb34041dc", "gallery": "nycc-2022", "n": 18, "like": "3009a252a778"},
-  {"id": "edd8468ad964", "gallery": "nycc-2022", "n": 26, "like": "36790617650e"},
-  {"id": "86a97559293b", "gallery": "nycc-2022", "n": 27, "like": "d78d44b72c0c"},
-  {"id": "b9fa26d42473", "gallery": "nycc-2022", "n": 31, "like": "c1a695f46408"},
-  {"id": "494eb11211a5", "gallery": "nycc-2022", "n": 32, "like": "759e1d60be14"},
-  {"id": "3fdaae41ab26", "gallery": "nycc-2022", "n": 34, "like": "154aa19ba6b2"},
-  {"id": "69dee65e311f", "gallery": "nycc-2022", "n": 35, "like": "969090e691a5"},
-  {"id": "9a255de1d09a", "gallery": "nycc-2022", "n": 37, "like": "830d0574b632"},
-  {"id": "0b552160a287", "gallery": "nycc-2022", "n": 42, "like": "19e5b3e35d17"},
-  {"id": "a87b715d0f78", "gallery": "nycc-2022", "n": 45, "like": "b8ebe6e47099"},
-  {"id": "86704835fe19", "gallery": "nycc-2022", "n": 46, "like": "3009a252a778"},
-  {"id": "7e50b7a3344a", "gallery": "nycc-2022", "n": 47, "like": "c1a695f46408"},
-  {"id": "b2d555a136e6", "gallery": "nycc-2022", "n": 49, "like": "759e1d60be14"},
-  {"id": "3c5f55199ea9", "gallery": "nycc-2022", "n": 50, "like": "24357d7caaf6"},
-  {"id": "f2b3033f4f6c", "gallery": "nycc-2022", "n": 54, "like": "3009a252a778"},
-  {"id": "a583734ec9af", "gallery": "nycc-2022", "n": 56, "like": "41ef2339ca71"},
-  {"id": "88f05474e176", "gallery": "nycc-2022", "n": 58, "like": "c1a695f46408"},
-  {"id": "985a9dae2737", "gallery": "nycc-2022", "n": 63, "like": "154aa19ba6b2"},
-  {"id": "19f512db761d", "gallery": "nycc-2022", "n": 66, "like": "154aa19ba6b2"},
-  {"id": "f3aff06d6945", "gallery": "nycc-2022", "n": 67, "like": "01e6f05fa601"},
-  {"id": "1b36f9807543", "gallery": "nycc-2022", "n": 74, "like": "154aa19ba6b2"},
-  {"id": "33e6423f830d", "gallery": "nycc-2022", "n": 75, "like": "d397244dd635"},
-  {"id": "a55c8ebbb7db", "gallery": "nycc-2022", "n": 76, "like": "67293230b2a0"},
-  {"id": "8dbef48756c5", "gallery": "nycc-2022", "n": 79, "like": "ad7dc399b05e"},
-  {"id": "73508fbc1c97", "gallery": "nycc-2022", "n": 83, "like": "36790617650e"},
-  {"id": "c6774f26cae5", "gallery": "brighton", "n": 3, "like": "f54cde540dfa"},
-  {"id": "12d07080bf97", "gallery": "brighton", "n": 7, "like": "1772f7392ce0"},
-  {"id": "d700fddbc699", "gallery": "ecuador", "n": 8, "like": "df90022a6b64"},
-  {"id": "bd5b43470f49", "gallery": "ecuador", "n": 9, "like": "273addb1f506"},
-  {"id": "afb949ff98de", "gallery": "ecuador", "n": 10, "like": "fad030cf9c61"},
-  {"id": "09aca7b133e4", "gallery": "ecuador", "n": 20, "like": "ab499833fc07"},
-  {"id": "09400a49272a", "gallery": "ecuador", "n": 24, "like": "df90022a6b64"},
-  {"id": "589145a93d36", "gallery": "ecuador", "n": 30, "like": "522c8856e424"},
-  {"id": "d070a139fb43", "gallery": "bogota-library", "n": 10, "like": "658b6955dca8"},
-  {"id": "952c49bfe778", "gallery": "bogota-library", "n": 13, "like": "2c8cbc779372"},
-  {"id": "843b121b0886", "gallery": "bogota-library", "n": 14, "like": "dd5aa731feb8"},
-  {"id": "edcacc1c3be3", "gallery": "bogota-library", "n": 16, "like": "31ed39489cdd"},
-  {"id": "7bbe424fc460", "gallery": "bogota-library", "n": 20, "like": "fe1179efa452"},
-  {"id": "51b7b4aad8af", "gallery": "bogota-library", "n": 24, "like": "11bb07b39ada"},
-  {"id": "5c381a0e03f1", "gallery": "bogota-library", "n": 29, "like": "1bd6690dff24"},
-  {"id": "aa3a11939df4", "gallery": "oaxaca", "n": 10, "like": "e93f58c6d827"},
-  {"id": "e57e9ab0e21d", "gallery": "oaxaca", "n": 12, "like": "f48907e03c73"},
-  {"id": "01b7a95e6e9c", "gallery": "oaxaca", "n": 20, "like": "7d62c5dd629c"},
-  {"id": "d06169b355a3", "gallery": "oaxaca", "n": 22, "like": "bbb83a567a24"},
-  {"id": "557f9a195309", "gallery": "oaxaca", "n": 23, "like": "f34d3b0bc3a5"},
-  {"id": "375eb5b97190", "gallery": "oaxaca", "n": 27, "like": "1ddde2a8a819"},
-  {"id": "73e3f1a750ee", "gallery": "oaxaca", "n": 33, "like": "d8ce6bcb3f74"},
-  {"id": "f1301af192c3", "gallery": "oaxaca", "n": 34, "like": "1ddde2a8a819"},
-  {"id": "cd12573707bc", "gallery": "new-jersey", "n": 5, "like": "7d2793a395e0"},
-  {"id": "ef361aed4bda", "gallery": "new-jersey", "n": 9, "like": "4d506538dbd6"},
-  {"id": "469c39c502d7", "gallery": "new-jersey", "n": 21, "like": "5afa79d709c5"},
-  {"id": "7ab78006589a", "gallery": "cartagena", "n": 5, "like": "0f7e813bf74c"},
-  {"id": "65d871e21674", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "a968d86bd3b1", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "b44a257136c2", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "6567a8e539df", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "36879297de72", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "990afb988d98", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "a49dc41c4fd8", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "2daf4c438d1d", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "8a3502feb6a6", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "f59f373ab1e1", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "1646d1176af7", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "d3d5272e716d", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "29f7b974b749", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "e86d832060ce", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "36545a84753d", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "e35904e079b8", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "337825704152", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "42b22393b5f2", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "85cfbbe6b544", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "60b75f8bd661", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "5e71408472f7", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "e1bce1534ee6", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "b0dd487814ac", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "4f369b559957", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "091a0b40bcfe", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "d284647736cb", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "ba89283aab80", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "859879d51e3c", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "a6c544eda02d", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "2dc7f9b62ad4", "gallery": "eureka", "n": 0, "like": "0c72f850e162", "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"},
-  {"id": "888acd961e64", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "6112cabdea9b", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "a51509ce4fac", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "eb4bc3b7c9ef", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "a57e1af8c655", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "776c7a10c498", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "7f37a3510640", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "5c4690365f19", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "51b182228402", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "eec21de88890", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "10b1c009b0a4", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "f7210743c889", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "7ff76b886f3a", "gallery": "san-francisco", "n": 0, "like": "f0dc8dd426d0", "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"},
-  {"id": "f20d910a8698", "gallery": "san-francisco", "n": 0, "like": "", "why": "Alamo Square wide: out of focus in the camera (people and dogs soft, far building sharp); the source ARW is gone, the proxy is soft too (2026-10-27)"},
-  {"id": "636702d16573", "gallery": "eureka", "n": 0, "like": "", "why": "plant tip against blue sky: the plant is out of focus in the camera (2026-10-27)"},
-  {"id": "bb3d4e638567", "gallery": "cartagena", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "e41c8b8e2fa4", "gallery": "cartagena", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "6ed3e2804281", "gallery": "cartagena", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "e6ac1c85d66a", "gallery": "cartagena", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "c2809a3109b8", "gallery": "cartagena", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "a325614882af", "gallery": "cartagena", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "1c5a71729fc5", "gallery": "cartagena", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "e021f200b7de", "gallery": "cartagena", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "059fa7107fd4", "gallery": "medellin", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "a473e94a111c", "gallery": "medellin", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "f065b3afb925", "gallery": "medellin", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "e890b7593c2a", "gallery": "medellin", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "bcaf874f6a2f", "gallery": "medellin", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "0a77e4fd7443", "gallery": "medellin", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "ed533827de9e", "gallery": "medellin", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "b93d3e1d5c37", "gallery": "westminster-2020", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"},
-  {"id": "c523ac92d74d", "gallery": "westminster-2020", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"},
-  {"id": "db4be8928276", "gallery": "westminster-2020", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"},
-  {"id": "2384a4cbfc26", "gallery": "westminster-2020", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"},
-  {"id": "8232d96c5fb8", "gallery": "westminster-2020", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"},
-  {"id": "c91c524ddd00", "gallery": "westminster-2020", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"},
-  {"id": "c8559ee01bb1", "gallery": "westminster-2020", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"},
-  {"id": "97be0b2f07c8", "gallery": "westminster-2020", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"},
-  {"id": "29bed4c00632", "gallery": "westminster-2020", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"},
-  {"id": "fd6b596f13e6", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "18b41b7cebe1", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "174fc66ac201", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "c357c09711f6", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "3c28cbfc0fa7", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "cc3712d1f75a", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "967a56791276", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "3aa38df7df6a", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "1dad43aa994d", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "eb315b08853e", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "46253e4cf267", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "dc8063590bfd", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "c54e9ef23cc0", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "7afb60ce0adb", "gallery": "new-york", "n": 0, "like": "", "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"},
-  {"id": "48b7263b54e1", "gallery": "norway", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate"},
-  {"id": "7f2decbdcef4", "gallery": "norway", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate"},
-  {"id": "428151988bab", "gallery": "medellin", "n": 0, "like": "", "why": "blown-out white wall, clipped highlights (2026-10-27)"},
-  {"id": "5eb840a86214", "gallery": "texas", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "df01d1ea7fcb", "gallery": "texas", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "45dbbc4ad19e", "gallery": "texas", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "f28071e8f1df", "gallery": "texas", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "521f0619f796", "gallery": "texas", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "7258cce61708", "gallery": "texas", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "5264fd60eb8c", "gallery": "texas", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "3d18d80da33f", "gallery": "texas", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "9323c587ff29", "gallery": "texas", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "b628071538e8", "gallery": "texas", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "8b90fbdae0a0", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "e1a8cee9d8d2", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "642f72184aa9", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "4c3068fe5c35", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "7e17bf0739fa", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "6e350512394c", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "6d67d98427f7", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "0c914f6c5a29", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "794933195955", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "2371c3c2fcc2", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "20da3c378fd4", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "9dec2b43a100", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"},
-  {"id": "bace031a10a3", "gallery": "arizona", "n": 0, "like": "", "why": "trimmed 2026-10-27: near-duplicate or weak frame"}
+  {
+   "id": "1d63097de311",
+   "gallery": "japan",
+   "n": 11,
+   "like": "3537ea53ef00"
+  },
+  {
+   "id": "322c558ae08d",
+   "gallery": "japan",
+   "n": 14,
+   "like": "132e3c04655e"
+  },
+  {
+   "id": "13704932e89b",
+   "gallery": "japan",
+   "n": 15,
+   "like": "132e3c04655e"
+  },
+  {
+   "id": "5a237d289043",
+   "gallery": "amsterdam",
+   "n": 5,
+   "like": "e8eb39de0256"
+  },
+  {
+   "id": "8061af18105e",
+   "gallery": "iceland",
+   "n": 5,
+   "like": "2ee026edc5ad"
+  },
+  {
+   "id": "81672bbc654a",
+   "gallery": "iceland",
+   "n": 9,
+   "like": "2514ed72568c"
+  },
+  {
+   "id": "6a04807dbaea",
+   "gallery": "iceland",
+   "n": 11,
+   "like": "f75a33eea283"
+  },
+  {
+   "id": "4de6fde2e8a1",
+   "gallery": "iceland",
+   "n": 17,
+   "like": "8ed54d8fafdf"
+  },
+  {
+   "id": "367b3038962d",
+   "gallery": "iceland",
+   "n": 19,
+   "like": "853e4fb34196"
+  },
+  {
+   "id": "30230c04e0b2",
+   "gallery": "barbados",
+   "n": 9,
+   "like": "7917b4abb34d"
+  },
+  {
+   "id": "e24c30734768",
+   "gallery": "rio",
+   "n": 10,
+   "like": "40c7788f2424"
+  },
+  {
+   "id": "3d79482ebb75",
+   "gallery": "sao-paulo",
+   "n": 2,
+   "like": "9cb155c525b5"
+  },
+  {
+   "id": "dec40e44c86f",
+   "gallery": "sao-paulo",
+   "n": 12,
+   "like": "da0adc774e70"
+  },
+  {
+   "id": "bd9673c6078e",
+   "gallery": "sao-paulo",
+   "n": 19,
+   "like": "9dc07953a37b"
+  },
+  {
+   "id": "7533005d6139",
+   "gallery": "mexico-city",
+   "n": 10,
+   "like": "9bb30d4a392d"
+  },
+  {
+   "id": "df42d948c2d9",
+   "gallery": "mexico-city",
+   "n": 15,
+   "like": "0f3de77a3927"
+  },
+  {
+   "id": "bf4a091b8726",
+   "gallery": "mexico-city",
+   "n": 20,
+   "like": "62d0c3ccf58b"
+  },
+  {
+   "id": "9e46d1de7d00",
+   "gallery": "costa-rica",
+   "n": 6,
+   "like": "ab2af5528ebc"
+  },
+  {
+   "id": "84a44aa71bfe",
+   "gallery": "medellin",
+   "n": 6,
+   "like": "a240288adf06"
+  },
+  {
+   "id": "fe3321c773c1",
+   "gallery": "medellin",
+   "n": 9,
+   "like": "a240288adf06"
+  },
+  {
+   "id": "366850976339",
+   "gallery": "medellin",
+   "n": 10,
+   "like": "a473e94a111c"
+  },
+  {
+   "id": "baa06e52f97b",
+   "gallery": "medellin",
+   "n": 12,
+   "like": "ab357fcae081"
+  },
+  {
+   "id": "ec4a8af999d4",
+   "gallery": "medellin",
+   "n": 13,
+   "like": "2ab3f934193f"
+  },
+  {
+   "id": "9fee18878801",
+   "gallery": "medellin",
+   "n": 24,
+   "like": "059fa7107fd4"
+  },
+  {
+   "id": "58a06fc1b3c3",
+   "gallery": "medellin",
+   "n": 25,
+   "like": "5bf464df1085"
+  },
+  {
+   "id": "69d8d88d29cc",
+   "gallery": "medellin",
+   "n": 30,
+   "like": "a45cb91f5d8d"
+  },
+  {
+   "id": "7b59c8952fb0",
+   "gallery": "medellin",
+   "n": 33,
+   "like": "ed533827de9e"
+  },
+  {
+   "id": "f2491968a24c",
+   "gallery": "medellin",
+   "n": 36,
+   "like": "29293d5231c2"
+  },
+  {
+   "id": "b683fbbd6ab0",
+   "gallery": "medellin",
+   "n": 37,
+   "like": "3b99f66463dc"
+  },
+  {
+   "id": "ab018e05429a",
+   "gallery": "medellin",
+   "n": 39,
+   "like": "2ab3f934193f"
+  },
+  {
+   "id": "c85c93558d87",
+   "gallery": "medellin",
+   "n": 43,
+   "like": "612a2ea4125d"
+  },
+  {
+   "id": "0324ade8309a",
+   "gallery": "medellin",
+   "n": 45,
+   "like": "0531206f5808"
+  },
+  {
+   "id": "64118c0844ba",
+   "gallery": "medellin",
+   "n": 47,
+   "like": "26a5d3eb6392"
+  },
+  {
+   "id": "8800c5c55b0c",
+   "gallery": "medellin",
+   "n": 49,
+   "like": "26a5d3eb6392"
+  },
+  {
+   "id": "d85e7fadf1a9",
+   "gallery": "medellin",
+   "n": 50,
+   "like": "26a5d3eb6392"
+  },
+  {
+   "id": "7196d52e94cb",
+   "gallery": "cartagena",
+   "n": 7,
+   "like": "a325614882af"
+  },
+  {
+   "id": "c670a60ce042",
+   "gallery": "cartagena",
+   "n": 9,
+   "like": "e41c8b8e2fa4"
+  },
+  {
+   "id": "f82470bb2bd7",
+   "gallery": "cartagena",
+   "n": 13,
+   "like": "b58bd55b2828"
+  },
+  {
+   "id": "841ede719db5",
+   "gallery": "cartagena",
+   "n": 18,
+   "like": "5719ed629bd3"
+  },
+  {
+   "id": "81cd85e6776c",
+   "gallery": "cartagena",
+   "n": 19,
+   "like": "c593d02efeaf"
+  },
+  {
+   "id": "b36e08d39b53",
+   "gallery": "cartagena",
+   "n": 21,
+   "like": "e41c8b8e2fa4"
+  },
+  {
+   "id": "615cdbf52dcf",
+   "gallery": "cartagena",
+   "n": 26,
+   "like": "5719ed629bd3"
+  },
+  {
+   "id": "d3473dd1cf30",
+   "gallery": "cartagena",
+   "n": 29,
+   "like": "4ea29399548c"
+  },
+  {
+   "id": "94a557237ded",
+   "gallery": "cartagena",
+   "n": 37,
+   "like": "779a57d9d18b"
+  },
+  {
+   "id": "6f41dab61c95",
+   "gallery": "cartagena",
+   "n": 45,
+   "like": "5719ed629bd3"
+  },
+  {
+   "id": "8ec0805f5c6e",
+   "gallery": "cartagena",
+   "n": 48,
+   "like": "5091f63b9ff0"
+  },
+  {
+   "id": "7b7e35736e5d",
+   "gallery": "cartagena",
+   "n": 53,
+   "like": "a08892570670"
+  },
+  {
+   "id": "552a62a6fa98",
+   "gallery": "cartagena",
+   "n": 56,
+   "like": "2c878167d885"
+  },
+  {
+   "id": "e77706c3c03c",
+   "gallery": "cartagena",
+   "n": 58,
+   "like": "08f6725696c9"
+  },
+  {
+   "id": "960aea9f71c4",
+   "gallery": "cartagena",
+   "n": 60,
+   "like": "3b196d4bc0d8"
+  },
+  {
+   "id": "fcd392752612",
+   "gallery": "cartagena",
+   "n": 64,
+   "like": "fd7d8967178d"
+  },
+  {
+   "id": "2f8889d820a8",
+   "gallery": "cartagena",
+   "n": 65,
+   "like": "e41c8b8e2fa4"
+  },
+  {
+   "id": "e33a0b4433b3",
+   "gallery": "cartagena",
+   "n": 67,
+   "like": "6ed3e2804281"
+  },
+  {
+   "id": "6ccf086b589c",
+   "gallery": "cartagena",
+   "n": 71,
+   "like": "7ba40c4c752f"
+  },
+  {
+   "id": "a5fdb8175e4e",
+   "gallery": "cartagena",
+   "n": 72,
+   "like": "93f60217ee99"
+  },
+  {
+   "id": "b0476a193934",
+   "gallery": "cartagena",
+   "n": 73,
+   "like": "5719ed629bd3"
+  },
+  {
+   "id": "3e5e3e592f6a",
+   "gallery": "cartagena",
+   "n": 74,
+   "like": "e41c8b8e2fa4"
+  },
+  {
+   "id": "f6dc09f2da13",
+   "gallery": "cartagena",
+   "n": 75,
+   "like": "2c878167d885"
+  },
+  {
+   "id": "635b9a2985d1",
+   "gallery": "cartagena",
+   "n": 76,
+   "like": "e41c8b8e2fa4"
+  },
+  {
+   "id": "c0f6b073a0fd",
+   "gallery": "cartagena",
+   "n": 77,
+   "like": "4ea29399548c"
+  },
+  {
+   "id": "f40046501388",
+   "gallery": "cartagena",
+   "n": 79,
+   "like": "5c05e97834fa"
+  },
+  {
+   "id": "872f26c73edd",
+   "gallery": "cartagena",
+   "n": 85,
+   "like": null,
+   "why": "almost black frame"
+  },
+  {
+   "id": "18485cac3cbb",
+   "gallery": "cartagena",
+   "n": 90,
+   "like": "a325614882af"
+  },
+  {
+   "id": "b5ff0819193f",
+   "gallery": "cartagena",
+   "n": 92,
+   "like": "6ed3e2804281"
+  },
+  {
+   "id": "341c901a41b9",
+   "gallery": "westminster-2020",
+   "n": 10,
+   "like": "c523ac92d74d"
+  },
+  {
+   "id": "d0a8e7fa7797",
+   "gallery": "westminster-2020",
+   "n": 12,
+   "like": "ae4ceaee15d4"
+  },
+  {
+   "id": "0117880754be",
+   "gallery": "westminster-2020",
+   "n": 14,
+   "like": "a7a29ff2893d"
+  },
+  {
+   "id": "2fa03a334c83",
+   "gallery": "westminster-2020",
+   "n": 16,
+   "like": "499baae19488"
+  },
+  {
+   "id": "f918b0b24927",
+   "gallery": "westminster-2020",
+   "n": 18,
+   "like": "2e7facf26eaf"
+  },
+  {
+   "id": "f4d54e6ea821",
+   "gallery": "westminster-2020",
+   "n": 26,
+   "like": "bb11c60c9481"
+  },
+  {
+   "id": "801e61c54d4e",
+   "gallery": "westminster-2020",
+   "n": 30,
+   "like": "01b6965470fb"
+  },
+  {
+   "id": "28cd8915c1e7",
+   "gallery": "westminster-2020",
+   "n": 34,
+   "like": "56ca831ab13f"
+  },
+  {
+   "id": "c7cba519dc50",
+   "gallery": "westminster-2020",
+   "n": 38,
+   "like": "b93d3e1d5c37"
+  },
+  {
+   "id": "c0b349537631",
+   "gallery": "westminster-2020",
+   "n": 39,
+   "like": "ee3eb803e85e"
+  },
+  {
+   "id": "f8c512f31824",
+   "gallery": "new-york",
+   "n": 4,
+   "like": "1dad43aa994d"
+  },
+  {
+   "id": "2b6217d08466",
+   "gallery": "new-york",
+   "n": 8,
+   "like": "95f8a639e888"
+  },
+  {
+   "id": "7d2a15ef01e1",
+   "gallery": "new-york",
+   "n": 10,
+   "like": "1dad43aa994d"
+  },
+  {
+   "id": "01f4ea267311",
+   "gallery": "new-york",
+   "n": 11,
+   "like": "eb315b08853e"
+  },
+  {
+   "id": "13ebf0d4e7d9",
+   "gallery": "new-york",
+   "n": 17,
+   "like": "eb315b08853e"
+  },
+  {
+   "id": "8663292554c9",
+   "gallery": "new-york",
+   "n": 28,
+   "like": "46253e4cf267"
+  },
+  {
+   "id": "097fababd60d",
+   "gallery": "new-york",
+   "n": 29,
+   "like": "0b6ece76a849"
+  },
+  {
+   "id": "e3fe5b67e69a",
+   "gallery": "new-york",
+   "n": 38,
+   "like": "7afb60ce0adb"
+  },
+  {
+   "id": "3dc439532ac0",
+   "gallery": "new-york",
+   "n": 40,
+   "like": "ed23360c189e"
+  },
+  {
+   "id": "b2725b3db949",
+   "gallery": "new-york",
+   "n": 43,
+   "like": "7afb60ce0adb"
+  },
+  {
+   "id": "b91944ea5292",
+   "gallery": "new-york",
+   "n": 47,
+   "like": "6e833239f6f9"
+  },
+  {
+   "id": "01fd357216c2",
+   "gallery": "new-york",
+   "n": 52,
+   "like": "3d295d89f021"
+  },
+  {
+   "id": "2d6ad81e31bc",
+   "gallery": "new-york",
+   "n": 53,
+   "like": "b381d57dd0c6"
+  },
+  {
+   "id": "5a0c5e79150c",
+   "gallery": "new-york",
+   "n": 56,
+   "like": "0b6ece76a849"
+  },
+  {
+   "id": "8e04d91cc379",
+   "gallery": "new-york",
+   "n": 60,
+   "like": "0b6ece76a849"
+  },
+  {
+   "id": "6aa173032f13",
+   "gallery": "new-york",
+   "n": 63,
+   "like": "2ad16d709a39"
+  },
+  {
+   "id": "5cbec0de32cd",
+   "gallery": "new-york",
+   "n": 66,
+   "like": "fca51028c2e6"
+  },
+  {
+   "id": "9d66c5a3ffe8",
+   "gallery": "new-york",
+   "n": 72,
+   "like": "eb315b08853e"
+  },
+  {
+   "id": "1d8c64e65557",
+   "gallery": "new-york",
+   "n": 79,
+   "like": "90beb81cff51"
+  },
+  {
+   "id": "bf4763e945a4",
+   "gallery": "new-york",
+   "n": 82,
+   "like": "f1981466d843"
+  },
+  {
+   "id": "2ca1b9d220c1",
+   "gallery": "new-york",
+   "n": 85,
+   "like": "eb315b08853e"
+  },
+  {
+   "id": "12f9c7b5b8d2",
+   "gallery": "new-york",
+   "n": 90,
+   "like": "95f8a639e888"
+  },
+  {
+   "id": "5b98e0a248a5",
+   "gallery": "texas",
+   "n": 7,
+   "like": "df01d1ea7fcb"
+  },
+  {
+   "id": "6153647c7e36",
+   "gallery": "texas",
+   "n": 15,
+   "like": "30a0f8108096"
+  },
+  {
+   "id": "289ea57f8ae5",
+   "gallery": "texas",
+   "n": 16,
+   "like": "1175c37edb8d"
+  },
+  {
+   "id": "91018a0b365c",
+   "gallery": "texas",
+   "n": 18,
+   "like": "5264fd60eb8c"
+  },
+  {
+   "id": "be4dc6247c08",
+   "gallery": "texas",
+   "n": 19,
+   "like": "521f0619f796"
+  },
+  {
+   "id": "236277f11c64",
+   "gallery": "texas",
+   "n": 24,
+   "like": "521f0619f796"
+  },
+  {
+   "id": "666d291cd98b",
+   "gallery": "texas",
+   "n": 25,
+   "like": "69225755ddb4"
+  },
+  {
+   "id": "6d1968b38a68",
+   "gallery": "texas",
+   "n": 26,
+   "like": "922aadcf40d6"
+  },
+  {
+   "id": "14e9855a07c2",
+   "gallery": "texas",
+   "n": 30,
+   "like": "6a41616e9c55"
+  },
+  {
+   "id": "1378db9b076a",
+   "gallery": "texas",
+   "n": 37,
+   "like": "ed1a4ea5004f"
+  },
+  {
+   "id": "bbb335999a90",
+   "gallery": "texas",
+   "n": 38,
+   "like": "3d18d80da33f"
+  },
+  {
+   "id": "d85b3659614e",
+   "gallery": "texas",
+   "n": 40,
+   "like": "0a3e8e2f0485"
+  },
+  {
+   "id": "ea8f4e397211",
+   "gallery": "westminster-2021",
+   "n": 5,
+   "like": "8702596d1c41"
+  },
+  {
+   "id": "afab491f0f6f",
+   "gallery": "westminster-2021",
+   "n": 11,
+   "like": "3303031e0c9d"
+  },
+  {
+   "id": "ed38c671ba09",
+   "gallery": "westminster-2021",
+   "n": 18,
+   "like": "9ef3f2134f25"
+  },
+  {
+   "id": "f16207fd4b89",
+   "gallery": "westminster-2021",
+   "n": 22,
+   "like": "093d386c8548"
+  },
+  {
+   "id": "324c5793eeb8",
+   "gallery": "westminster-2021",
+   "n": 27,
+   "like": "9c6a821cc4d1"
+  },
+  {
+   "id": "f05a1ce555d3",
+   "gallery": "westminster-2021",
+   "n": 28,
+   "like": "64358849a35e"
+  },
+  {
+   "id": "6148ff236002",
+   "gallery": "westminster-2021",
+   "n": 32,
+   "like": "87c41d6f4fc7"
+  },
+  {
+   "id": "3a5c2ea67b23",
+   "gallery": "westminster-2021",
+   "n": 35,
+   "like": "9c6a821cc4d1"
+  },
+  {
+   "id": "4189779798de",
+   "gallery": "westminster-2021",
+   "n": 39,
+   "like": "21c1ca986ed2"
+  },
+  {
+   "id": "ea1ad9ef5c28",
+   "gallery": "westminster-2021",
+   "n": 42,
+   "like": "8c34d1d8506d"
+  },
+  {
+   "id": "bc2563400f68",
+   "gallery": "westminster-2021",
+   "n": 43,
+   "like": "a690c30b4674"
+  },
+  {
+   "id": "184c9ab87941",
+   "gallery": "westminster-2021",
+   "n": 45,
+   "like": "62f5a591e097"
+  },
+  {
+   "id": "943bbbea9679",
+   "gallery": "westminster-2021",
+   "n": 47,
+   "like": "a690c30b4674"
+  },
+  {
+   "id": "64d6d3c68492",
+   "gallery": "westminster-2021",
+   "n": 49,
+   "like": "fe34ca3976cf"
+  },
+  {
+   "id": "e64dfa0145fe",
+   "gallery": "westminster-2021",
+   "n": 52,
+   "like": "21c1ca986ed2"
+  },
+  {
+   "id": "c42374c42d79",
+   "gallery": "colorado",
+   "n": 8,
+   "like": "c9a71bb4d7f7"
+  },
+  {
+   "id": "9d2fc5d5c108",
+   "gallery": "colorado",
+   "n": 11,
+   "like": "67d384d3a2a8"
+  },
+  {
+   "id": "5ae58fc3c1c5",
+   "gallery": "colorado",
+   "n": 15,
+   "like": "1f5613624a2a"
+  },
+  {
+   "id": "067d085e85ea",
+   "gallery": "colorado",
+   "n": 16,
+   "like": "67d384d3a2a8"
+  },
+  {
+   "id": "3949f020fa70",
+   "gallery": "colorado",
+   "n": 17,
+   "like": "990efdaed0b8"
+  },
+  {
+   "id": "db48bea3ea63",
+   "gallery": "colorado",
+   "n": 18,
+   "like": "0118a8eea237"
+  },
+  {
+   "id": "bc0c9dded6e0",
+   "gallery": "colorado",
+   "n": 19,
+   "like": "1d7cdf0c1536"
+  },
+  {
+   "id": "0c20794b0b8e",
+   "gallery": "colorado",
+   "n": 20,
+   "like": "1628cad856a3"
+  },
+  {
+   "id": "809341a3cf8e",
+   "gallery": "colorado",
+   "n": 26,
+   "like": "0118a8eea237"
+  },
+  {
+   "id": "d650a30f46b9",
+   "gallery": "colorado",
+   "n": 27,
+   "like": "39fae5dfbe33"
+  },
+  {
+   "id": "41638aa27c45",
+   "gallery": "colorado",
+   "n": 30,
+   "like": "1628cad856a3"
+  },
+  {
+   "id": "4021791e43da",
+   "gallery": "colorado",
+   "n": 31,
+   "like": "9ecaa060ee8c"
+  },
+  {
+   "id": "fb2df59643d3",
+   "gallery": "colorado",
+   "n": 33,
+   "like": "5b19784512b4"
+  },
+  {
+   "id": "debae1dddb7e",
+   "gallery": "nycc-2021",
+   "n": 1,
+   "like": "647d73a95eb6"
+  },
+  {
+   "id": "f0f332a607d4",
+   "gallery": "nycc-2021",
+   "n": 5,
+   "like": "e52d23f5d013"
+  },
+  {
+   "id": "41edd51bae07",
+   "gallery": "nycc-2021",
+   "n": 6,
+   "like": "7394d0ad6877"
+  },
+  {
+   "id": "61f4f40130d4",
+   "gallery": "nycc-2021",
+   "n": 14,
+   "like": "ec3108241159"
+  },
+  {
+   "id": "6a0acd7fcca0",
+   "gallery": "nycc-2021",
+   "n": 19,
+   "like": "52103c1a3e86"
+  },
+  {
+   "id": "ba0089fe4be9",
+   "gallery": "nycc-2021",
+   "n": 28,
+   "like": "db8dac24a162"
+  },
+  {
+   "id": "c085c72b6d27",
+   "gallery": "nycc-2021",
+   "n": 29,
+   "like": "647d73a95eb6"
+  },
+  {
+   "id": "442b60552ddc",
+   "gallery": "nycc-2021",
+   "n": 30,
+   "like": "7394d0ad6877"
+  },
+  {
+   "id": "6a8c8fc3c7e3",
+   "gallery": "nycc-2021",
+   "n": 35,
+   "like": "a01b398a058d"
+  },
+  {
+   "id": "765f31cfad83",
+   "gallery": "arizona",
+   "n": 6,
+   "like": "317b7c1bc63b"
+  },
+  {
+   "id": "192cf1fa8f0f",
+   "gallery": "arizona",
+   "n": 8,
+   "like": "6e350512394c"
+  },
+  {
+   "id": "6454eecb1dfe",
+   "gallery": "arizona",
+   "n": 9,
+   "like": "4c3068fe5c35"
+  },
+  {
+   "id": "8a860222ed06",
+   "gallery": "arizona",
+   "n": 13,
+   "like": "7efd9131716f"
+  },
+  {
+   "id": "22d3e80d9d03",
+   "gallery": "arizona",
+   "n": 23,
+   "like": "3543805bf9f1"
+  },
+  {
+   "id": "f683f1a09df9",
+   "gallery": "arizona",
+   "n": 25,
+   "like": "7efd9131716f"
+  },
+  {
+   "id": "bf92e0ddfeb2",
+   "gallery": "arizona",
+   "n": 27,
+   "like": "6c3278f8556b"
+  },
+  {
+   "id": "401c18f89a95",
+   "gallery": "arizona",
+   "n": 29,
+   "like": "4c3068fe5c35"
+  },
+  {
+   "id": "fc64657e8374",
+   "gallery": "arizona",
+   "n": 30,
+   "like": "c19cada9178e"
+  },
+  {
+   "id": "f65a66ad8205",
+   "gallery": "arizona",
+   "n": 31,
+   "like": "6c3278f8556b"
+  },
+  {
+   "id": "32027f6508d9",
+   "gallery": "arizona",
+   "n": 34,
+   "like": "c19cada9178e"
+  },
+  {
+   "id": "bddcd881022a",
+   "gallery": "arizona",
+   "n": 35,
+   "like": "6c3278f8556b"
+  },
+  {
+   "id": "44df9a7ce9a6",
+   "gallery": "arizona",
+   "n": 38,
+   "like": "c19cada9178e"
+  },
+  {
+   "id": "a46ce22b75f8",
+   "gallery": "arizona",
+   "n": 42,
+   "like": "6c3278f8556b"
+  },
+  {
+   "id": "772e0aad6fc5",
+   "gallery": "arizona",
+   "n": 43,
+   "like": "8b90fbdae0a0"
+  },
+  {
+   "id": "d6300007e432",
+   "gallery": "arizona",
+   "n": 45,
+   "like": "1172ae4ba09e"
+  },
+  {
+   "id": "ccde571037c0",
+   "gallery": "arizona",
+   "n": 46,
+   "like": "6e350512394c"
+  },
+  {
+   "id": "f41f3393c585",
+   "gallery": "arizona",
+   "n": 47,
+   "like": "317b7c1bc63b"
+  },
+  {
+   "id": "13d19941f5ee",
+   "gallery": "arizona",
+   "n": 48,
+   "like": "1172ae4ba09e"
+  },
+  {
+   "id": "4e95b88cbc93",
+   "gallery": "arizona",
+   "n": 50,
+   "like": "c19cada9178e"
+  },
+  {
+   "id": "defb48e2f789",
+   "gallery": "arizona",
+   "n": 53,
+   "like": "c19cada9178e"
+  },
+  {
+   "id": "8c3ea2cabf3d",
+   "gallery": "arizona",
+   "n": 56,
+   "like": "2d7cef73f89e"
+  },
+  {
+   "id": "74f4a3dee915",
+   "gallery": "arizona",
+   "n": 61,
+   "like": "2d7cef73f89e"
+  },
+  {
+   "id": "1394cd2d0c57",
+   "gallery": "arizona",
+   "n": 64,
+   "like": "1b3007ab1adb"
+  },
+  {
+   "id": "d211f54667ac",
+   "gallery": "new-mexico",
+   "n": 5,
+   "like": "ac67231631ae"
+  },
+  {
+   "id": "926a13123b1a",
+   "gallery": "new-mexico",
+   "n": 15,
+   "like": "834342aaf93d"
+  },
+  {
+   "id": "970c555176b9",
+   "gallery": "new-mexico",
+   "n": 19,
+   "like": "834342aaf93d"
+  },
+  {
+   "id": "36bf64d95191",
+   "gallery": "new-mexico",
+   "n": 20,
+   "like": "10bdfbd12c5b"
+  },
+  {
+   "id": "986af0fff2b4",
+   "gallery": "new-mexico",
+   "n": 21,
+   "like": "ac67231631ae"
+  },
+  {
+   "id": "63bc497156cb",
+   "gallery": "lisbon",
+   "n": 9,
+   "like": "795387f5bd09"
+  },
+  {
+   "id": "2874bf567134",
+   "gallery": "lisbon",
+   "n": 18,
+   "like": "860946bc0a1b"
+  },
+  {
+   "id": "c987f0dba644",
+   "gallery": "lisbon",
+   "n": 20,
+   "like": "c739c5ff5e89"
+  },
+  {
+   "id": "1d367373be19",
+   "gallery": "madeira",
+   "n": 8,
+   "like": "ec6791280afe"
+  },
+  {
+   "id": "9478e035eaf3",
+   "gallery": "madeira",
+   "n": 12,
+   "like": "fe25d3df4901"
+  },
+  {
+   "id": "b3159cd2ac0b",
+   "gallery": "madeira",
+   "n": 16,
+   "like": "3b14c580356c"
+  },
+  {
+   "id": "1bd1d1fea07a",
+   "gallery": "stockholm",
+   "n": 5,
+   "like": "144a52c8d1af"
+  },
+  {
+   "id": "ea659deb9913",
+   "gallery": "norway",
+   "n": 12,
+   "like": "a10f719a144e"
+  },
+  {
+   "id": "21edb699055e",
+   "gallery": "norway",
+   "n": 17,
+   "like": "935d1a82df80"
+  },
+  {
+   "id": "d8a49d92b053",
+   "gallery": "norway",
+   "n": 20,
+   "like": "935d1a82df80"
+  },
+  {
+   "id": "703c0d1e751a",
+   "gallery": "wyoming-2022",
+   "n": 7,
+   "like": "381a31c10188"
+  },
+  {
+   "id": "db112e943d2d",
+   "gallery": "wyoming-2022",
+   "n": 14,
+   "like": "5189303f4114"
+  },
+  {
+   "id": "ef5421870d6f",
+   "gallery": "wyoming-2022",
+   "n": 20,
+   "like": "71680c95a4d4"
+  },
+  {
+   "id": "48ad4a0bc279",
+   "gallery": "wyoming-2022",
+   "n": 24,
+   "like": "5189303f4114"
+  },
+  {
+   "id": "23d9b3b0d453",
+   "gallery": "wyoming-2022",
+   "n": 29,
+   "like": "f93ded623474"
+  },
+  {
+   "id": "d7cf5a15bd09",
+   "gallery": "wyoming-2022",
+   "n": 30,
+   "like": "a35d085e0b15"
+  },
+  {
+   "id": "d45ffbca0a31",
+   "gallery": "wyoming-2022",
+   "n": 39,
+   "like": "504ca6882e62"
+  },
+  {
+   "id": "9d13c8cd72e6",
+   "gallery": "wyoming-2022",
+   "n": 40,
+   "like": "4ed536b4ce2d"
+  },
+  {
+   "id": "e9461c481c2c",
+   "gallery": "wyoming-2022",
+   "n": 41,
+   "like": "fb84fae0ebb4"
+  },
+  {
+   "id": "d0d3b452dce9",
+   "gallery": "nycc-2022",
+   "n": 7,
+   "like": "24357d7caaf6"
+  },
+  {
+   "id": "f2ebd172f543",
+   "gallery": "nycc-2022",
+   "n": 12,
+   "like": "3009a252a778"
+  },
+  {
+   "id": "12b62f8a1a07",
+   "gallery": "nycc-2022",
+   "n": 17,
+   "like": "ad7dc399b05e"
+  },
+  {
+   "id": "de5bb34041dc",
+   "gallery": "nycc-2022",
+   "n": 18,
+   "like": "3009a252a778"
+  },
+  {
+   "id": "edd8468ad964",
+   "gallery": "nycc-2022",
+   "n": 26,
+   "like": "36790617650e"
+  },
+  {
+   "id": "86a97559293b",
+   "gallery": "nycc-2022",
+   "n": 27,
+   "like": "d78d44b72c0c"
+  },
+  {
+   "id": "b9fa26d42473",
+   "gallery": "nycc-2022",
+   "n": 31,
+   "like": "c1a695f46408"
+  },
+  {
+   "id": "494eb11211a5",
+   "gallery": "nycc-2022",
+   "n": 32,
+   "like": "759e1d60be14"
+  },
+  {
+   "id": "3fdaae41ab26",
+   "gallery": "nycc-2022",
+   "n": 34,
+   "like": "154aa19ba6b2"
+  },
+  {
+   "id": "69dee65e311f",
+   "gallery": "nycc-2022",
+   "n": 35,
+   "like": "969090e691a5"
+  },
+  {
+   "id": "9a255de1d09a",
+   "gallery": "nycc-2022",
+   "n": 37,
+   "like": "830d0574b632"
+  },
+  {
+   "id": "0b552160a287",
+   "gallery": "nycc-2022",
+   "n": 42,
+   "like": "19e5b3e35d17"
+  },
+  {
+   "id": "a87b715d0f78",
+   "gallery": "nycc-2022",
+   "n": 45,
+   "like": "b8ebe6e47099"
+  },
+  {
+   "id": "86704835fe19",
+   "gallery": "nycc-2022",
+   "n": 46,
+   "like": "3009a252a778"
+  },
+  {
+   "id": "7e50b7a3344a",
+   "gallery": "nycc-2022",
+   "n": 47,
+   "like": "c1a695f46408"
+  },
+  {
+   "id": "b2d555a136e6",
+   "gallery": "nycc-2022",
+   "n": 49,
+   "like": "759e1d60be14"
+  },
+  {
+   "id": "3c5f55199ea9",
+   "gallery": "nycc-2022",
+   "n": 50,
+   "like": "24357d7caaf6"
+  },
+  {
+   "id": "f2b3033f4f6c",
+   "gallery": "nycc-2022",
+   "n": 54,
+   "like": "3009a252a778"
+  },
+  {
+   "id": "a583734ec9af",
+   "gallery": "nycc-2022",
+   "n": 56,
+   "like": "41ef2339ca71"
+  },
+  {
+   "id": "88f05474e176",
+   "gallery": "nycc-2022",
+   "n": 58,
+   "like": "c1a695f46408"
+  },
+  {
+   "id": "985a9dae2737",
+   "gallery": "nycc-2022",
+   "n": 63,
+   "like": "154aa19ba6b2"
+  },
+  {
+   "id": "19f512db761d",
+   "gallery": "nycc-2022",
+   "n": 66,
+   "like": "154aa19ba6b2"
+  },
+  {
+   "id": "f3aff06d6945",
+   "gallery": "nycc-2022",
+   "n": 67,
+   "like": "01e6f05fa601"
+  },
+  {
+   "id": "1b36f9807543",
+   "gallery": "nycc-2022",
+   "n": 74,
+   "like": "154aa19ba6b2"
+  },
+  {
+   "id": "33e6423f830d",
+   "gallery": "nycc-2022",
+   "n": 75,
+   "like": "d397244dd635"
+  },
+  {
+   "id": "a55c8ebbb7db",
+   "gallery": "nycc-2022",
+   "n": 76,
+   "like": "67293230b2a0"
+  },
+  {
+   "id": "8dbef48756c5",
+   "gallery": "nycc-2022",
+   "n": 79,
+   "like": "ad7dc399b05e"
+  },
+  {
+   "id": "73508fbc1c97",
+   "gallery": "nycc-2022",
+   "n": 83,
+   "like": "36790617650e"
+  },
+  {
+   "id": "c6774f26cae5",
+   "gallery": "brighton",
+   "n": 3,
+   "like": "f54cde540dfa"
+  },
+  {
+   "id": "12d07080bf97",
+   "gallery": "brighton",
+   "n": 7,
+   "like": "1772f7392ce0"
+  },
+  {
+   "id": "d700fddbc699",
+   "gallery": "ecuador",
+   "n": 8,
+   "like": "df90022a6b64"
+  },
+  {
+   "id": "bd5b43470f49",
+   "gallery": "ecuador",
+   "n": 9,
+   "like": "273addb1f506"
+  },
+  {
+   "id": "afb949ff98de",
+   "gallery": "ecuador",
+   "n": 10,
+   "like": "fad030cf9c61"
+  },
+  {
+   "id": "09aca7b133e4",
+   "gallery": "ecuador",
+   "n": 20,
+   "like": "ab499833fc07"
+  },
+  {
+   "id": "09400a49272a",
+   "gallery": "ecuador",
+   "n": 24,
+   "like": "df90022a6b64"
+  },
+  {
+   "id": "589145a93d36",
+   "gallery": "ecuador",
+   "n": 30,
+   "like": "522c8856e424"
+  },
+  {
+   "id": "d070a139fb43",
+   "gallery": "bogota-library",
+   "n": 10,
+   "like": "658b6955dca8"
+  },
+  {
+   "id": "952c49bfe778",
+   "gallery": "bogota-library",
+   "n": 13,
+   "like": "2c8cbc779372"
+  },
+  {
+   "id": "843b121b0886",
+   "gallery": "bogota-library",
+   "n": 14,
+   "like": "dd5aa731feb8"
+  },
+  {
+   "id": "edcacc1c3be3",
+   "gallery": "bogota-library",
+   "n": 16,
+   "like": "31ed39489cdd"
+  },
+  {
+   "id": "7bbe424fc460",
+   "gallery": "bogota-library",
+   "n": 20,
+   "like": "fe1179efa452"
+  },
+  {
+   "id": "51b7b4aad8af",
+   "gallery": "bogota-library",
+   "n": 24,
+   "like": "11bb07b39ada"
+  },
+  {
+   "id": "5c381a0e03f1",
+   "gallery": "bogota-library",
+   "n": 29,
+   "like": "1bd6690dff24"
+  },
+  {
+   "id": "aa3a11939df4",
+   "gallery": "oaxaca",
+   "n": 10,
+   "like": "e93f58c6d827"
+  },
+  {
+   "id": "e57e9ab0e21d",
+   "gallery": "oaxaca",
+   "n": 12,
+   "like": "f48907e03c73"
+  },
+  {
+   "id": "01b7a95e6e9c",
+   "gallery": "oaxaca",
+   "n": 20,
+   "like": "7d62c5dd629c"
+  },
+  {
+   "id": "d06169b355a3",
+   "gallery": "oaxaca",
+   "n": 22,
+   "like": "bbb83a567a24"
+  },
+  {
+   "id": "557f9a195309",
+   "gallery": "oaxaca",
+   "n": 23,
+   "like": "f34d3b0bc3a5"
+  },
+  {
+   "id": "375eb5b97190",
+   "gallery": "oaxaca",
+   "n": 27,
+   "like": "1ddde2a8a819"
+  },
+  {
+   "id": "73e3f1a750ee",
+   "gallery": "oaxaca",
+   "n": 33,
+   "like": "d8ce6bcb3f74"
+  },
+  {
+   "id": "f1301af192c3",
+   "gallery": "oaxaca",
+   "n": 34,
+   "like": "1ddde2a8a819"
+  },
+  {
+   "id": "cd12573707bc",
+   "gallery": "new-jersey",
+   "n": 5,
+   "like": "7d2793a395e0"
+  },
+  {
+   "id": "ef361aed4bda",
+   "gallery": "new-jersey",
+   "n": 9,
+   "like": "4d506538dbd6"
+  },
+  {
+   "id": "469c39c502d7",
+   "gallery": "new-jersey",
+   "n": 21,
+   "like": "5afa79d709c5"
+  },
+  {
+   "id": "7ab78006589a",
+   "gallery": "cartagena",
+   "n": 5,
+   "like": "0f7e813bf74c"
+  },
+  {
+   "id": "65d871e21674",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "a968d86bd3b1",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "b44a257136c2",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "6567a8e539df",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "36879297de72",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "990afb988d98",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "a49dc41c4fd8",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "2daf4c438d1d",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "8a3502feb6a6",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "f59f373ab1e1",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "1646d1176af7",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "d3d5272e716d",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "29f7b974b749",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "e86d832060ce",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "36545a84753d",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "e35904e079b8",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "337825704152",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "42b22393b5f2",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "85cfbbe6b544",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "60b75f8bd661",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "5e71408472f7",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "e1bce1534ee6",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "b0dd487814ac",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "4f369b559957",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "091a0b40bcfe",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "d284647736cb",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "ba89283aab80",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "859879d51e3c",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "a6c544eda02d",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "2dc7f9b62ad4",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "0c72f850e162",
+   "why": "trimmed 2026-10-27: near-duplicate or tinted; the Eureka set was cut from 70 to 40"
+  },
+  {
+   "id": "888acd961e64",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "6112cabdea9b",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "a51509ce4fac",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "eb4bc3b7c9ef",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "a57e1af8c655",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "776c7a10c498",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "7f37a3510640",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "5c4690365f19",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "51b182228402",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "eec21de88890",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "10b1c009b0a4",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "f7210743c889",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "7ff76b886f3a",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "f0dc8dd426d0",
+   "why": "trimmed 2026-10-27: near-duplicate or colour cast; San Francisco cut from 29 to 16"
+  },
+  {
+   "id": "f20d910a8698",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "",
+   "why": "Alamo Square wide: out of focus in the camera (people and dogs soft, far building sharp); the source ARW is gone, the proxy is soft too (2026-10-27)"
+  },
+  {
+   "id": "636702d16573",
+   "gallery": "eureka",
+   "n": 0,
+   "like": "",
+   "why": "plant tip against blue sky: the plant is out of focus in the camera (2026-10-27)"
+  },
+  {
+   "id": "bb3d4e638567",
+   "gallery": "cartagena",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "e41c8b8e2fa4",
+   "gallery": "cartagena",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "6ed3e2804281",
+   "gallery": "cartagena",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "e6ac1c85d66a",
+   "gallery": "cartagena",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "c2809a3109b8",
+   "gallery": "cartagena",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "a325614882af",
+   "gallery": "cartagena",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "1c5a71729fc5",
+   "gallery": "cartagena",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "e021f200b7de",
+   "gallery": "cartagena",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "059fa7107fd4",
+   "gallery": "medellin",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "a473e94a111c",
+   "gallery": "medellin",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "f065b3afb925",
+   "gallery": "medellin",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "e890b7593c2a",
+   "gallery": "medellin",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "bcaf874f6a2f",
+   "gallery": "medellin",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "0a77e4fd7443",
+   "gallery": "medellin",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "ed533827de9e",
+   "gallery": "medellin",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "b93d3e1d5c37",
+   "gallery": "westminster-2020",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"
+  },
+  {
+   "id": "c523ac92d74d",
+   "gallery": "westminster-2020",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"
+  },
+  {
+   "id": "db4be8928276",
+   "gallery": "westminster-2020",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"
+  },
+  {
+   "id": "2384a4cbfc26",
+   "gallery": "westminster-2020",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"
+  },
+  {
+   "id": "8232d96c5fb8",
+   "gallery": "westminster-2020",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"
+  },
+  {
+   "id": "c91c524ddd00",
+   "gallery": "westminster-2020",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"
+  },
+  {
+   "id": "c8559ee01bb1",
+   "gallery": "westminster-2020",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"
+  },
+  {
+   "id": "97be0b2f07c8",
+   "gallery": "westminster-2020",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"
+  },
+  {
+   "id": "29bed4c00632",
+   "gallery": "westminster-2020",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate, soft or weak frame"
+  },
+  {
+   "id": "fd6b596f13e6",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "18b41b7cebe1",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "174fc66ac201",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "c357c09711f6",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "3c28cbfc0fa7",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "cc3712d1f75a",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "967a56791276",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "3aa38df7df6a",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "1dad43aa994d",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "eb315b08853e",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "46253e4cf267",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "dc8063590bfd",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "c54e9ef23cc0",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "7afb60ce0adb",
+   "gallery": "new-york",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: soft, near-duplicate or weak frame"
+  },
+  {
+   "id": "48b7263b54e1",
+   "gallery": "norway",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate"
+  },
+  {
+   "id": "7f2decbdcef4",
+   "gallery": "norway",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate"
+  },
+  {
+   "id": "428151988bab",
+   "gallery": "medellin",
+   "n": 0,
+   "like": "",
+   "why": "blown-out white wall, clipped highlights (2026-10-27)"
+  },
+  {
+   "id": "5eb840a86214",
+   "gallery": "texas",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "df01d1ea7fcb",
+   "gallery": "texas",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "45dbbc4ad19e",
+   "gallery": "texas",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "f28071e8f1df",
+   "gallery": "texas",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "521f0619f796",
+   "gallery": "texas",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "7258cce61708",
+   "gallery": "texas",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "5264fd60eb8c",
+   "gallery": "texas",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "3d18d80da33f",
+   "gallery": "texas",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "9323c587ff29",
+   "gallery": "texas",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "b628071538e8",
+   "gallery": "texas",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "8b90fbdae0a0",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "e1a8cee9d8d2",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "642f72184aa9",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "4c3068fe5c35",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "7e17bf0739fa",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "6e350512394c",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "6d67d98427f7",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "0c914f6c5a29",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "794933195955",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "2371c3c2fcc2",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "20da3c378fd4",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "9dec2b43a100",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "bace031a10a3",
+   "gallery": "arizona",
+   "n": 0,
+   "like": "",
+   "why": "trimmed 2026-10-27: near-duplicate or weak frame"
+  },
+  {
+   "id": "6163d66b5f9f",
+   "gallery": "ecuador",
+   "n": 4,
+   "like": "",
+   "why": "gallery review 2026-10-29: sheep pasture clip C0012_s3: one sheep clip is enough (C0011_s1 stays as the hero)"
+  },
+  {
+   "id": "ddaa9108c889",
+   "gallery": "ecuador",
+   "n": 6,
+   "like": "",
+   "why": "gallery review 2026-10-29: sheep pasture clip C0010_s1: same pasture"
+  },
+  {
+   "id": "ee3210d5df85",
+   "gallery": "ecuador",
+   "n": 8,
+   "like": "",
+   "why": "gallery review 2026-10-29: sheep pasture clip C0016_s3: same pasture"
+  },
+  {
+   "id": "7add2f40ab30",
+   "gallery": "ecuador",
+   "n": 10,
+   "like": "",
+   "why": "gallery review 2026-10-29: sheep pasture clip C0014_s2: same pasture"
+  },
+  {
+   "id": "bfaead5b05c1",
+   "gallery": "ecuador",
+   "n": 13,
+   "like": "",
+   "why": "gallery review 2026-10-29: sheep pasture clip C0015_s2: same pasture"
+  },
+  {
+   "id": "7e5ff6be7dbf",
+   "gallery": "ecuador",
+   "n": 17,
+   "like": "",
+   "why": "gallery review 2026-10-29: sheep pasture clip C0017_s3: same pasture"
+  },
+  {
+   "id": "d51fecce267b",
+   "gallery": "ecuador",
+   "n": 21,
+   "like": "",
+   "why": "gallery review 2026-10-29: sheep pasture clip C0013_s1: same pasture"
+  },
+  {
+   "id": "9a805c6c8f3f",
+   "gallery": "ecuador",
+   "n": 32,
+   "like": "",
+   "why": "gallery review 2026-10-29: sheep lying in grass (1344935): repeats 12"
+  },
+  {
+   "id": "9f25f3b43795",
+   "gallery": "ecuador",
+   "n": 37,
+   "like": "",
+   "why": "gallery review 2026-10-29: b/w sheep in the field (1367208): repeats 26"
+  },
+  {
+   "id": "0e83f1fc4d0b",
+   "gallery": "ecuador",
+   "n": 15,
+   "like": "",
+   "why": "gallery review 2026-10-29: empty cobbled plaza clip C0019_s2: the plaza is shown by C0018_s4 and C0022_s1"
+  },
+  {
+   "id": "41a321c3d7fb",
+   "gallery": "ecuador",
+   "n": 36,
+   "like": "",
+   "why": "gallery review 2026-10-29: plaza with the van, C0024_s3: same plaza"
+  },
+  {
+   "id": "9e4b115fb88c",
+   "gallery": "ecuador",
+   "n": 38,
+   "like": "",
+   "why": "gallery review 2026-10-29: plaza with the van, C0023_s1: same plaza"
+  },
+  {
+   "id": "52be837ce419",
+   "gallery": "ecuador",
+   "n": 42,
+   "like": "",
+   "why": "gallery review 2026-10-29: cross on the hill C0008_s1: repeats C0007_s1"
+  },
+  {
+   "id": "69427e1e585a",
+   "gallery": "ecuador",
+   "n": 33,
+   "like": "",
+   "why": "gallery review 2026-10-29: crater lake clip C0027_s1: the lake is shown by the two stills"
+  },
+  {
+   "id": "132e3c04655e",
+   "gallery": "japan",
+   "n": 10,
+   "like": "d83e816c1cca",
+   "why": "gallery review 2026-10-29: lone figure on the rocks (744609): same rocks and sea as 9, which has the couple"
+  },
+  {
+   "id": "ab10eaf49105",
+   "gallery": "london",
+   "n": 12,
+   "like": "",
+   "why": "gallery review 2026-10-29: hostel room, man standing (469006): same room as 13"
+  },
+  {
+   "id": "4d2a2b6ca92e",
+   "gallery": "amsterdam",
+   "n": 2,
+   "like": "e8eb39de0256",
+   "why": "gallery review 2026-10-29: friend drinking on the boat (415527): same seat and light as 1, the two friends"
+  },
+  {
+   "id": "146fb5f833be",
+   "gallery": "barbados",
+   "n": 2,
+   "like": "7917b4abb34d",
+   "why": "gallery review 2026-10-29: market hall interior (567901): the market is shown by the hero (0) and the vendor (9)"
+  },
+  {
+   "id": "da0adc774e70",
+   "gallery": "sao-paulo",
+   "n": 2,
+   "like": "9cb155c525b5",
+   "why": "gallery review 2026-10-29: friend in the brown shirt by the window (417547): five portraits of him in the same outfit, keep the balcony (0), the two friends (1) and the seated one with the camera (3)"
+  },
+  {
+   "id": "233c2da0c49c",
+   "gallery": "sao-paulo",
+   "n": 7,
+   "like": "",
+   "why": "gallery review 2026-10-29: friend in the brown shirt, arms crossed on the street (160846): same session"
+  },
+  {
+   "id": "9dc07953a37b",
+   "gallery": "sao-paulo",
+   "n": 14,
+   "like": "43005ef0483b",
+   "why": "gallery review 2026-10-29: friend in the maroon shirt, profile (119028): keep the drink with the traffic streaks (13) and the magazines (16)"
+  },
+  {
+   "id": "430311bd4bbf",
+   "gallery": "mexico-city",
+   "n": 3,
+   "like": "9c792f8a093a",
+   "why": "gallery review 2026-10-29: people climbing the pyramid steps (569693): the pyramid is 9, 15 and the view from the top (16)"
+  },
+  {
+   "id": "64fe6640728a",
+   "gallery": "wyoming-2020",
+   "n": 10,
+   "like": "7b33f483ecb7",
+   "why": "gallery review 2026-10-29: dark Teton skyline (1241914): 15 is the same dusk with the lake"
+  },
+  {
+   "id": "f3095a6658eb",
+   "gallery": "wyoming-2020",
+   "n": 16,
+   "like": "1d06f235e872",
+   "why": "gallery review 2026-10-29: backs of the bus group (1241925): the hero (1) is the same ride"
+  },
+  {
+   "id": "7b206a38a698",
+   "gallery": "wyoming-2020",
+   "n": 18,
+   "like": "c3fc9bd15d23",
+   "why": "gallery review 2026-10-29: selfie in the fog (1247010): the fog overlook is 3 (figure under the tree) and 13 (the lone tree)"
+  },
+  {
+   "id": "9ed69ea1cfa1",
+   "gallery": "medellin",
+   "n": 12,
+   "like": "6e4acfb0f5b4",
+   "why": "gallery review 2026-10-29: protest clip IMG_3277: the still of the signs (11) says it"
+  },
+  {
+   "id": "7c0e2ee8956c",
+   "gallery": "medellin",
+   "n": 21,
+   "like": "b58bd55b2828",
+   "why": "gallery review 2026-10-29: hen clip IMG_3350: the hen on the skateboard (7) and the white rooster (26) stay"
+  },
+  {
+   "id": "c1dfdd393902",
+   "gallery": "medellin",
+   "n": 27,
+   "like": "2931c0d63e8b",
+   "why": "gallery review 2026-10-29: man with a dog clip IMG_3403: 49 is the same idea as a still"
+  },
+  {
+   "id": "2e89758eecf5",
+   "gallery": "medellin",
+   "n": 30,
+   "like": "ea97a29e5dba",
+   "why": "gallery review 2026-10-29: dancer clip IMG_3420: the dancer in pink is 19 and the mural clip 33"
+  },
+  {
+   "id": "356543b43639",
+   "gallery": "medellin",
+   "n": 36,
+   "like": "89896be8c009",
+   "why": "gallery review 2026-10-29: breaker clip IMG_3451: the headspin still (2) and the crew (20) stay"
+  },
+  {
+   "id": "4e292e0f6dd7",
+   "gallery": "medellin",
+   "n": 42,
+   "like": "a45cb91f5d8d",
+   "why": "gallery review 2026-10-29: monstera clip IMG_3539: 29 is the leaf"
+  },
+  {
+   "id": "97e6eb548404",
+   "gallery": "medellin",
+   "n": 43,
+   "like": "2c878167d885",
+   "why": "gallery review 2026-10-29: dog in the window (357502): 31 is the dog on the balcony"
+  },
+  {
+   "id": "e4e05e02be0f",
+   "gallery": "cartagena",
+   "n": 30,
+   "like": "5091f63b9ff0",
+   "why": "gallery review 2026-10-29: dog digging clip IMG_4014: the still (4) is the digging dog"
+  },
+  {
+   "id": "e99c964aa751",
+   "gallery": "cartagena",
+   "n": 33,
+   "like": "5c05e97834fa",
+   "why": "gallery review 2026-10-29: stick on the rocks clip 754864: 22 is the stick"
+  },
+  {
+   "id": "c97b82e589e6",
+   "gallery": "cartagena",
+   "n": 34,
+   "like": "",
+   "why": "gallery review 2026-10-29: dog sniffing clip IMG_4029: twelve beach dogs, keep eight stills with different ideas"
+  },
+  {
+   "id": "90230f6db38b",
+   "gallery": "cartagena",
+   "n": 37,
+   "like": "5dcf99af690e",
+   "why": "gallery review 2026-10-29: dog lying on the beach clip IMG_4081: 36 is the sleeping dog"
+  },
+  {
+   "id": "34cfa0ea4412",
+   "gallery": "cartagena",
+   "n": 43,
+   "like": "",
+   "why": "gallery review 2026-10-29: dog sleeping clip IMG_4149: same"
+  },
+  {
+   "id": "1ff88999d0b2",
+   "gallery": "cartagena",
+   "n": 52,
+   "like": "3b196d4bc0d8",
+   "why": "gallery review 2026-10-29: palms with the city clip IMG_4269: 47 is the two palms"
+  },
+  {
+   "id": "e2aa7d0c16b7",
+   "gallery": "westminster-2020",
+   "n": 18,
+   "like": "a7a29ff2893d",
+   "why": "gallery review 2026-10-29: whippet in the orange vest alone (321402): 8 is the same dog with its owner"
+  },
+  {
+   "id": "d71acb847950",
+   "gallery": "westminster-2020",
+   "n": 23,
+   "like": "499baae19488",
+   "why": "gallery review 2026-10-29: afghan hound on the street clip IMG_4600: 5 is the same dog with its owner at the car"
+  },
+  {
+   "id": "a3f19e131233",
+   "gallery": "westminster-2020",
+   "n": 24,
+   "like": "bb11c60c9481",
+   "why": "gallery review 2026-10-29: handler from behind, Masters Agility shirt (10815): 17 is the same idea at the ring"
+  },
+  {
+   "id": "980829a6ffbd",
+   "gallery": "new-york",
+   "n": 17,
+   "like": "",
+   "why": "gallery review 2026-10-29: skyline clip C0035_s2: nineteen dusk / skyline-over-water frames, keep the eight strongest stills and two clips"
+  },
+  {
+   "id": "e527c543ac29",
+   "gallery": "new-york",
+   "n": 21,
+   "like": "",
+   "why": "gallery review 2026-10-29: dusk skyline clip C0036_s3"
+  },
+  {
+   "id": "c9332b113e77",
+   "gallery": "new-york",
+   "n": 34,
+   "like": "",
+   "why": "gallery review 2026-10-29: sunset harbour clip 10022021_C0001"
+  },
+  {
+   "id": "783dede83191",
+   "gallery": "new-york",
+   "n": 38,
+   "like": "",
+   "why": "gallery review 2026-10-29: Manhattan Bridge dusk clip 10022021_C0003"
+  },
+  {
+   "id": "4299b3fb4a42",
+   "gallery": "new-york",
+   "n": 46,
+   "like": "4fcb3cbba1a6",
+   "why": "gallery review 2026-10-29: bridge walkway dusk clip 10022021_C0005: 13 is the same walk"
+  },
+  {
+   "id": "d67f91ffa2bf",
+   "gallery": "new-york",
+   "n": 51,
+   "like": "",
+   "why": "gallery review 2026-10-29: skyline dusk clip C0034_s2"
+  },
+  {
+   "id": "f604e2137f4d",
+   "gallery": "new-york",
+   "n": 55,
+   "like": "",
+   "why": "gallery review 2026-10-29: dusk skyline clip 10022021_C0002"
+  },
+  {
+   "id": "1629d0bfa852",
+   "gallery": "new-york",
+   "n": 57,
+   "like": "b6825218881c",
+   "why": "gallery review 2026-10-29: sunset over the water (45073): 23 and 78 are the better sunsets"
+  },
+  {
+   "id": "e2552643f165",
+   "gallery": "new-york",
+   "n": 72,
+   "like": "",
+   "why": "gallery review 2026-10-29: sky over the water clip 12252021_C0001"
+  },
+  {
+   "id": "ed461792b6e5",
+   "gallery": "new-york",
+   "n": 43,
+   "like": "7fe357e3041a",
+   "why": "gallery review 2026-10-29: reservoir in snow, portrait (2579630): 41 is the same view wide"
+  },
+  {
+   "id": "4f05f820e390",
+   "gallery": "new-york",
+   "n": 48,
+   "like": "812169a6d2d6",
+   "why": "gallery review 2026-10-29: tractors in the snow, wide (2579690): 47 is the same tractors"
+  },
+  {
+   "id": "9c8a8df06c1d",
+   "gallery": "new-york",
+   "n": 67,
+   "like": "4d7f5cfdc5e3",
+   "why": "gallery review 2026-10-29: lit field at night clip C0030_s1: 63 is the same field"
+  },
+  {
+   "id": "e46f5a47a6d6",
+   "gallery": "new-york",
+   "n": 59,
+   "like": "e7e2d11ca4e7",
+   "why": "gallery review 2026-10-29: people on the field at dusk clip C0027_s1: 29 is the same evening"
+  },
+  {
+   "id": "63c7a856c1c0",
+   "gallery": "new-york",
+   "n": 8,
+   "like": "bbc60ebb1d0d",
+   "why": "gallery review 2026-10-29: brownstone street clip C0002_s1: the hero (4) is the same street"
+  },
+  {
+   "id": "cb8277f44fbd",
+   "gallery": "new-york",
+   "n": 42,
+   "like": "b757e298a0db",
+   "why": "gallery review 2026-10-29: grey street clip C0008_s2: 25 is the same corner"
+  },
+  {
+   "id": "8dbe0f4a4b1e",
+   "gallery": "eureka",
+   "n": 3,
+   "like": "090b46cb2b51",
+   "why": "gallery review 2026-10-29: seagull on the post clip 20201105_08025 s1: 6 is the gull as a still"
+  },
+  {
+   "id": "85e0147e9ff5",
+   "gallery": "eureka",
+   "n": 5,
+   "like": "",
+   "why": "gallery review 2026-10-29: seagull on the post clip 20201105_08025 s2: second window of the same clip"
+  },
+  {
+   "id": "212c3cf9f591",
+   "gallery": "eureka",
+   "n": 8,
+   "like": "d52b26b2d437",
+   "why": "gallery review 2026-10-29: two silhouettes on the beach clip 20201106_09273: 4 is the same pair as a still"
+  },
+  {
+   "id": "d1d201da1c16",
+   "gallery": "eureka",
+   "n": 14,
+   "like": "421fae4e1da6",
+   "why": "gallery review 2026-10-29: caf\u00e9 clip 20201106_10094: 12 is the caf\u00e9"
+  },
+  {
+   "id": "a4cf91f12681",
+   "gallery": "eureka",
+   "n": 17,
+   "like": "6e0d766c346a",
+   "why": "gallery review 2026-10-29: beach under the cliff, portrait (070a771e): 1 is the same beach wide"
+  },
+  {
+   "id": "a6c92d280da3",
+   "gallery": "eureka",
+   "n": 20,
+   "like": "",
+   "why": "gallery review 2026-10-29: tree over the sea (d362d0ba): three of these, keep 21"
+  },
+  {
+   "id": "3494e8a3d8a8",
+   "gallery": "eureka",
+   "n": 24,
+   "like": "",
+   "why": "gallery review 2026-10-29: tree over the sea (343b7fd7): same"
+  },
+  {
+   "id": "7da77b0c62ab",
+   "gallery": "eureka",
+   "n": 41,
+   "like": "",
+   "why": "gallery review 2026-10-29: tree over the sea clip IMG_7708: the same tree again"
+  },
+  {
+   "id": "9c28282638b7",
+   "gallery": "eureka",
+   "n": 44,
+   "like": "",
+   "why": "gallery review 2026-10-29: tree over the beach clip IMG_7709: the same tree again"
+  },
+  {
+   "id": "122a5df7c972",
+   "gallery": "eureka",
+   "n": 51,
+   "like": "a75fb40ca7b0",
+   "why": "gallery review 2026-10-29: hanging plant (df2c0fba): 53 (the man in the barn with it) and 47 (close) stay"
+  },
+  {
+   "id": "b411806b1868",
+   "gallery": "eureka",
+   "n": 55,
+   "like": "25e6144f537d",
+   "why": "gallery review 2026-10-29: hand holding the plant clip IMG_7820: 50 is the hands trimming"
+  },
+  {
+   "id": "5abd27ef2e1e",
+   "gallery": "eureka",
+   "n": 57,
+   "like": "d4639b7b2970",
+   "why": "gallery review 2026-10-29: man in the field clip IMG_7823: 36 is the same man in the same field"
+  },
+  {
+   "id": "8e201d7338e6",
+   "gallery": "eureka",
+   "n": 59,
+   "like": "6c3317b0165b",
+   "why": "gallery review 2026-10-29: man standing at the tarp (5c2aad9a): 48 is the same spot"
+  },
+  {
+   "id": "c02bc513bda6",
+   "gallery": "san-francisco",
+   "n": 0,
+   "like": "642f239a341d",
+   "why": "gallery review 2026-10-29: Painted Ladies from the street (cb463327): 1 has them with the city behind"
+  },
+  {
+   "id": "3a369b5c43ac",
+   "gallery": "san-francisco",
+   "n": 6,
+   "like": "",
+   "why": "gallery review 2026-10-29: sun over the field clip 20201109_11105 s2: second window of the hero clip"
+  },
+  {
+   "id": "8fb9b256b788",
+   "gallery": "san-francisco",
+   "n": 11,
+   "like": "9896c75417b0",
+   "why": "gallery review 2026-10-29: bay view with the yucca (7fbba032): 5 is the same view"
+  },
+  {
+   "id": "18bb00118f94",
+   "gallery": "san-francisco",
+   "n": 12,
+   "like": "",
+   "why": "gallery review 2026-10-29: sun over the hill clip IMG_7952: eight sun-flare frames, keep five"
+  },
+  {
+   "id": "10d55fd93d3a",
+   "gallery": "san-francisco",
+   "n": 18,
+   "like": "f82d5563b086",
+   "why": "gallery review 2026-10-29: sun over the building with the dogs clip IMG_7955: 15 is the same moment"
+  },
+  {
+   "id": "fa1038417ed8",
+   "gallery": "texas",
+   "n": 9,
+   "like": "ed1a4ea5004f",
+   "why": "gallery review 2026-10-29: Capitol from the lawn clip C0002_s1: 1 (front) and 33 (dome silhouette) stay"
+  },
+  {
+   "id": "5472c32d8814",
+   "gallery": "texas",
+   "n": 24,
+   "like": "",
+   "why": "gallery review 2026-10-29: Capitol dome clip C0005_s1"
+  },
+  {
+   "id": "b1c608e35d59",
+   "gallery": "texas",
+   "n": 13,
+   "like": "922aadcf40d6",
+   "why": "gallery review 2026-10-29: Alon gas station clip C0016_s1: seven frames of the station, keep the still with the sun (19) and C0012_s2"
+  },
+  {
+   "id": "02b456355ace",
+   "gallery": "texas",
+   "n": 17,
+   "like": "",
+   "why": "gallery review 2026-10-29: Alon gas station vertical clip C0015_s1"
+  },
+  {
+   "id": "c64597eb7b01",
+   "gallery": "texas",
+   "n": 20,
+   "like": "",
+   "why": "gallery review 2026-10-29: Alon gas station clip C0014_s2"
+  },
+  {
+   "id": "02bc63786c2f",
+   "gallery": "texas",
+   "n": 28,
+   "like": "",
+   "why": "gallery review 2026-10-29: Alon gas station clip C0011_s1"
+  },
+  {
+   "id": "85bfb0aea324",
+   "gallery": "texas",
+   "n": 30,
+   "like": "",
+   "why": "gallery review 2026-10-29: Alon gas station clip C0013_s1"
+  },
+  {
+   "id": "f51f2f5bdcdf",
+   "gallery": "texas",
+   "n": 16,
+   "like": "7ff56e32e288",
+   "why": "gallery review 2026-10-29: rock formation (90764): 23 is the same rock with a figure at sunset"
+  },
+  {
+   "id": "fb2e6066cb52",
+   "gallery": "westminster-2021",
+   "n": 5,
+   "like": "bc47ec161ccd",
+   "why": "gallery review 2026-10-29: hedge path clip C0019_s1: the hero (2) is the same path"
+  },
+  {
+   "id": "b7f8241af958",
+   "gallery": "westminster-2021",
+   "n": 7,
+   "like": "",
+   "why": "gallery review 2026-10-29: tents and crowd clip C0025_s2: 28 clips of the show lawn, keep eleven"
+  },
+  {
+   "id": "d8f277ec9a9d",
+   "gallery": "westminster-2021",
+   "n": 9,
+   "like": "",
+   "why": "gallery review 2026-10-29: tent lawn clip C0020_s2"
+  },
+  {
+   "id": "81938a4edfda",
+   "gallery": "westminster-2021",
+   "n": 14,
+   "like": "",
+   "why": "gallery review 2026-10-29: tents and crowd clip C0026_s1"
+  },
+  {
+   "id": "3ab8e9e7e0da",
+   "gallery": "westminster-2021",
+   "n": 18,
+   "like": "",
+   "why": "gallery review 2026-10-29: tent with people clip C0004_s3"
+  },
+  {
+   "id": "96a23d965c73",
+   "gallery": "westminster-2021",
+   "n": 21,
+   "like": "",
+   "why": "gallery review 2026-10-29: tent with people clip C0005_s2"
+  },
+  {
+   "id": "212eb1640d41",
+   "gallery": "westminster-2021",
+   "n": 30,
+   "like": "",
+   "why": "gallery review 2026-10-29: tents on the lawn clip C0023_s4"
+  },
+  {
+   "id": "b1c8d20f3e59",
+   "gallery": "westminster-2021",
+   "n": 32,
+   "like": "640983b4f0ae",
+   "why": "gallery review 2026-10-29: agility tunnel clip C0013_s1: 23 is the tunnel"
+  },
+  {
+   "id": "1c6ae1cce6fc",
+   "gallery": "westminster-2021",
+   "n": 35,
+   "like": "e10ad08b5457",
+   "why": "gallery review 2026-10-29: under the big tent clip C0009_s1: 28 is the same tent"
+  },
+  {
+   "id": "100dab3eaa7f",
+   "gallery": "westminster-2021",
+   "n": 37,
+   "like": "",
+   "why": "gallery review 2026-10-29: people at the tent clip C0006_s2"
+  },
+  {
+   "id": "9affe3e77062",
+   "gallery": "westminster-2021",
+   "n": 42,
+   "like": "26f9811035a2",
+   "why": "gallery review 2026-10-29: purple arena clip C0003_s1: 39 is the arena"
+  },
+  {
+   "id": "a400116a3c3f",
+   "gallery": "westminster-2021",
+   "n": 44,
+   "like": "",
+   "why": "gallery review 2026-10-29: purple arena re-encode test_31_1080_s: the one test_* file that was not on the excluded list"
+  },
+  {
+   "id": "dd38b2d5e86e",
+   "gallery": "westminster-2021",
+   "n": 46,
+   "like": "6b3715450d56",
+   "why": "gallery review 2026-10-29: agility jumps clip IMG_9334: 62 (weave poles) stays"
+  },
+  {
+   "id": "ceca6fa02526",
+   "gallery": "westminster-2021",
+   "n": 49,
+   "like": "",
+   "why": "gallery review 2026-10-29: handlers at the ring clip IMG_9369"
+  },
+  {
+   "id": "a6935a2beb39",
+   "gallery": "westminster-2021",
+   "n": 55,
+   "like": "",
+   "why": "gallery review 2026-10-29: people seated at the ring clip C0012_s1"
+  },
+  {
+   "id": "a07bd3ee418b",
+   "gallery": "westminster-2021",
+   "n": 58,
+   "like": "",
+   "why": "gallery review 2026-10-29: tent crowd clip C0022_s2"
+  },
+  {
+   "id": "dcfe16482db9",
+   "gallery": "westminster-2021",
+   "n": 65,
+   "like": "",
+   "why": "gallery review 2026-10-29: tents on the lawn clip C0024_s1"
+  },
+  {
+   "id": "ceada25a2ca6",
+   "gallery": "westminster-2021",
+   "n": 29,
+   "like": "9ef3f2134f25",
+   "why": "gallery review 2026-10-29: woman with the black afghan at the tent (543011): 22 is the same pair"
+  },
+  {
+   "id": "07589f35b12d",
+   "gallery": "westminster-2021",
+   "n": 59,
+   "like": "ca1c8241a3a6",
+   "why": "gallery review 2026-10-29: afghan head against blue (458805): 4 is the afghan head"
+  },
+  {
+   "id": "093d386c8548",
+   "gallery": "westminster-2021",
+   "n": 40,
+   "like": "fe34ca3976cf",
+   "why": "gallery review 2026-10-29: mansion hall (61763): 10 is the same hall"
+  },
+  {
+   "id": "f8711a1560cb",
+   "gallery": "westminster-2021",
+   "n": 48,
+   "like": "",
+   "why": "gallery review 2026-10-29: coffee grinder on the table (543400): a detail too many among eleven interiors"
+  },
+  {
+   "id": "e4db83e43fbf",
+   "gallery": "colorado",
+   "n": 1,
+   "like": "990efdaed0b8",
+   "why": "gallery review 2026-10-29: dark grass field at dusk (486313): 8 is the same place with the red rocks"
+  },
+  {
+   "id": "611436d30bc0",
+   "gallery": "colorado",
+   "n": 3,
+   "like": "c9a71bb4d7f7",
+   "why": "gallery review 2026-10-29: man standing on the dune clip C0003_s2: the hero (0) is the same man"
+  },
+  {
+   "id": "763fa3f7bf84",
+   "gallery": "colorado",
+   "n": 10,
+   "like": "1628cad856a3",
+   "why": "gallery review 2026-10-29: dune with the valley clip C0006_s1: 9 is the same view"
+  },
+  {
+   "id": "7d769c4d32ac",
+   "gallery": "colorado",
+   "n": 12,
+   "like": "39fae5dfbe33",
+   "why": "gallery review 2026-10-29: dune at sunrise (80611): 23 is the dune with the sun"
+  },
+  {
+   "id": "ba50b374a81e",
+   "gallery": "colorado",
+   "n": 17,
+   "like": "0118a8eea237",
+   "why": "gallery review 2026-10-29: dune with people clip C0001_s2: 11 is the ridge"
+  },
+  {
+   "id": "3c6c6a5d264a",
+   "gallery": "colorado",
+   "n": 18,
+   "like": "1d7cdf0c1536",
+   "why": "gallery review 2026-10-29: dunes and mountains (67415): 13 is the same view"
+  },
+  {
+   "id": "4106b539f214",
+   "gallery": "colorado",
+   "n": 19,
+   "like": "67d384d3a2a8",
+   "why": "gallery review 2026-10-29: dune ridge curve (486346): 5 is the same curve"
+  },
+  {
+   "id": "2ac97030ed11",
+   "gallery": "colorado",
+   "n": 20,
+   "like": "12dd7b2d7f11",
+   "why": "gallery review 2026-10-29: dunes and mountains clip C0005_s4: 14 is the same view"
+  },
+  {
+   "id": "1f6f79880dcd",
+   "gallery": "nycc-2021",
+   "n": 19,
+   "like": "30e6b538f7ab",
+   "why": "gallery review 2026-10-29: Batman with his arm up clip DJI_20211007 s3: 21 is the same pose as a still"
+  },
+  {
+   "id": "f9259299ab7d",
+   "gallery": "nycc-2021",
+   "n": 23,
+   "like": "",
+   "why": "gallery review 2026-10-29: Batman with his arm up clip DJI_20211007 s4: same"
+  },
+  {
+   "id": "265d232f099f",
+   "gallery": "arizona",
+   "n": 4,
+   "like": "e18f1c5e3be0",
+   "why": "gallery review 2026-10-29: rim at dusk clip C0005_s1: 12 is the rim at sunset"
+  },
+  {
+   "id": "e5bf3a1768cd",
+   "gallery": "arizona",
+   "n": 19,
+   "like": "8922526bb857",
+   "why": "gallery review 2026-10-29: canyon, portrait, flat light (242205): 11 is the canyon lit by the sunset"
+  },
+  {
+   "id": "f01a598ab567",
+   "gallery": "arizona",
+   "n": 21,
+   "like": "0aa1395eaf5e",
+   "why": "gallery review 2026-10-29: canyon from the rim clip C0003_s2 (New Mexico folder): 16 is the canyon wide"
+  },
+  {
+   "id": "4cb151dd929b",
+   "gallery": "arizona",
+   "n": 25,
+   "like": "",
+   "why": "gallery review 2026-10-29: canyon from the rim clip C0003_s2 (phoenix folder): same view"
+  },
+  {
+   "id": "b3998f4592a1",
+   "gallery": "arizona",
+   "n": 6,
+   "like": "1172ae4ba09e",
+   "why": "gallery review 2026-10-29: cholla in grass (265768): 10 is the cholla at sunset"
+  },
+  {
+   "id": "ee23aedebe5e",
+   "gallery": "arizona",
+   "n": 20,
+   "like": "3543805bf9f1",
+   "why": "gallery review 2026-10-29: saguaro silhouettes (265755): 14 is the saguaro silhouette on the path"
+  },
+  {
+   "id": "2d7cef73f89e",
+   "gallery": "arizona",
+   "n": 35,
+   "like": "",
+   "why": "gallery review 2026-10-29: saguaro silhouette (265803): same"
+  },
+  {
+   "id": "ccb15b3b0868",
+   "gallery": "arizona",
+   "n": 29,
+   "like": "bf4ddaf61bc1",
+   "why": "gallery review 2026-10-29: balloons, portrait clip C0008_s3: 33 is the balloons wide"
+  },
+  {
+   "id": "a02aa81384ca",
+   "gallery": "arizona",
+   "n": 36,
+   "like": "77654f6fa91c",
+   "why": "gallery review 2026-10-29: bison head in the shop (224954): 34 is the same shop"
+  },
+  {
+   "id": "4387df5e1933",
+   "gallery": "new-mexico",
+   "n": 8,
+   "like": "0e04fdaa284d",
+   "why": "gallery review 2026-10-29: person on the dune (770858): 4 is the person on the white sand"
+  },
+  {
+   "id": "4ae46ffed8d6",
+   "gallery": "new-mexico",
+   "n": 14,
+   "like": "10bdfbd12c5b",
+   "why": "gallery review 2026-10-29: people on the dunes (770745): 24 is the people at dusk"
+  },
+  {
+   "id": "6988461b9450",
+   "gallery": "new-mexico",
+   "n": 19,
+   "like": "c41ac012afde",
+   "why": "gallery review 2026-10-29: yucca on the dunes (770737): 16 is the yucca"
+  },
+  {
+   "id": "14205973b4b3",
+   "gallery": "new-mexico",
+   "n": 20,
+   "like": "c7298547d5ef",
+   "why": "gallery review 2026-10-29: dunes at sunset clip C0002_s3: 25 is the dunes at dusk"
+  },
+  {
+   "id": "d6afb51c3c86",
+   "gallery": "new-mexico",
+   "n": 7,
+   "like": "d07f03c4a4da",
+   "why": "gallery review 2026-10-29: banded cliffs over the lake clip staging_C0002: 5 is the same cliffs"
+  },
+  {
+   "id": "2676fca08afa",
+   "gallery": "new-mexico",
+   "n": 12,
+   "like": "",
+   "why": "gallery review 2026-10-29: banded cliffs over the lake clip staging_C0003: same"
+  },
+  {
+   "id": "148d7c9e5be0",
+   "gallery": "new-mexico",
+   "n": 17,
+   "like": "1547ff05a29e",
+   "why": "gallery review 2026-10-29: moon over the badlands clip C0006_s1: 22 is the same moonrise"
+  },
+  {
+   "id": "235624eef1ac",
+   "gallery": "lisbon",
+   "n": 5,
+   "like": "2b71a5af9c74",
+   "why": "gallery review 2026-10-29: castle hill (927388): 8 is the same view"
+  },
+  {
+   "id": "860946bc0a1b",
+   "gallery": "lisbon",
+   "n": 12,
+   "like": "c739c5ff5e89",
+   "why": "gallery review 2026-10-29: dancer with her arms up (927130): 4 (at the statue) and 17 (leaning back) stay"
+  },
+  {
+   "id": "0a0cd55a37fc",
+   "gallery": "madeira",
+   "n": 2,
+   "like": "77e0224dffeb",
+   "why": "gallery review 2026-10-29: sea stack clip IMG_1565: 6 is the stack from the cliff path"
+  },
+  {
+   "id": "2f3e7329ddbe",
+   "gallery": "madeira",
+   "n": 12,
+   "like": "",
+   "why": "gallery review 2026-10-29: misty peak clip IMG_1772: eight misty ridges, keep five"
+  },
+  {
+   "id": "e96137cc44a4",
+   "gallery": "madeira",
+   "n": 16,
+   "like": "3b14c580356c",
+   "why": "gallery review 2026-10-29: green hills, wide (949738): 0 is the same hill"
+  },
+  {
+   "id": "1e3c554f18db",
+   "gallery": "madeira",
+   "n": 17,
+   "like": "ec6791280afe",
+   "why": "gallery review 2026-10-29: waterfall clip DJI_20220406: 9 and 19 are the waterfalls"
+  },
+  {
+   "id": "d59022898985",
+   "gallery": "madeira",
+   "n": 21,
+   "like": "c775bc8cd5e0",
+   "why": "gallery review 2026-10-29: misty ridge with snow (977111): 3 is the snowy ridge"
+  },
+  {
+   "id": "36d6b38a9c62",
+   "gallery": "madeira",
+   "n": 25,
+   "like": "065425dd45f9",
+   "why": "gallery review 2026-10-29: misty mountains clip C0002_s1: the hero (22) is the same range"
+  },
+  {
+   "id": "9d6dd4422c55",
+   "gallery": "stockholm",
+   "n": 5,
+   "like": "4db70bf22d54",
+   "why": "gallery review 2026-10-29: fountain clip C0032_s2: 10 is the fountain"
+  },
+  {
+   "id": "9c602a88541f",
+   "gallery": "stockholm",
+   "n": 16,
+   "like": "57aa957a67e2",
+   "why": "gallery review 2026-10-29: pier at dusk clip C0035_s1: 14 is the same pier"
+  },
+  {
+   "id": "349a3b9a479c",
+   "gallery": "norway",
+   "n": 35,
+   "like": "4e11ef3622c5",
+   "why": "gallery review 2026-10-29: fjord reflection clip C0022_s2: six reflection clips, keep C0023_s1 (24) and the vertical C0015_s2 (42)"
+  },
+  {
+   "id": "708fe7da43ab",
+   "gallery": "norway",
+   "n": 37,
+   "like": "",
+   "why": "gallery review 2026-10-29: fjord reflection clip C0014_s2"
+  },
+  {
+   "id": "0c9c2140fdaf",
+   "gallery": "norway",
+   "n": 39,
+   "like": "",
+   "why": "gallery review 2026-10-29: fjord reflection clip DJI_0247_s2"
+  },
+  {
+   "id": "285bffbc1241",
+   "gallery": "norway",
+   "n": 29,
+   "like": "1fc2fd962655",
+   "why": "gallery review 2026-10-29: village on the fjord clip DJI_0275_s1: 6 is the same village from the air"
+  },
+  {
+   "id": "7e44e7f13a43",
+   "gallery": "norway",
+   "n": 16,
+   "like": "680a1316c04a",
+   "why": "gallery review 2026-10-29: Trolltunga clip C0009_s2: 18 has the person on the tongue"
+  },
+  {
+   "id": "5086f3014407",
+   "gallery": "norway",
+   "n": 41,
+   "like": "6caa5ce23347",
+   "why": "gallery review 2026-10-29: person on the tongue, blue (1149888): 15 is the same shot wider"
+  },
+  {
+   "id": "26070b604bd6",
+   "gallery": "norway",
+   "n": 11,
+   "like": "11914b0d3387",
+   "why": "gallery review 2026-10-29: rock plateau from the air clip DJI_0241_s1: 5 is the same plateau"
+  },
+  {
+   "id": "10df97a84fd8",
+   "gallery": "norway",
+   "n": 26,
+   "like": "c18462858df5",
+   "why": "gallery review 2026-10-29: city rooftops clip C0004_s2: 8 is the same tower"
+  },
+  {
+   "id": "097fcf22f1b4",
+   "gallery": "norway",
+   "n": 31,
+   "like": "7206528b8a7c",
+   "why": "gallery review 2026-10-29: city evening clip C0006_s1: 21 is the harbour at dusk"
+  },
+  {
+   "id": "7390d4499d6e",
+   "gallery": "norway",
+   "n": 40,
+   "like": "9d4368004384",
+   "why": "gallery review 2026-10-29: rocks in the sea clip C0011_s1: 34 is the islands"
+  },
+  {
+   "id": "e4c44bd3d61e",
+   "gallery": "wyoming-2022",
+   "n": 27,
+   "like": "504ca6882e62",
+   "why": "gallery review 2026-10-29: Mount Moran over the fog, portrait (1215706): 45 (wide) and the clip 41 stay"
+  },
+  {
+   "id": "cd854d0d5825",
+   "gallery": "wyoming-2022",
+   "n": 33,
+   "like": "",
+   "why": "gallery review 2026-10-29: Mount Moran over the fog clip C0038_s4"
+  },
+  {
+   "id": "a20c2751d4e6",
+   "gallery": "wyoming-2022",
+   "n": 16,
+   "like": "25155cc93172",
+   "why": "gallery review 2026-10-29: forest slope, portrait (1215744): 34 has the same slope with the peak"
+  },
+  {
+   "id": "7be11ae5f69a",
+   "gallery": "wyoming-2022",
+   "n": 58,
+   "like": "65543556fa4b",
+   "why": "gallery review 2026-10-29: creek with rocks (1215745): 6 is the same creek"
+  },
+  {
+   "id": "522f2242cb4b",
+   "gallery": "wyoming-2022",
+   "n": 15,
+   "like": "6122499d8ac6",
+   "why": "gallery review 2026-10-29: valley from the air clip DJI_0376_s1: 17 is the same valley"
+  },
+  {
+   "id": "88f38d195365",
+   "gallery": "wyoming-2022",
+   "n": 26,
+   "like": "bd3bfb4269d6",
+   "why": "gallery review 2026-10-29: dusk ridge clip DJI_0375_s1: 48 is the same ridge"
+  },
+  {
+   "id": "b4288bed71e5",
+   "gallery": "wyoming-2022",
+   "n": 59,
+   "like": "851aef6ced0a",
+   "why": "gallery review 2026-10-29: dusk sky clip C0042_s1: 54 is the same dusk"
+  },
+  {
+   "id": "7ddf61f35d88",
+   "gallery": "wyoming-2022",
+   "n": 19,
+   "like": "7f03d49056b2",
+   "why": "gallery review 2026-10-29: dusk valley, portrait (1215702): 53 is the sunrise over the range"
+  },
+  {
+   "id": "fab8dcb48242",
+   "gallery": "wyoming-2022",
+   "n": 24,
+   "like": "",
+   "why": "gallery review 2026-10-29: canyon cliff clip DJI_0409_s1: nine canyon / falls frames, keep the two stills and two clips"
+  },
+  {
+   "id": "bfe368b88507",
+   "gallery": "wyoming-2022",
+   "n": 35,
+   "like": "",
+   "why": "gallery review 2026-10-29: fog in the canyon clip C0044_s1"
+  },
+  {
+   "id": "66f978475c28",
+   "gallery": "wyoming-2022",
+   "n": 39,
+   "like": "",
+   "why": "gallery review 2026-10-29: fog over the mountains clip DJI_0400_s1"
+  },
+  {
+   "id": "6f4fe5042e55",
+   "gallery": "wyoming-2022",
+   "n": 56,
+   "like": "",
+   "why": "gallery review 2026-10-29: pale canyon clip DJI_0399_s3 (the near-black candidate from the audit)"
+  },
+  {
+   "id": "d6e414883b30",
+   "gallery": "wyoming-2022",
+   "n": 61,
+   "like": "ba0f47b3e69f",
+   "why": "gallery review 2026-10-29: fog over the falls clip C0045_s1: 50 is the same"
+  },
+  {
+   "id": "8c71fbf3a5a1",
+   "gallery": "wyoming-2022",
+   "n": 23,
+   "like": "293687b2e622",
+   "why": "gallery review 2026-10-29: back of a head at the geyser (1216026): 55 is the same idea"
+  },
+  {
+   "id": "f93ded623474",
+   "gallery": "wyoming-2022",
+   "n": 40,
+   "like": "c20ed7330cdd",
+   "why": "gallery review 2026-10-29: night pool with stars, portrait (1216120): 49 is the milky way wide"
+  },
+  {
+   "id": "2cd6d55648e4",
+   "gallery": "wyoming-2022",
+   "n": 4,
+   "like": "7e6c56860d6e",
+   "why": "gallery review 2026-10-29: rocks and moss from the air clip DJI_0384_s1: the hero (2) is the same ground"
+  },
+  {
+   "id": "fe503c2f604d",
+   "gallery": "wyoming-2022",
+   "n": 22,
+   "like": "a7695bc8256a",
+   "why": "gallery review 2026-10-29: trees from the air clip DJI_0407_s1: 13 is the same"
+  },
+  {
+   "id": "9bc5a7fae325",
+   "gallery": "wyoming-2022",
+   "n": 28,
+   "like": "0f091beac3cf",
+   "why": "gallery review 2026-10-29: valley forest clip C0047_s2: 20 is the same valley"
+  },
+  {
+   "id": "24357d7caaf6",
+   "gallery": "nycc-2022",
+   "n": 3,
+   "like": "",
+   "why": "gallery review 2026-10-29: panel of three (1279486): seventeen panel frames, keep eight"
+  },
+  {
+   "id": "ad7dc399b05e",
+   "gallery": "nycc-2022",
+   "n": 7,
+   "like": "",
+   "why": "gallery review 2026-10-29: panel of five (1279645)"
+  },
+  {
+   "id": "19e5b3e35d17",
+   "gallery": "nycc-2022",
+   "n": 26,
+   "like": "d397244dd635",
+   "why": "gallery review 2026-10-29: woman and man at the panel (1279576): 54 is the same pair laughing"
+  },
+  {
+   "id": "1573a8462e54",
+   "gallery": "nycc-2022",
+   "n": 30,
+   "like": "",
+   "why": "gallery review 2026-10-29: bearded man with the mic (1279552)"
+  },
+  {
+   "id": "5922daec8c5e",
+   "gallery": "nycc-2022",
+   "n": 36,
+   "like": "",
+   "why": "gallery review 2026-10-29: man in yellow with the mic (1279490)"
+  },
+  {
+   "id": "e36abbbaf65b",
+   "gallery": "nycc-2022",
+   "n": 38,
+   "like": "",
+   "why": "gallery review 2026-10-29: grey-haired man with the mic (1279608)"
+  },
+  {
+   "id": "01e6f05fa601",
+   "gallery": "nycc-2022",
+   "n": 41,
+   "like": "",
+   "why": "gallery review 2026-10-29: two women at the panel (1279469)"
+  },
+  {
+   "id": "154aa19ba6b2",
+   "gallery": "nycc-2022",
+   "n": 46,
+   "like": "",
+   "why": "gallery review 2026-10-29: man in yellow and woman in red (1279497)"
+  },
+  {
+   "id": "6354a27b9a7a",
+   "gallery": "nycc-2022",
+   "n": 51,
+   "like": "3dda3363cf5d",
+   "why": "gallery review 2026-10-29: woman with the mic, hand on her head (1279591): 47 is the same woman"
+  },
+  {
+   "id": "dc8d71d5b70a",
+   "gallery": "nycc-2022",
+   "n": 31,
+   "like": "386022b94746",
+   "why": "gallery review 2026-10-29: Chewbacca close (1296611): 19 is Chewbacca"
+  },
+  {
+   "id": "edc8c3bf01ed",
+   "gallery": "nycc-2022",
+   "n": 50,
+   "like": "f05fdd9cad49",
+   "why": "gallery review 2026-10-29: skull mask (1301570): 40 has the skull with Deadpool"
+  },
+  {
+   "id": "b7018aa6e20d",
+   "gallery": "brighton",
+   "n": 6,
+   "like": "11b44ae09130",
+   "why": "gallery review 2026-10-29: beach at sunset (1340325): 7 is the same frame"
+  },
+  {
+   "id": "ecb19ceab342",
+   "gallery": "bogota",
+   "n": 8,
+   "like": "cdc1851c2084",
+   "why": "gallery review 2026-10-29: Monserrate church on the hill clip C0028_s1: the hero (16) and the still (17) are the same hill"
+  },
+  {
+   "id": "1fbde5c55b2b",
+   "gallery": "bogota",
+   "n": 20,
+   "like": "44688e406c16",
+   "why": "gallery review 2026-10-29: b/w greenhouse pond (1379771): 19 is the greenhouse walkway"
+  },
+  {
+   "id": "b91abf9c8656",
+   "gallery": "oaxaca",
+   "n": 5,
+   "like": "63fb95a037a2",
+   "why": "gallery review 2026-10-29: market alley clip C0063_s1: nine market frames, keep the produce still (15), C0059_s2, C0061_s2 and C0058_s3"
+  },
+  {
+   "id": "34e0264fd2eb",
+   "gallery": "oaxaca",
+   "n": 11,
+   "like": "85220290cba0",
+   "why": "gallery review 2026-10-29: market hall clip C0060_s1: 7 is the same hall"
+  },
+  {
+   "id": "28da0cb0e21f",
+   "gallery": "oaxaca",
+   "n": 16,
+   "like": "",
+   "why": "gallery review 2026-10-29: market walkway clip C0062_s2"
+  },
+  {
+   "id": "e7cbae11cfb9",
+   "gallery": "oaxaca",
+   "n": 21,
+   "like": "",
+   "why": "gallery review 2026-10-29: market stall clip C0056_s2"
+  },
+  {
+   "id": "fc1d5f5524e9",
+   "gallery": "oaxaca",
+   "n": 27,
+   "like": "",
+   "why": "gallery review 2026-10-29: outdoor market stalls clip C0055_s1"
+  },
+  {
+   "id": "2bbd9abc92a7",
+   "gallery": "oaxaca",
+   "n": 23,
+   "like": "7d62c5dd629c",
+   "why": "gallery review 2026-10-29: church plaza clip C0054_s3: 17 and 32 are Santo Domingo"
+  },
+  {
+   "id": "db7a6c1a2a4b",
+   "gallery": "oaxaca",
+   "n": 37,
+   "like": "91f18dd752fe",
+   "why": "gallery review 2026-10-29: Monte Alb\u00e1n plateau with people clip C0042_s2: 14 (pyramid), 25 (tree) and 43 (wide) stay"
+  },
+  {
+   "id": "8a64a0d46a94",
+   "gallery": "oaxaca",
+   "n": 39,
+   "like": "",
+   "why": "gallery review 2026-10-29: Monte Alb\u00e1n ruins clip C0043_s1"
+  },
+  {
+   "id": "c90cdc8780d9",
+   "gallery": "oaxaca",
+   "n": 46,
+   "like": "32ee595ed65a",
+   "why": "gallery review 2026-10-29: Monte Alb\u00e1n plateau wide clip C0045_s1: 43 is the same view"
+  },
+  {
+   "id": "47e576fe4e5f",
+   "gallery": "new-jersey",
+   "n": 7,
+   "like": "b35aabecd0aa",
+   "why": "gallery review 2026-10-29: kids on the play mat (2099848): 17 is the same scene"
+  },
+  {
+   "id": "4d84785ac2cc",
+   "gallery": "new-jersey",
+   "n": 8,
+   "like": "794b38d8a57f",
+   "why": "gallery review 2026-10-29: girl on the slide (2099873): 13 is the girl on the slide"
+  },
+  {
+   "id": "960757b2c5fe",
+   "gallery": "pennsylvania",
+   "n": 3,
+   "like": "d4719589f7cd",
+   "why": "gallery review 2026-10-29: mother and girl on the bench, wide (2147251): the hero (1) is the same frame tighter"
+  },
+  {
+   "id": "265c637e65b7",
+   "gallery": "central-park",
+   "n": 0,
+   "like": "252a26eb1867",
+   "why": "gallery review 2026-10-29: Hermes on the stoop: ten frames of the burst, 2 stays"
+  },
+  {
+   "id": "1032470c996e",
+   "gallery": "central-park",
+   "n": 1,
+   "like": "",
+   "why": "gallery review 2026-10-29: stoop burst"
+  },
+  {
+   "id": "f5713fdd5b31",
+   "gallery": "central-park",
+   "n": 3,
+   "like": "",
+   "why": "gallery review 2026-10-29: stoop burst"
+  },
+  {
+   "id": "573729260899",
+   "gallery": "central-park",
+   "n": 4,
+   "like": "",
+   "why": "gallery review 2026-10-29: stoop burst"
+  },
+  {
+   "id": "a889266fa9ac",
+   "gallery": "central-park",
+   "n": 5,
+   "like": "",
+   "why": "gallery review 2026-10-29: stoop burst"
+  },
+  {
+   "id": "d2345c42ce1d",
+   "gallery": "central-park",
+   "n": 6,
+   "like": "",
+   "why": "gallery review 2026-10-29: stoop burst"
+  },
+  {
+   "id": "f8a286b4c50a",
+   "gallery": "central-park",
+   "n": 7,
+   "like": "",
+   "why": "gallery review 2026-10-29: stoop burst"
+  },
+  {
+   "id": "16df8343586f",
+   "gallery": "central-park",
+   "n": 8,
+   "like": "",
+   "why": "gallery review 2026-10-29: stoop burst"
+  },
+  {
+   "id": "3f168248ef2d",
+   "gallery": "central-park",
+   "n": 9,
+   "like": "",
+   "why": "gallery review 2026-10-29: stoop burst"
+  },
+  {
+   "id": "cfb77dddde24",
+   "gallery": "central-park",
+   "n": 10,
+   "like": "2b32b5de9956",
+   "why": "gallery review 2026-10-29: Hermes on the rock under the building: 13 stays"
+  },
+  {
+   "id": "8d5d63a31f68",
+   "gallery": "central-park",
+   "n": 11,
+   "like": "",
+   "why": "gallery review 2026-10-29: rock burst"
+  },
+  {
+   "id": "9cfb391d3e26",
+   "gallery": "central-park",
+   "n": 12,
+   "like": "",
+   "why": "gallery review 2026-10-29: rock burst"
+  },
+  {
+   "id": "0030ca518173",
+   "gallery": "central-park",
+   "n": 14,
+   "like": "",
+   "why": "gallery review 2026-10-29: rock burst"
+  },
+  {
+   "id": "0984d26e6252",
+   "gallery": "central-park",
+   "n": 15,
+   "like": "d73548a83e91",
+   "why": "gallery review 2026-10-29: Hermes on the rock by the bushes: 16 stays"
+  },
+  {
+   "id": "55d9f7a22fd9",
+   "gallery": "central-park",
+   "n": 17,
+   "like": "",
+   "why": "gallery review 2026-10-29: rock burst"
+  },
+  {
+   "id": "1d9134cde063",
+   "gallery": "central-park",
+   "n": 18,
+   "like": "1db1cf39c2fc",
+   "why": "gallery review 2026-10-29: head close-up: 19 stays"
+  },
+  {
+   "id": "fbf890b64afd",
+   "gallery": "central-park",
+   "n": 20,
+   "like": "d489827176fe",
+   "why": "gallery review 2026-10-29: seated close-up: 21 stays"
+  },
+  {
+   "id": "206bd6214dcd",
+   "gallery": "central-park",
+   "n": 22,
+   "like": "",
+   "why": "gallery review 2026-10-29: seated close-up"
+  },
+  {
+   "id": "1cb63b7fec37",
+   "gallery": "central-park",
+   "n": 24,
+   "like": "4eaef26f4ff4",
+   "why": "gallery review 2026-10-29: lying in the grass: the hero (23) is the same"
+  },
+  {
+   "id": "020096baf998",
+   "gallery": "central-park",
+   "n": 25,
+   "like": "a3c4763e9599",
+   "why": "gallery review 2026-10-29: on the bench, wide: 26 stays"
+  },
+  {
+   "id": "20e31db7b015",
+   "gallery": "central-park",
+   "n": 27,
+   "like": "aa0a6776700d",
+   "why": "gallery review 2026-10-29: on the bench with the woman: 28 (skyline) stays"
+  },
+  {
+   "id": "60c3ebacc7f3",
+   "gallery": "central-park",
+   "n": 29,
+   "like": "",
+   "why": "gallery review 2026-10-29: on the bench with the cyclist"
+  },
+  {
+   "id": "518abf45ff89",
+   "gallery": "central-park",
+   "n": 32,
+   "like": "d43de6f2c100",
+   "why": "gallery review 2026-10-29: in the woods: 31 stays"
+  },
+  {
+   "id": "78f59344e5d5",
+   "gallery": "central-park",
+   "n": 33,
+   "like": "",
+   "why": "gallery review 2026-10-29: woods burst"
+  },
+  {
+   "id": "4ca851db1b9b",
+   "gallery": "central-park",
+   "n": 34,
+   "like": "",
+   "why": "gallery review 2026-10-29: woods burst"
+  },
+  {
+   "id": "4767f85907c0",
+   "gallery": "central-park",
+   "n": 35,
+   "like": "8416e1a945db",
+   "why": "gallery review 2026-10-29: small in the park: 36 stays"
+  },
+  {
+   "id": "07398e0acf6e",
+   "gallery": "central-park",
+   "n": 37,
+   "like": "4cd79987ed1c",
+   "why": "gallery review 2026-10-29: skyline over the meadow: 38 stays"
+  },
+  {
+   "id": "f699577fd41f",
+   "gallery": "central-park",
+   "n": 39,
+   "like": "",
+   "why": "gallery review 2026-10-29: skyline burst"
+  },
+  {
+   "id": "cb6d6ae5a3f9",
+   "gallery": "central-park",
+   "n": 40,
+   "like": "e1526764e205",
+   "why": "gallery review 2026-10-29: tractors under the skyline: 41 stays"
+  },
+  {
+   "id": "b1dec64b776e",
+   "gallery": "central-park",
+   "n": 42,
+   "like": "",
+   "why": "gallery review 2026-10-29: tractor burst"
+  },
+  {
+   "id": "015fb74e0206",
+   "gallery": "central-park",
+   "n": 43,
+   "like": "",
+   "why": "gallery review 2026-10-29: tractor burst"
+  },
+  {
+   "id": "fa6ce5c46331",
+   "gallery": "central-park",
+   "n": 44,
+   "like": "06cb2be123e7",
+   "why": "gallery review 2026-10-29: pumpkin on the rock with the skyline: 45 stays"
+  },
+  {
+   "id": "aa17c8f9c731",
+   "gallery": "central-park",
+   "n": 46,
+   "like": "",
+   "why": "gallery review 2026-10-29: pumpkin burst"
+  },
+  {
+   "id": "64228a898d9c",
+   "gallery": "central-park",
+   "n": 47,
+   "like": "",
+   "why": "gallery review 2026-10-29: pumpkin by the tree"
+  },
+  {
+   "id": "e62ca53247ad",
+   "gallery": "central-park",
+   "n": 48,
+   "like": "",
+   "why": "gallery review 2026-10-29: pumpkin burst"
+  },
+  {
+   "id": "71163c407c83",
+   "gallery": "central-park",
+   "n": 49,
+   "like": "",
+   "why": "gallery review 2026-10-29: pumpkin burst"
+  },
+  {
+   "id": "59bab367e9bf",
+   "gallery": "central-park",
+   "n": 50,
+   "like": "",
+   "why": "gallery review 2026-10-29: pumpkin burst"
+  },
+  {
+   "id": "03e71ac05989",
+   "gallery": "central-park",
+   "n": 51,
+   "like": "",
+   "why": "gallery review 2026-10-29: pumpkin burst"
+  },
+  {
+   "id": "6a09fdb3fdee",
+   "gallery": "central-park",
+   "n": 53,
+   "like": "1e6e1f8fd4f0",
+   "why": "gallery review 2026-10-29: pumpkin on the path: 52 stays"
+  },
+  {
+   "id": "f580f5806c69",
+   "gallery": "central-park",
+   "n": 55,
+   "like": "ee95abb1c803",
+   "why": "gallery review 2026-10-29: trees against blue: 54 and 56 stay"
+  },
+  {
+   "id": "70d27da24717",
+   "gallery": "central-park",
+   "n": 57,
+   "like": "7d224471845f",
+   "why": "gallery review 2026-10-29: stroller under the tree: 59 stays"
+  },
+  {
+   "id": "aefeece1a9ca",
+   "gallery": "central-park",
+   "n": 58,
+   "like": "",
+   "why": "gallery review 2026-10-29: stroller burst"
+  },
+  {
+   "id": "fac714e555d7",
+   "gallery": "central-park",
+   "n": 60,
+   "like": "",
+   "why": "gallery review 2026-10-29: stroller wide"
+  },
+  {
+   "id": "255e8f8b08d6",
+   "gallery": "central-park",
+   "n": 62,
+   "like": "76180faa1fcf",
+   "why": "gallery review 2026-10-29: tree with the skyline: 61 stays"
+  },
+  {
+   "id": "a1303dc400bf",
+   "gallery": "central-park",
+   "n": 63,
+   "like": "",
+   "why": "gallery review 2026-10-29: tree burst"
+  },
+  {
+   "id": "5ea61ed0ccdf",
+   "gallery": "central-park",
+   "n": 64,
+   "like": "3f7d4136a110",
+   "why": "gallery review 2026-10-29: person under the tree: 65 stays"
+  },
+  {
+   "id": "4aa93141f95d",
+   "gallery": "central-park",
+   "n": 66,
+   "like": "",
+   "why": "gallery review 2026-10-29: person burst"
+  },
+  {
+   "id": "ec2d47283587",
+   "gallery": "central-park",
+   "n": 68,
+   "like": "00844466dd0d",
+   "why": "gallery review 2026-10-29: tree with the man and dog: 69 stays"
+  },
+  {
+   "id": "6722a7738b05",
+   "gallery": "central-park",
+   "n": 71,
+   "like": "1e21814d3433",
+   "why": "gallery review 2026-10-29: red bushes: 70 stays"
+  },
+  {
+   "id": "0db420cb5ac0",
+   "gallery": "central-park",
+   "n": 72,
+   "like": "2126ce059b76",
+   "why": "gallery review 2026-10-29: red trees with the figure: 73 stays"
+  },
+  {
+   "id": "f380b067475f",
+   "gallery": "toko",
+   "n": 1,
+   "like": "1d5c38024884",
+   "why": "gallery review 2026-10-29: birthday burst: the hero (0) and the clapping (2) stay"
+  },
+  {
+   "id": "001e43b07414",
+   "gallery": "toko",
+   "n": 3,
+   "like": "",
+   "why": "gallery review 2026-10-29: birthday burst"
+  },
+  {
+   "id": "c92cf0b3ee4b",
+   "gallery": "toko",
+   "n": 4,
+   "like": "",
+   "why": "gallery review 2026-10-29: birthday burst"
+  },
+  {
+   "id": "fbfd531d352d",
+   "gallery": "toko",
+   "n": 6,
+   "like": "193ffe94df67",
+   "why": "gallery review 2026-10-29: baby in the walker: 5 stays"
+  },
+  {
+   "id": "43f8c747106e",
+   "gallery": "toko",
+   "n": 10,
+   "like": "d0c596d50d49",
+   "why": "gallery review 2026-10-29: pink sweater in the plants: 11 and the smile (13) stay"
+  },
+  {
+   "id": "a3e30a47cb69",
+   "gallery": "toko",
+   "n": 12,
+   "like": "",
+   "why": "gallery review 2026-10-29: pink sweater burst"
+  },
+  {
+   "id": "4dd2a8ac465b",
+   "gallery": "toko",
+   "n": 20,
+   "like": "e62760fd1e77",
+   "why": "gallery review 2026-10-29: red jacket in the park: 21 (crouching), 24 (path) and 26 (close) stay"
+  },
+  {
+   "id": "51580cb88533",
+   "gallery": "toko",
+   "n": 22,
+   "like": "",
+   "why": "gallery review 2026-10-29: red jacket burst"
+  },
+  {
+   "id": "d608403ab678",
+   "gallery": "toko",
+   "n": 23,
+   "like": "",
+   "why": "gallery review 2026-10-29: red jacket burst"
+  },
+  {
+   "id": "5b0487aaeb6f",
+   "gallery": "toko",
+   "n": 25,
+   "like": "",
+   "why": "gallery review 2026-10-29: red jacket burst"
+  },
+  {
+   "id": "074e823a146c",
+   "gallery": "toko",
+   "n": 32,
+   "like": "04cc5c18983f",
+   "why": "gallery review 2026-10-29: on the court with the dog: 33 stays"
+  },
+  {
+   "id": "8120b566b224",
+   "gallery": "toko",
+   "n": 40,
+   "like": "5887d91e9c3f",
+   "why": "gallery review 2026-10-29: playground with the ball: 41 stays"
+  },
+  {
+   "id": "3ee53a36e757",
+   "gallery": "toko",
+   "n": 45,
+   "like": "b95978b91062",
+   "why": "gallery review 2026-10-29: snow: 46 stays"
+  },
+  {
+   "id": "014456718ad6",
+   "gallery": "toko",
+   "n": 48,
+   "like": "4a71caa7b879",
+   "why": "gallery review 2026-10-29: night by the river: 49 and 51 stay"
+  },
+  {
+   "id": "787736bbe6d5",
+   "gallery": "toko",
+   "n": 50,
+   "like": "",
+   "why": "gallery review 2026-10-29: river burst"
+  },
+  {
+   "id": "54c10ef02e22",
+   "gallery": "toko",
+   "n": 52,
+   "like": "",
+   "why": "gallery review 2026-10-29: river burst"
+  },
+  {
+   "id": "bec899702427",
+   "gallery": "iceland",
+   "n": 4,
+   "like": "20a3d0d332e4",
+   "why": "gallery review 2026-10-29: woman in the basalt columns (391413): 5 has the same scene wider"
+  },
+  {
+   "id": "f75a33eea283",
+   "gallery": "iceland",
+   "n": 6,
+   "like": "853e4fb34196",
+   "why": "gallery review 2026-10-29: Blue Lagoon couple (389949): three frames of the lagoon, keep the portrait (8) and the group (9)"
+  },
+  {
+   "id": "8ed54d8fafdf",
+   "gallery": "iceland",
+   "n": 12,
+   "like": "bc31afadace5",
+   "why": "gallery review 2026-10-29: two fog silhouettes (13200): 14 is the better frame of the same fog"
+  },
+  {
+   "id": "f2697d646238",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "burst pick changed when the import finished (AR503712 replaced by a sharper neighbour)"
+  },
+  {
+   "id": "86af4ab5b68e",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "burst pick changed when the import finished (AR503747 replaced by a sharper neighbour)"
+  },
+  {
+   "id": "3d353c560494",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "burst pick changed when the import finished (AR503750 replaced by a sharper neighbour)"
+  },
+  {
+   "id": "c701a83b1628",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "burst pick changed when the import finished (AR503753 replaced by a sharper neighbour)"
+  },
+  {
+   "id": "fe1befc2a65e",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "night flash miss: flash blew the back of the dress to white (AR503768)"
+  },
+  {
+   "id": "f0a7149cb56c",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "night flash miss: flash blew the whole figure (AR503862)"
+  },
+  {
+   "id": "8bf185a5ee89",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "night frame not flagged as a pick in Lightroom (AR503770)"
+  },
+  {
+   "id": "3d7f27d9ed25",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "night frame not flagged as a pick in Lightroom (AR503775)"
+  },
+  {
+   "id": "155aac0b3204",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "night frame not flagged as a pick in Lightroom (AR503836)"
+  },
+  {
+   "id": "9e625280b032",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "night frame not flagged as a pick in Lightroom (AR503856)"
+  },
+  {
+   "id": "4f371472d406",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "night frame not flagged as a pick in Lightroom (AR503857)"
+  },
+  {
+   "id": "c27b69441997",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "night frame not flagged as a pick in Lightroom (AR503859)"
+  },
+  {
+   "id": "0052b9999d74",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "night frame not flagged as a pick in Lightroom (AR503871)"
+  },
+  {
+   "id": "e05fbe7cfed9",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "night frame not flagged as a pick in Lightroom (AR503876)"
+  },
+  {
+   "id": "955d422eac71",
+   "gallery": "halloween-2026",
+   "n": 0,
+   "like": "",
+   "why": "night frame not flagged as a pick in Lightroom (AR503886)"
+  },
+  {
+   "id": "d73548a83e91",
+   "gallery": "central-park",
+   "n": 2,
+   "like": "2b32b5de9956",
+   "why": "Hermes on the rock: 1 (skyline behind) stays"
+  },
+  {
+   "id": "d489827176fe",
+   "gallery": "central-park",
+   "n": 4,
+   "like": "2b32b5de9956",
+   "why": "rock burst: 1 stays"
+  },
+  {
+   "id": "a6f1e77b2a83",
+   "gallery": "central-park",
+   "n": 8,
+   "like": "a3c4763e9599",
+   "why": "bench at the reservoir, wide: 6 stays, 7 is the close one"
+  },
+  {
+   "id": "1e6e1f8fd4f0",
+   "gallery": "central-park",
+   "n": 14,
+   "like": "06cb2be123e7",
+   "why": "pumpkin on the rock: 13 stays"
+  },
+  {
+   "id": "8c23fe7089df",
+   "gallery": "central-park",
+   "n": 16,
+   "like": "ee95abb1c803",
+   "why": "empty lawn: 15 has the colour"
+  },
+  {
+   "id": "1e21814d3433",
+   "gallery": "central-park",
+   "n": 22,
+   "like": "2126ce059b76",
+   "why": "red tree alone: 23 (with Hermes) stays"
+  },
+  {
+   "id": "ccf6bf8c95dd",
+   "gallery": "halloween-2026",
+   "n": 1,
+   "like": "a11f4581c600",
+   "why": "back to the fence: 0 stays"
+  },
+  {
+   "id": "5f021647f1a9",
+   "gallery": "halloween-2026",
+   "n": 5,
+   "like": "7ee38fa1f422",
+   "why": "facing at the fence, small: 2 (opener) stays"
+  },
+  {
+   "id": "faa49706f7c2",
+   "gallery": "halloween-2026",
+   "n": 6,
+   "like": "cd422111320d",
+   "why": "haunted-house arch: 4 (walking in) and 7 (hands up) stay"
+  },
+  {
+   "id": "2055245c7020",
+   "gallery": "halloween-2026",
+   "n": 9,
+   "like": "cd422111320d",
+   "why": "arch burst: 7 stays"
+  },
+  {
+   "id": "414ba1fa2a47",
+   "gallery": "halloween-2026",
+   "n": 13,
+   "like": "e3548f86943b",
+   "why": "beside the sheep: 16 stays"
+  },
+  {
+   "id": "07e2a963641f",
+   "gallery": "halloween-2026",
+   "n": 14,
+   "like": "ce91996104bc",
+   "why": "among the sheep: the hero (11) is the same scene"
+  },
+  {
+   "id": "a301cc09b7fd",
+   "gallery": "halloween-2026",
+   "n": 15,
+   "like": "2cab360919ad",
+   "why": "balloon backdrop, back turned: 17 stays"
+  },
+  {
+   "id": "e3bdb6b2ccdf",
+   "gallery": "halloween-2026",
+   "n": 18,
+   "like": "e3548f86943b",
+   "why": "beside the sheep: 16 stays"
+  },
+  {
+   "id": "473d3cdec652",
+   "gallery": "halloween-2026",
+   "n": 20,
+   "like": "bc2ddaef872a",
+   "why": "rock at dusk, lollipop: 19 stays"
+  },
+  {
+   "id": "7d528aec521c",
+   "gallery": "halloween-2026",
+   "n": 22,
+   "like": "b23cde188b6f",
+   "why": "rock at dusk: 21 (crawling) stays"
+  },
+  {
+   "id": "56dd0601ba7b",
+   "gallery": "halloween-2026",
+   "n": 24,
+   "like": "8b697a942561",
+   "why": "rock at dusk: 25 stays"
+  },
+  {
+   "id": "3858880804e6",
+   "gallery": "halloween-2026",
+   "n": 26,
+   "like": "c78ca7cf6d0d",
+   "why": "close lollipop portrait: 23 (full) stays"
+  },
+  {
+   "id": "8c5ca351cdf7",
+   "gallery": "halloween-2026",
+   "n": 27,
+   "like": "13a55646dd17",
+   "why": "pointing: 28 (skyline) stays"
+  },
+  {
+   "id": "c484771b3c1a",
+   "gallery": "halloween-2026",
+   "n": 30,
+   "like": "af21aaa813d2",
+   "why": "crawling with the toy: 29 stays"
+  },
+  {
+   "id": "c839e20772d5",
+   "gallery": "halloween-2026",
+   "n": 32,
+   "like": "53f25056552d",
+   "why": "scooter on the ground: 33 stays"
+  },
+  {
+   "id": "c202792c619a",
+   "gallery": "halloween-2026",
+   "n": 34,
+   "like": "bc2ddaef872a",
+   "why": "rock at dusk burst: 19 stays"
+  },
+  {
+   "id": "4e574c6ff17d",
+   "gallery": "halloween-2026",
+   "n": 35,
+   "like": "bc2ddaef872a",
+   "why": "rock burst: 19 stays"
+  },
+  {
+   "id": "124402aa6b63",
+   "gallery": "halloween-2026",
+   "n": 36,
+   "like": "bc2ddaef872a",
+   "why": "rock burst: 19 stays"
+  },
+  {
+   "id": "bd3777658720",
+   "gallery": "halloween-2026",
+   "n": 37,
+   "like": "b23cde188b6f",
+   "why": "rock burst: 21 stays"
+  },
+  {
+   "id": "1b180a6cb287",
+   "gallery": "halloween-2026",
+   "n": 38,
+   "like": "85f37f4a89d7",
+   "why": "rock burst: 41 stays"
+  },
+  {
+   "id": "347bc64f9872",
+   "gallery": "halloween-2026",
+   "n": 39,
+   "like": "85f37f4a89d7",
+   "why": "rock burst: 41 stays"
+  },
+  {
+   "id": "188b059e5a32",
+   "gallery": "halloween-2026",
+   "n": 40,
+   "like": "b23cde188b6f",
+   "why": "rock burst: 21 stays"
+  },
+  {
+   "id": "3934a84d4e2c",
+   "gallery": "halloween-2026",
+   "n": 42,
+   "like": "85f37f4a89d7",
+   "why": "rock burst: 41 stays"
+  },
+  {
+   "id": "a7af24d0daf6",
+   "gallery": "halloween-2026",
+   "n": 43,
+   "like": "85f37f4a89d7",
+   "why": "rock burst: 41 stays"
+  },
+  {
+   "id": "03301b915c36",
+   "gallery": "halloween-2026",
+   "n": 44,
+   "like": "6cc9ebbe49b6",
+   "why": "rock burst: 45 stays"
+  },
+  {
+   "id": "0e9ddd5bb027",
+   "gallery": "halloween-2026",
+   "n": 46,
+   "like": "1e7317bed4fa",
+   "why": "standing on the rock: 48 stays"
+  },
+  {
+   "id": "f325fb9fc4c3",
+   "gallery": "halloween-2026",
+   "n": 47,
+   "like": "1e7317bed4fa",
+   "why": "standing on the rock: 48 stays"
+  },
+  {
+   "id": "b159d2617023",
+   "gallery": "halloween-2026",
+   "n": 49,
+   "like": "1e7317bed4fa",
+   "why": "standing with lollipop: 48 stays"
+  },
+  {
+   "id": "5970f17375ea",
+   "gallery": "halloween-2026",
+   "n": 50,
+   "like": "d3081e8f849e",
+   "why": "skyline close-ups: 51 stays"
+  },
+  {
+   "id": "8a0b5df3c204",
+   "gallery": "halloween-2026",
+   "n": 52,
+   "like": "d3081e8f849e",
+   "why": "skyline close-ups: 51 stays"
+  },
+  {
+   "id": "c85b482c07a8",
+   "gallery": "halloween-2026",
+   "n": 53,
+   "like": "8fd4c1f7f5ea",
+   "why": "skyline close-ups: 54 stays"
+  },
+  {
+   "id": "c11bc7cd933c",
+   "gallery": "halloween-2026",
+   "n": 55,
+   "like": "7098b2f79a70",
+   "why": "crawling on the rock: 56 stays"
+  },
+  {
+   "id": "95b35a195b1b",
+   "gallery": "halloween-2026",
+   "n": 57,
+   "like": "7098b2f79a70",
+   "why": "rock crawl burst: 56 stays"
+  },
+  {
+   "id": "012a5cde1b1c",
+   "gallery": "halloween-2026",
+   "n": 58,
+   "like": "00410bef58bc",
+   "why": "rock crawl burst: 60 stays"
+  },
+  {
+   "id": "c52772ac153f",
+   "gallery": "halloween-2026",
+   "n": 59,
+   "like": "00410bef58bc",
+   "why": "rock crawl burst: 60 stays"
+  },
+  {
+   "id": "475ca00da389",
+   "gallery": "halloween-2026",
+   "n": 61,
+   "like": "96f2a0215b1c",
+   "why": "standing against the skyline: 62 (twirl) stays"
+  },
+  {
+   "id": "a5e9e1d022b7",
+   "gallery": "halloween-2026",
+   "n": 63,
+   "like": "96f2a0215b1c",
+   "why": "twirl burst: 62 stays"
+  },
+  {
+   "id": "7b0e3938295c",
+   "gallery": "halloween-2026",
+   "n": 64,
+   "like": "f8f7f3e97b91",
+   "why": "twirl burst: 65 stays"
+  },
+  {
+   "id": "598f1cb794ed",
+   "gallery": "halloween-2026",
+   "n": 66,
+   "like": "3522e2e8d3fe",
+   "why": "on the path with the lights: 68 stays"
+  },
+  {
+   "id": "b4aec208924e",
+   "gallery": "halloween-2026",
+   "n": 67,
+   "like": "3522e2e8d3fe",
+   "why": "path burst: 68 stays"
+  },
+  {
+   "id": "906c3d514023",
+   "gallery": "halloween-2026",
+   "n": 69,
+   "like": "3522e2e8d3fe",
+   "why": "path burst: 68 stays"
+  },
+  {
+   "id": "3e1ddbb63d10",
+   "gallery": "halloween-2026",
+   "n": 70,
+   "like": "62ca9672992f",
+   "why": "crawling on the path with the crown: 73 stays"
+  },
+  {
+   "id": "dea7ea77c447",
+   "gallery": "halloween-2026",
+   "n": 71,
+   "like": "62ca9672992f",
+   "why": "path crawl burst: 73 stays"
+  },
+  {
+   "id": "509062450a8d",
+   "gallery": "halloween-2026",
+   "n": 72,
+   "like": "62ca9672992f",
+   "why": "path crawl burst: 73 stays"
+  },
+  {
+   "id": "a3c4763e9599",
+   "gallery": "central-park",
+   "n": 4,
+   "like": "aa0a6776700d",
+   "why": "third pass 2026-11-01: bench at the reservoir, wide: 5 (Hermes close, the favourite) stays"
+  },
+  {
+   "id": "8416e1a945db",
+   "gallery": "central-park",
+   "n": 7,
+   "like": "2126ce059b76",
+   "why": "third pass 2026-11-01: Hermes small on an autumn lawn: 17 (red trees with Hermes) and 11 (the lawn with colour) stay"
+  },
+  {
+   "id": "4cd79987ed1c",
+   "gallery": "central-park",
+   "n": 8,
+   "like": "e1526764e205",
+   "why": "third pass 2026-11-01: skyline over the meadow, hazy: 9 (tractors under the skyline) stays"
+  },
+  {
+   "id": "3f7d4136a110",
+   "gallery": "central-park",
+   "n": 14,
+   "like": "b559fdba449d",
+   "why": "third pass 2026-11-01: seated close-up of the woman: 15 (the couple under the tree, the favourite) stays"
+  }
  ]
 }

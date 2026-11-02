@@ -6,13 +6,17 @@ import Base from "../layouts/Base.astro";
 import Navbar from "../components/Navbar.astro";
 import ChapterNav from "../components/ChapterNav.astro";
 import MediaItem from "../components/MediaItem.astro";
-import { getCollectionPage, getNav, type Photo } from "../lib/collections";
+import { getAltLooks, getCollectionPage, getNav, type Photo } from "../lib/collections";
 import GeoCaption from "../components/GeoCaption.astro";
 import { applyPicks } from "../lib/hero";
 import picks from "../data/page-picks.json";
 import { placeText } from "../lib/caption";
 
 export const prerender = false;
+
+// Pages with a toggle of their own in place of the theme button: HEXify swaps every photograph to its film-look twin, kept in a
+// storage-only sibling collection (scripts/publish-library.mjs STORAGE_ONLY), with the Polaroid-style development in MediaItem.astro.
+const FEATURES: Record<string, { hexify: string }> = { "hex-series-d": { hexify: "hex-series-d-film" } };
 
 const { slug = "" } = Astro.params;
 const page = await getCollectionPage(slug);
@@ -21,6 +25,10 @@ else Astro.response.headers.set("Cache-Control", "public, max-age=0, s-maxage=60
 
 const nav = page ? await getNav() : [];
 const media = page?.media ?? [];
+const feature = page ? FEATURES[slug] : undefined;
+const twins = feature ? await getAltLooks(slug, feature.hexify) : new Map<string, Photo>();
+let swaps = 0;
+const swapDelay = () => Math.min(swaps++ * 70, 560); // a screenful develops one print after another
 // The hero: hand-picked (data/page-picks.json) or, by default, a landscape clip, else a landscape still sharp enough to fill the screen (lib/hero.ts).
 const pick = (picks as Record<string, { hero?: string; next?: string }>)[slug];
 const { hero: heroIdx, next: nextIdx } = applyPicks(media, pick);
@@ -62,7 +70,7 @@ const hasCaption = (m: Photo) => !!(m.caption || placeText(m));
   description={page ? `${page.title}: ${count} photographs by Nyke Harewood.` : "Nothing here."}
   image={hero?.urls.main}
   noindex={!!page?.unlisted}>
-  <Navbar surface="media" collections={nav} />
+  <Navbar surface="media" collections={nav} feature={feature ? "hexify" : undefined} />
 
   {
     !page || !hero ? (
@@ -73,7 +81,7 @@ const hasCaption = (m: Photo) => !!(m.caption || placeText(m));
     ) : (
       <main>
         <section class="hero">
-          <MediaItem media={hero} eager fit="cover" sizes="100vw" />
+          <MediaItem media={hero} eager fit="cover" sizes="100vw" alt={twins.get(hero.id)} />
           <div class="scrim top"></div>
           <div class="scrim bottom"></div>
           <div class="hero-text">
@@ -86,14 +94,14 @@ const hasCaption = (m: Photo) => !!(m.caption || placeText(m));
         {blocks.map((b) =>
           b.kind === "single" && b.style === "full" ? (
             <section class="full">
-              <MediaItem media={b.m} fit="cover" sizes="100vw" class="reveal" />
+              <MediaItem media={b.m} fit="cover" sizes="100vw" class="reveal" alt={twins.get(b.m.id)} delay={swapDelay()} />
               <div class="scrim bottom"></div>
               {hasCaption(b.m) && <p class="caption on-media reveal"><GeoCaption m={b.m} /></p>}
             </section>
           ) : b.kind === "single" ? (
             <section class="inset">
               <figure class="reveal">
-                <MediaItem media={b.m} sizes="(max-width: 767px) 100vw, 1312px" />
+                <MediaItem media={b.m} sizes="(max-width: 767px) 100vw, 1312px" alt={twins.get(b.m.id)} delay={swapDelay()} />
                 {hasCaption(b.m) && <figcaption class="caption"><GeoCaption m={b.m} /></figcaption>}
               </figure>
             </section>
@@ -101,7 +109,7 @@ const hasCaption = (m: Photo) => !!(m.caption || placeText(m));
             <section class:list={["row", `n${b.ms.length}`]}>
               {b.ms.map((m) => (
                 <figure class="reveal">
-                  <MediaItem media={m} sizes={`(max-width: 767px) 100vw, ${Math.round(1312 / b.ms.length)}px`} />
+                  <MediaItem media={m} sizes={`(max-width: 767px) 100vw, ${Math.round(1312 / b.ms.length)}px`} alt={twins.get(m.id)} delay={swapDelay()} />
                   {hasCaption(m) && <figcaption class="caption"><GeoCaption m={m} /></figcaption>}
                 </figure>
               ))}
@@ -133,6 +141,15 @@ const hasCaption = (m: Photo) => !!(m.caption || placeText(m));
 <script>
   import { initPhotos } from "../scripts/photos";
   document.addEventListener("astro:page-load", initPhotos);
+
+  // HEXify (pages listed in FEATURES): the button in the Navbar flips `data-hexify` on <html>, and every photograph's twin develops into view (MediaItem.astro).
+  document.addEventListener("click", (e) => {
+    const b = (e.target as Element).closest<HTMLElement>("[data-hexify]");
+    if (!b) return;
+    const on = document.documentElement.toggleAttribute("data-hexify");
+    b.setAttribute("aria-pressed", String(on));
+  });
+  document.addEventListener("astro:after-swap", () => document.documentElement.removeAttribute("data-hexify"));
 </script>
 
 <style>

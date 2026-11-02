@@ -28,6 +28,7 @@ const { values: a } = parseArgs({
     "exclude-borderline": { type: "boolean", default: false },
     "photos-dir": { type: "string", default: "web2560" }, // the 2560 px set; its own manifest has the real sizes and hero_ok
     "no-clips": { type: "boolean", default: false }, // photographs only (a quick local copy to build pages against)
+    "plan-out": { type: "string" }, // write the plan (every collection's items in page order, with ids and files) to this JSON file and stop; for review tooling
   },
 });
 const LIB = a.library;
@@ -49,7 +50,11 @@ const CLIP_REV = {
   // Wyoming grade fixes (crushed shadows re-baked into the LUT, neon alpenglow toned, haze cut with a curve): files replaced, so new ids
   "grand_teton_2022/C0036_s1": 2, "grand_teton_2022/C0036_s2": 2, "grand_teton_2022/C0036_s3": 2, "grand_teton_2022/C0036_s4": 2, "grand_teton_2022/C0040_s1": 2, "grand_teton_2022/C0040_s2": 2, "grand_teton_2022/C0041_s1": 2, "grand_teton_2022/C0041_s2": 2, "grand_teton_2022/C0041_s3": 2, "grand_teton_2022/C0041_s4": 2, "grand_teton_2022/DJI_0375_s1": 2, "grand_teton_2022/DJI_0375_s2": 2, "yellowstone_2022/C0042_s1": 2, "yellowstone_2022/C0042_s2": 2, "yellowstone_2022/C0042_s3": 2, "yellowstone_2022/C0044_s1": 2, "yellowstone_2022/C0044_s2": 2, "yellowstone_2022/C0045_s1": 2, "yellowstone_2022/C0046_s1": 2, "yellowstone_2022/C0046_s2": 2, "yellowstone_2022/C0046_s3": 2, "yellowstone_2022/DJI_0399_s3": 2, "yellowstone_2022/DJI_0408_s1": 2, "yellowstone_2022/DJI_0408_s2": 2,
 };
-const clipId = (mid) => sha(CLIP_REV[mid] ? `lib:${mid}#r${CLIP_REV[mid]}` : `lib:${mid}`);
+// A subclip re-cut with the one nykelab look (LibraryGrade/review/stage_clips.py puts `looks.nykelab` on its row) is a replaced file too: it gets the id
+// `lib:<mid>#n1` and its previous id (whatever CLIP_REV said) is retired. Bump CLIP_NYK_REV if the nykelab cuts are ever replaced again.
+const CLIP_NYK_REV = 1;
+const oldClipId = (mid) => sha(CLIP_REV[mid] ? `lib:${mid}#r${CLIP_REV[mid]}` : `lib:${mid}`);
+const clipId = (mid, nyk) => (nyk ? sha(`lib:${mid}#n${CLIP_NYK_REV}`) : oldClipId(mid));
 const q = (s) => (s == null ? "NULL" : typeof s === "number" ? String(s) : `'${String(s).replace(/'/g, "''")}'`);
 
 function sh(args, { input } = {}) {
@@ -62,6 +67,10 @@ function sh(args, { input } = {}) {
     if (input) p.stdin.end(input); else p.stdin.end();
   });
 }
+
+/** Runs a SQL script on D1 as one --command (statements split by wrangler). A --file goes through the import API in wrangler 4.15x, which takes the
+ * database offline for the duration and failed outright on a 500-statement script (D1_RESET_DO, 29 Oct 2026). */
+const d1 = (sql) => (sql.trim() ? sh(["d1", "execute", "DB", ...where, "--command", sql]) : Promise.resolve(""));
 
 // ---- plan ------------------------------------------------------------------------------------------
 const PHOTO_DIR = path.join("photos", a["photos-dir"]);
@@ -92,12 +101,18 @@ const PASSES = [
   { rev: 18, before: "manifest.before_dust.json" }, // dust spots healed (dust_spots.py); one White Sands frame's violet-black top-edge bleed fixed (top_band.py)
   { rev: 19, before: "manifest.before_dust2.json" }, // a second dust pass on Arizona's skies: faint round spots the first pass missed, checked by eye
   { rev: 20, before: "manifest.before_toko_rich.json" }, // Toko re-graded richer (render_toko_rich.py); the bench frame re-rendered later is covered too, its old bytes are in this manifest
+  { rev: 21, before: "manifest.before_trips_regrade.json" }, // Ecuador, Bogotá, Oaxaca re-graded from RAW with the one nykelab look (~/code/nykelab-grade); the rows gained looks.nykelab
+  { rev: 22, before: "manifest.before_nykelab2.json" }, // the whole library re-graded with the revised nykelab-grade engine (29 Oct 2026: highlight-anchored tone, crushed-colour shadow lift, fog rule, caps on boostable pixels, Leica vignette); staged by LibraryGrade/review/stage_all.py
+  { rev: 23, before: "manifest.before_soft_c.json" }, // the whole library re-graded with the softer floor ("variant C", 29 Oct 2026 evening: blacks keep texture, gentler toe, chroma ceiling 1.5, frames closer to as-shot) after the user found the look crushed; LibraryGrade/review/crushed/regrade_c.py
+  { rev: 24, before: "manifest.before_halloween_night.json" }, // Halloween 2026 night frames re-graded outside the engine to the user's own Lightroom grade (review/halloween/night/night_look.py, 30 Oct 2026): replaced files under the same ids, so a new rev
+  { rev: 25, before: "manifest.before_nj_fresh.json" }, // New Jersey re-graded outside the engine (review/new_jersey/nj_grade.py, 1 Nov 2026): rich colour, open faces, no halos; replaced files under the same ids, so a new rev
+  { rev: 26, before: "manifest.before_ny_rich.json" }, // New York re-graded outside the engine (review/rich_grade/rich_grade.py, 1 Nov 2026): rich colour, deep shadows, faces held, no halos; replaced files under the same ids, so a new rev
 ];
 const fingerprint = (u, by) => (by === "size" ? `${u.width}x${u.height}` : u.bytes);
 const loadPass = ({ rev, before, by = "bytes" }) => {
   const file = path.join(LIB, PHOTO_DIR, before);
   const photos = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, "utf8")).photos : [];
-  return { rev, by, was: new Map(photos.map((p) => [p.id, fingerprint(p.looks.voyages, by)])) };
+  return { rev, by, was: new Map(photos.map((p) => [p.id, fingerprint(p.looks.nykelab ?? p.looks.voyages, by)])) };
 };
 const passes = PASSES.map(loadPass).reverse(); // newest first: the latest pass that changed a photo wins
 const photoRev = (it) => passes.find((p) => p.was.has(it.id) && p.was.get(it.id) !== fingerprint(it.use, p.by))?.rev ?? BASE_REV;
@@ -127,6 +142,12 @@ const LANDMARKS = new Map(JSON.parse(fs.readFileSync(new URL("../data/landmarks.
 // Galleries are places. A subject that is not a place (Toko, a dog) is kept in storage but not shown: its collection is created with published = 0
 // and a rerun never turns it back on (the upsert below leaves `published` alone). Turn one on in /admin when wanted.
 const HIDDEN = new Set(["toko"]); // created unlisted: collections.published = 2, reachable at its address but not listed anywhere (see src/lib/collections.ts)
+// Created with collections.published = 0: never a page, only storage. The Hex event page swaps its photographs to these film-look twins on HEXify
+// (src/pages/[slug].astro FEATURES; the twins carry the same catalog id under another folder, see LibraryGrade/review/hex-series-d/make_film_shoot.py).
+const STORAGE_ONLY = new Set(["hex-series-d-film"]);
+// A hand-ordered gallery (data/gallery-order.json: slug -> source ids, photos and clips mixed): only the listed items are published, in that order,
+// and the rest of the collection's rows are set to published = 0. Collections not listed there follow the interleave below.
+const ORDER = JSON.parse(fs.readFileSync(new URL("../data/gallery-order.json", import.meta.url), "utf8"));
 const FALLBACK = { new_jersey: { slug: "new-jersey", place: "New Jersey" }, toko: { slug: "toko", title: "Toko", place: "", order: 999 } };
 // Which trip each clip folder belongs to, from looking at the footage (not the folder names):
 //  - "New Mexico" and phoenix_2021 are the same Grand Canyon / Arizona-rim footage: both go to the Arizona trip
@@ -138,7 +159,9 @@ const CLIP_TRIP = {
   // 1080p proxies of the Eureka / San Francisco footage (the originals are not on any drive) and the phone videos from Photos (graded by pipeline/lib/grade_proxies.py)
   eureka_2020: "eureka", san_francisco_2020: "san-francisco", phone_eureka: "eureka", phone_san_francisco: "san-francisco", phone_cartagena: "cartagena", phone_medellin: "medellin",
   phone_westminster_2020: "westminster-2020", phone_westminster_2021: "westminster-2021", phone_nycc_2021: "nycc-2021", phone_madeira: "madeira", phone_lisbon: "lisbon",
+  central_park: "central-park", // the 28 Oct 2026 shoot, graded and cut with nykelab-grade (shoots/clips/central_park)
   phone_stockholm: "stockholm", phone_norway: "norway",
+  hex_series_d: "hex-series-d", // the 29 Oct 2026 Hex Series D camcorder tape, cut into scenes (review/hex-series-d/video_src) and graded with nykelab-grade
 };
 /** A named place for a clip when the footage says where it is; otherwise the trip's own place. */
 function clipLandmark(s) {
@@ -190,11 +213,21 @@ function plan() {
     cols.set(slug, c);
   }
   for (const s of a["no-clips"] ? [] : clipsM.subclips) {
+    if (HIDDEN_PHOTOS.has(clipId(s.id, !!s.looks.nykelab))) continue; // a clip hidden by the gallery review (same list as the photos, by media id)
     const c = cols.get(CLIP_TRIP[s.folder]);
     if (c) c.clips.push(s);
   }
   // interleave: photos by rank, clips by quality, clips spread evenly, rank 1 stays first
   for (const c of cols.values()) {
+    const order = Array.isArray(ORDER[c.slug]) ? new Map(ORDER[c.slug].map((id, i) => [id, i])) : null;
+    if (order) {
+      // a hand-ordered gallery: the listed items only, photos and clips in the order given
+      c.items = [...c.photos.map((p) => ({ kind: "photo", ...p })), ...c.clips.map((s) => ({ kind: "video", ...s }))].filter((it) => order.has(it.id)).sort((x, y) => order.get(x.id) - order.get(y.id));
+      const missing = [...order.keys()].filter((id) => !c.items.some((it) => it.id === id));
+      if (missing.length) log(`  WARNING: ${c.slug}: ${missing.length} ordered item(s) not in the library: ${missing.join(", ")}`);
+      c.photos = c.items.filter((it) => it.kind === "photo"); c.clips = c.items.filter((it) => it.kind === "video");
+      continue;
+    }
     c.photos.sort((x, y) => x.rank - y.rank);
     const cover = c.photos.findIndex((p) => sha(`lib:${p.id}`) === CURATION.covers?.[c.slug]?.id);
     if (cover > 0) c.photos.unshift(...c.photos.splice(cover, 1)); // a gallery's chosen cover goes first
@@ -232,10 +265,12 @@ function rowFor(c, it, position) {
       place: g?.place ?? c.place, geo_lat: g ? g.lat : c.lat, geo_lon: g ? g.lon : c.lon, geo_source: g ? g.source : c.place ? "trip" : "",
     };
   }
-  const id = clipId(it.id);
-  const u = it.looks.voyages;
+  const id = clipId(it.id, !!it.looks.nykelab);
+  const u = it.looks.nykelab ?? it.looks.voyages;
   const lm = LANDMARKS.get(clipLandmark(it) ?? "");
-  const clip = lm ? { place: lm.name, lat: Math.round(lm.lat * 100) / 100, lon: Math.round(lm.lon * 100) / 100 } : { place: c.place, lat: c.place.includes(",") ? c.lat : null, lon: c.place.includes(",") ? c.lon : null }; // no pin for a whole state
+  // the Hex tape starts at the office and goes down into the 23rd Street station before Times Square (the collection's place)
+  const hex = it.folder === "hex_series_d" ? (/^(street|birds)/.test(it.source) ? { place: "Flatiron District, New York", lat: 40.74, lon: -73.99 } : /^(subway|train)/.test(it.source) ? { place: "23rd Street station, New York", lat: 40.74, lon: -73.99 } : null) : null;
+  const clip = lm ? { place: lm.name, lat: Math.round(lm.lat * 100) / 100, lon: Math.round(lm.lon * 100) / 100 } : hex ?? { place: c.place, lat: c.place.includes(",") ? c.lat : null, lon: c.place.includes(",") ? c.lon : null }; // no pin for a whole state
   return {
     id, position, type: "video", orientation: it.orientation, width: u.width, height: u.height, source_id: it.id,
     files: [
@@ -243,8 +278,8 @@ function rowFor(c, it, position) {
       { key: `${id}/poster.jpg`, file: path.join(LIB, "subclips", u.poster), type: "image/jpeg" },
     ],
     key_main: `${id}/main.mp4`, key_original: null, key_poster: `${id}/poster.jpg`,
-    captured_at: null, avg_colour: u.avg_colour, text_on: u.text_on, look: "voyages", duration: u.duration,
-    hero_ok: 1, rev: 1,
+    captured_at: null, avg_colour: u.avg_colour, text_on: u.text_on, look: it.looks.nykelab ? "nykelab" : "voyages", duration: u.duration,
+    hero_ok: Math.max(u.width, u.height) >= 1280 ? 1 : 0, rev: 1, // a standard-definition clip (the Hex camcorder tape) stays inset, never full-bleed or the hero
     place: clip.place, geo_lat: clip.lat, geo_lon: clip.lon, geo_source: clip.place ? "trip" : "",
   };
 }
@@ -295,7 +330,7 @@ async function slugFor(c, taken) {
 }
 
 function sqlFor(c, slug, rows) {
-  const out = [`INSERT INTO collections (slug, title, position, published) VALUES (${q(slug)}, ${q(c.title)}, ${c.position}, ${HIDDEN.has(slug) ? 2 : 1})
+  const out = [`INSERT INTO collections (slug, title, position, published) VALUES (${q(slug)}, ${q(c.title)}, ${c.position}, ${STORAGE_ONLY.has(slug) ? 0 : HIDDEN.has(slug) ? 2 : 1})
 ON CONFLICT(slug) DO UPDATE SET title = excluded.title, position = excluded.position;`];
   for (const r of rows) {
     out.push(`INSERT INTO media (id, collection, type, caption, place, orientation, width, height, position, published, featured,
@@ -327,14 +362,26 @@ log(`plan: ${cols.length} collections, ${nPhotos} photos, ${nClips} clips${appro
 for (const c of cols.slice(0, 80)) log(`  ${c.slug.padEnd(28)} ${String(c.photos.length).padStart(2)} photos ${String(c.clips.length).padStart(2)} clips  ${c.title}`);
 const unplaced = clipsM.subclips.filter((s) => !cols.some((c) => c.clips.includes(s)));
 if (!a.only && unplaced.length) log(`  WARNING: ${unplaced.length} clips belong to no published collection`);
+if (a["plan-out"]) {
+  const out = cols.map((c) => ({
+    slug: c.slug, title: c.title, position: c.position,
+    items: c.items.map((it, i) => {
+      const r = rowFor(c, it, i);
+      return { id: r.id, kind: it.kind, source_id: it.id, position: i, orientation: r.orientation, width: r.width, height: r.height, hero_ok: r.hero_ok, rev: r.rev,
+        captured_at: it.kind === "photo" ? it.capture ?? null : null, rank: it.rank ?? null, quality_score: it.quality_score ?? null, file: r.files[r.files.length - 1].file };
+    }),
+  }));
+  fs.writeFileSync(a["plan-out"], JSON.stringify(out, null, 1));
+  log(`plan written to ${a["plan-out"]}`);
+  process.exit(0);
+}
 if (a["dry-run"]) process.exit(0);
 
 // retire the rows of clips that were replaced under a new id (idempotent: once source_id carries the suffix it no longer matches)
 {
-  const file = path.join(os.tmpdir(), "lib-retire-clips.sql");
-  fs.writeFileSync(file, Object.keys(CLIP_REV).map((mid) => `UPDATE media SET published = 0, source_id = source_id || '#old' WHERE id = ${q(sha(`lib:${mid}`))} AND source_id = ${q(mid)};`).join("\n"));
-  if (!a["dry-run"]) await sh(["d1", "execute", "DB", ...where, "--file", file]);
-  fs.rmSync(file);
+  const retire = [...Object.keys(CLIP_REV).map((mid) => [sha(`lib:${mid}`), mid]), ...clipsM.subclips.filter((s) => s.looks.nykelab).map((s) => [oldClipId(s.id), s.id])];
+  // the freed source_id gets a suffix unique to the row (source_id is unique): a clip replaced twice has two retired rows
+  if (!a["dry-run"]) await d1(retire.map(([id, mid]) => `UPDATE media SET published = 0, source_id = source_id || '#old#' || id WHERE id = ${q(id)} AND source_id = ${q(mid)};`).join("\n"));
 }
 const taken = remote ? await existingCollections() : await existingCollections().catch(() => null);
 const usedSlugs = [];
@@ -351,10 +398,9 @@ for (const c of cols) {
     continue;
   }
   for (const row of rows) for (const f of row.files) f.size = f.size ?? fs.statSync(f.file).size;
-  const sql = path.join(os.tmpdir(), `lib-${slug}.sql`);
-  fs.writeFileSync(sql, sqlFor(c, slug, rows));
-  await sh(["d1", "execute", "DB", ...where, "--file", sql]);
-  fs.rmSync(sql);
+  await d1(sqlFor(c, slug, rows));
+  // a hand-ordered gallery: whatever else of the library sits in this collection (a frame dropped from the order) goes off the page
+  if (Array.isArray(ORDER[c.slug])) await d1(`UPDATE media SET published = 0 WHERE collection = ${q(slug)} AND source_id IS NOT NULL AND id NOT IN (${rows.map((r) => q(r.id)).join(", ")});`);
   report.collections++;
   usedSlugs.push(slug);
   log(`✓ ${slug.padEnd(28)} ${c.photos.length} photos + ${c.clips.length} clips  uploaded ${r.uploaded} (${(r.bytes / 1048576).toFixed(0)} MB), skipped ${r.skipped}  in ${((Date.now() - t0) / 1000).toFixed(0)}s${slug !== c.slug ? `  [slug ${slug}: ${c.slug} already holds other items]` : ""}`);
@@ -363,28 +409,19 @@ for (const c of cols) {
 // (the rows stay, published = 0; anything that still holds published items, like your own uploads, is left alone).
 if (!a.only) {
   const old = [...new Set(photosM.photos.map((p) => p.id.split("/")[0].replace(/_/g, "-").toLowerCase()))].filter((x) => !usedSlugs.includes(x));
-  const file = path.join(os.tmpdir(), "lib-retire.sql");
-  fs.writeFileSync(file, old.map((x) => `UPDATE collections SET published = 0 WHERE slug = ${q(x)} AND NOT EXISTS (SELECT 1 FROM media m WHERE m.collection = ${q(x)} AND m.published = 1);`).join("\n"));
-  await sh(["d1", "execute", "DB", ...where, "--file", file]);
-  fs.rmSync(file);
+  await d1(old.map((x) => `UPDATE collections SET published = 0 WHERE slug = ${q(x)} AND NOT EXISTS (SELECT 1 FROM media m WHERE m.collection = ${q(x)} AND m.published = 1);`).join("\n"));
   log(`retired up to ${old.length} per-folder collections that are now part of a trip`);
 }
 
 // hide excluded clips an earlier run published (rows stay, published = 0; files stay in R2)
 {
   const ids = [...EXCLUDED];
-  const file = path.join(os.tmpdir(), "lib-hide.sql");
-  fs.writeFileSync(file, ids.map((id) => `UPDATE media SET published = 0 WHERE source_id = ${q(id)};`).join("\n"));
-  await sh(["d1", "execute", "DB", ...where, "--file", file]);
-  fs.rmSync(file);
+  await d1(ids.map((id) => `UPDATE media SET published = 0 WHERE source_id = ${q(id)};`).join("\n"));
   log(`hidden: ${ids.length} excluded clips${a["exclude-borderline"] ? " (including the borderline list)" : ""}`);
 }
 // hide the curated near-duplicates an earlier run published (rows stay, published = 0; files stay in R2)
 {
-  const file = path.join(os.tmpdir(), "lib-hide-photos.sql");
-  fs.writeFileSync(file, [...HIDDEN_PHOTOS].map((id) => `UPDATE media SET published = 0 WHERE id = ${q(id)} AND source_id IS NOT NULL;`).join("\n"));
-  await sh(["d1", "execute", "DB", ...where, "--file", file]);
-  fs.rmSync(file);
+  await d1([...HIDDEN_PHOTOS].map((id) => `UPDATE media SET published = 0 WHERE id = ${q(id)} AND source_id IS NOT NULL;`).join("\n"));
   log(`hidden: ${HIDDEN_PHOTOS.size} near-duplicate photos (data/gallery-curation.json)`);
 }
 log(`done: ${report.collections}/${cols.length} collections, ${report.uploaded} files uploaded (${(report.bytes / 1073741824).toFixed(2)} GB), ${report.skipped} unchanged, ${report.failures.length} failures`);
