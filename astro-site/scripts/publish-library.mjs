@@ -107,6 +107,7 @@ const PASSES = [
   { rev: 24, before: "manifest.before_halloween_night.json" }, // Halloween 2026 night frames re-graded outside the engine to the user's own Lightroom grade (review/halloween/night/night_look.py, 30 Oct 2026): replaced files under the same ids, so a new rev
   { rev: 25, before: "manifest.before_nj_fresh.json" }, // New Jersey re-graded outside the engine (review/new_jersey/nj_grade.py, 1 Nov 2026): rich colour, open faces, no halos; replaced files under the same ids, so a new rev
   { rev: 26, before: "manifest.before_ny_rich.json" }, // New York re-graded outside the engine (review/rich_grade/rich_grade.py, 1 Nov 2026): rich colour, deep shadows, faces held, no halos; replaced files under the same ids, so a new rev
+  { rev: 27, before: "manifest.before_abba_v3.json" }, // Abba Farm re-graded with nykelab-grade v3.1 (8 Nov 2026: per-frame scene read, no fixed curve, local work on a guided-filter base; shoots/Abba Farm v3): the 25 published frames replaced under the same ids, so a new rev; the cut widened to 47 frames, most of them of the user's daughter
 ];
 const fingerprint = (u, by) => (by === "size" ? `${u.width}x${u.height}` : u.bytes);
 const loadPass = ({ rev, before, by = "bytes" }) => {
@@ -141,7 +142,7 @@ const LANDMARKS = new Map(JSON.parse(fs.readFileSync(new URL("../data/landmarks.
 // Photos with no trip of their own (no shot of the catalogue near their date): the collection they sit in.
 // Galleries are places. A subject that is not a place (Toko, a dog) is kept in storage but not shown: its collection is created with published = 0
 // and a rerun never turns it back on (the upsert below leaves `published` alone). Turn one on in /admin when wanted.
-const HIDDEN = new Set(["toko"]); // created unlisted: collections.published = 2, reachable at its address but not listed anywhere (see src/lib/collections.ts)
+const HIDDEN = new Set(["toko"]); // created unlisted: collections.published = 2, reachable at its address but not listed anywhere (see src/lib/collections.ts). abba-farm was here until the v3.1 re-grade (8 Nov 2026); listing it took a hand UPDATE of collections.published, the upsert never touches that column
 // Created with collections.published = 0: never a page, only storage. The Hex event page swaps its photographs to these film-look twins on HEXify
 // (src/pages/[slug].astro FEATURES; the twins carry the same catalog id under another folder, see LibraryGrade/review/hex-series-d/make_film_shoot.py).
 const STORAGE_ONLY = new Set(["hex-series-d-film"]);
