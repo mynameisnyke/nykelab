@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import type { AppEnv, MediaRow } from "./types";
-import { SLUG_RE, VARIANT_WIDTHS, toApiMedia } from "./util";
+import { SLUG_RE, VARIANT_WIDTHS, toApiMedia, variantUrl } from "./util";
 
 export const publicRoutes = new Hono<AppEnv>();
 
@@ -80,14 +80,54 @@ function parseRange(range: R2Range, size: number) {
 // request (Cloudflare Images binding) and cached in R2 under its own key.
 const VARIANT_RE = new RegExp(`^([a-f0-9]{12})/w(${VARIANT_WIDTHS.join("|")})\\.webp$`);
 
-function variantResponse(obj: R2Object | R2ObjectBody) {
+const IMMUTABLE = "public, max-age=31536000, immutable";
+
+function variantResponse(obj: R2Object | R2ObjectBody, cacheControl = IMMUTABLE) {
   const headers = new Headers();
   obj.writeHttpMetadata(headers);
   headers.set("ETag", obj.httpEtag);
-  headers.set("Cache-Control", "public, max-age=31536000, immutable");
+  headers.set("Cache-Control", cacheControl);
   if (!("body" in obj)) return new Response(null, { status: 304, headers });
   headers.set("Content-Length", String(obj.size));
   return new Response(obj.body, { headers });
+}
+
+/** Sized copies of a photograph that belong to another rev than `rev`: copies of a file that has since been replaced. Removed once the current one exists. */
+async function dropOtherRevs(media: R2Bucket, id: string, rev: number) {
+  const { objects } = await media.list({ prefix: `${id}/w` });
+  const old = objects
+    .map((o) => ({ key: o.key, m: /\/w\d+(?:-r(\d+))?\.webp$/.exec(o.key) }))
+    .filter(({ m }) => m && Number(m[1] ?? 1) !== rev)
+    .map(({ key }) => key);
+  if (old.length) await media.delete(old);
+}
+
+// Every other stored JPEG (a clip's poster frame, an older browser-resized photograph, the Azure page's poster) is handed out as WebP too:
+// /m/<id>/poster.webp is made from the poster.jpg beside it on first request and kept in R2 under that name, so it does not matter which
+// way the JPEG got into storage (the admin, the video watcher or the library publish script, which writes to R2 directly).
+const WEBP_COPY_RE = /^(?:[a-f0-9]{12}\/(?:main|small|poster)|azure\/[a-z0-9-]+)\.webp$/;
+
+async function webpCopy(env: AppEnv["Bindings"], key: string, conditions: Headers, cacheControl: string) {
+  const [cached, src] = await Promise.all([
+    env.MEDIA.get(key, { onlyIf: conditions }),
+    env.MEDIA.head(key.replace(/\.webp$/, ".jpg")),
+  ]);
+  if (!src) return null; // no JPEG beside it: a file uploaded as WebP (or nothing at all), which the plain route below answers
+  // the copy remembers which JPEG it was made from, so a JPEG replaced under the same name (the Azure poster) gets a new copy
+  if (cached?.customMetadata?.from === src.etag) return { response: variantResponse(cached, cacheControl) };
+
+  const jpeg = await env.MEDIA.get(src.key);
+  if (!jpeg) return null;
+  const out = await env.IMAGES.input(jpeg.body)
+    .transform({ width: 2400, fit: "scale-down" })
+    .output({ format: "image/webp", quality: 82 });
+  const body = await out.response().arrayBuffer();
+  return {
+    response: new Response(body, {
+      headers: { "Content-Type": "image/webp", "Content-Length": String(body.byteLength), "Cache-Control": cacheControl },
+    }),
+    keep: env.MEDIA.put(key, body, { httpMetadata: { contentType: "image/webp" }, customMetadata: { from: src.etag } }),
+  };
 }
 
 publicRoutes.get("/m/*", async (c) => {
@@ -103,6 +143,11 @@ publicRoutes.get("/m/*", async (c) => {
     const cached = await c.env.MEDIA.get(cacheKey, { onlyIf: c.req.raw.headers });
     if (cached) return variantResponse(cached);
 
+    // Not made yet. Only a photograph's current rev is made and kept: an address that carries another rev (a page held in a cache, an old
+    // link) is sent on to the current one, so a copy of the file as it is now is never stored under an old rev's name.
+    const row = await c.env.DB.prepare("SELECT rev FROM media WHERE id = ?").bind(id).first<{ rev: number | null }>();
+    if (row && (row.rev ?? 1) !== rev) return c.redirect(variantUrl(id, Number(w), row.rev ?? 1), 302);
+
     const found = await c.env.MEDIA.list({ prefix: `${id}/orig.`, limit: 1 });
     const origKey = found.objects[0]?.key;
     const orig = origKey ? await c.env.MEDIA.get(origKey) : null;
@@ -114,19 +159,30 @@ publicRoutes.get("/m/*", async (c) => {
       .output({ format: "image/webp", quality: width >= 1440 ? 85 : 80 });
     const body = await out.response().arrayBuffer();
     c.executionCtx.waitUntil(
-      c.env.MEDIA.put(cacheKey, body, { httpMetadata: { contentType: "image/webp" } }),
+      c.env.MEDIA.put(cacheKey, body, { httpMetadata: { contentType: "image/webp" } })
+        // the sized copies of the file this one replaced go, now that the page has the new one
+        .then(() => (row ? dropOtherRevs(c.env.MEDIA, id, rev) : undefined)),
     );
     return new Response(body, {
       headers: {
         "Content-Type": "image/webp",
         "Content-Length": String(body.byteLength),
-        "Cache-Control": "public, max-age=31536000, immutable",
+        "Cache-Control": IMMUTABLE,
       },
     });
   }
 
-  const azure = AZURE_RE.test(key);
-  if (!azure && !KEY_RE.test(key)) return c.notFound();
+  // The azure files keep their names (they may be replaced in place): a day, then revalidate. Everything else never changes under its name.
+  const cacheControl = key.startsWith("azure/") ? "public, max-age=86400" : IMMUTABLE;
+
+  if (WEBP_COPY_RE.test(key)) {
+    const copy = await webpCopy(c.env, key, c.req.raw.headers, cacheControl);
+    if (copy) {
+      if (copy.keep) c.executionCtx.waitUntil(copy.keep);
+      return copy.response;
+    }
+  }
+  if (!AZURE_RE.test(key) && !KEY_RE.test(key)) return c.notFound();
 
   const isRange = c.req.header("Range") !== undefined;
 
@@ -140,8 +196,7 @@ publicRoutes.get("/m/*", async (c) => {
   obj.writeHttpMetadata(headers);
   headers.set("ETag", obj.httpEtag);
   headers.set("Accept-Ranges", "bytes");
-  // Keys are per-upload (random id), so content never changes in place. The azure files keep their names: a day, then revalidate.
-  headers.set("Cache-Control", azure ? "public, max-age=86400" : "public, max-age=31536000, immutable");
+  headers.set("Cache-Control", cacheControl);
 
   if (!("body" in obj)) {
     return new Response(null, { status: 304, headers });

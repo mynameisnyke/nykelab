@@ -25,7 +25,8 @@ export default defineConfig({
   // Dev on 4322: an early build redirected / -> /journal and browsers cache redirects per origin.
   server: { port: 4322 },
   adapter: cloudflare({ prerenderEnvironment: "node" }),
-  integrations: [mdx(), sitemap(), vue()],
+  // /admin is prerendered (a shell for the Vue island) but is not a page for search engines.
+  integrations: [mdx(), sitemap({ filter: (page) => !new URL(page).pathname.startsWith("/admin") }), vue()],
   vite: { plugins: [tailwindcss()] },
   markdown: {
     shikiConfig: {

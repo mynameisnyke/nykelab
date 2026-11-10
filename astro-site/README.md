@@ -26,7 +26,7 @@ npm run dev     # in one terminal (port 4322); `npm test` starts it if it is not
 npm test        # Playwright, desktop + phone, uses the installed Chrome (no browser download)
 ```
 
-`tests/site.spec.ts`: every page loads with no console errors or failed requests; every internal link resolves; nothing blocks a click on any link or button (the `/places` bug); the menu matches the bottom nav and is keyboard-operable; theme, home views, places filter, soft navigation. `tests/a11y.spec.ts`: axe WCAG 2.1 A/AA on every page in both themes. The link-preview card (`public/og.png`) is regenerated from `scripts/og.html` (command in the file).
+`tests/site.spec.ts`: every page loads with no console errors or failed requests; every internal link resolves; nothing blocks a click on any link or button (the `/places` bug); the menu matches the bottom nav and is keyboard-operable; theme, home views, places filter, soft navigation. `tests/a11y.spec.ts`: axe WCAG 2.1 A/AA on every page in both themes. `tests/media.spec.ts`: every image address is WebP, a stored JPEG is served as a WebP copy, an old rev redirects to the current file and old sized copies are dropped. The link-preview card (`public/og.png`) is regenerated from `scripts/og.html` (command in the file).
 
 ## Writing a post
 
@@ -94,9 +94,9 @@ npm run catalog -- /Volumes/Whiskey/photos-3plus-or-picked.csv   # rerun wheneve
 - **Any file size.** The admin cuts a file into 16 MiB chunks and sends each as its own request (`POST /api/admin/uploads` → `PUT …/parts/:n` → `POST …/complete`); the Worker forwards them to an R2 multipart upload. No chunk is near the Worker body limit, so photos (≤200 MB) and videos (≤2 GB) both work. True browser→R2 presigned uploads would also need an R2 API token and bucket CORS; this needs neither.
 - **Originals first.** Photos are no longer resized in the browser. The original is stored as `<id>/orig.<ext>` and `media.key_original` is set (migration `0002_original.sql`).
 - **Variants on demand.** `/m/<id>/w{480,900,1440,2400}.webp` is generated from the original with the Cloudflare Images binding on first request, cached in R2, and served immutable. Widths never upscale past the original, and `srcset` lists only real widths (`urls.variants` in the API). Deleting a photo removes the original and every cached variant.
-- Older rows (browser-resized `main`/`small`) keep working unchanged.
+- **Every image is served as WebP, whichever way it was uploaded.** Storage keeps what was uploaded (JPEG originals, JPEG poster frames); the conversion happens in the Worker the first time an image is asked for, and the copy is kept in R2. That one place covers the admin, the video watcher and the library publish script (which writes to R2 directly and never passes through the Worker). Photographs are the sized variants above. Any other stored JPEG (a clip's `poster.jpg`, an older browser-resized `main.jpg` / `small.jpg`, the Azure page's `azure/background.jpg`) is handed out under the same name ending in `.webp` (`mediaUrl()` in `worker/src/util.ts`): `/m/<id>/poster.webp` is made from the `poster.jpg` beside it. The copy records which JPEG it was made from, so a JPEG replaced under the same name gets a new copy. The `.jpg` addresses still answer. Not WebP on purpose: `public/og.png` and a journal post's cover as `og:image` (link-preview crawlers), and `favicon.svg`.
+- **Only the current file of a photograph is kept.** A photograph replaced in place gets a new `rev` (see `scripts/publish-library.mjs`) and its sized copies are cached per rev. The first time a copy of the new rev is made, the copies of the other revs are deleted from R2, and an address that carries an old rev (a page held in a cache, an old link) is redirected to the current one instead of being made again under the old name.
 - HEIC/AVIF originals are not accepted yet (the browser must decode the file to read its size); export JPEG.
-- After pulling this change, run the new migration on any existing database: `npm run db:migrate:local` / `npm run db:migrate:remote` (root app) or `npm run seed` (astro-site local data).
 
 ## Photo pages: how data flows
 
@@ -159,7 +159,7 @@ How the domain was attached (kept for reference):
 
 - `astro.config.mjs` sets `prerenderEnvironment: "node"`. With the default (`workerd`) prerendered routes returned 404 in `astro dev` when using the custom Hono entry.
 - `wrangler.jsonc` sets `html_handling: "drop-trailing-slash"` so `/journal` is served without a redirect.
-- The adapter also auto-adds a `SESSION` KV binding and an `IMAGES` binding (Cloudflare Images). Neither is used yet; `IMAGES` is how responsive image variants could replace the browser-side resizing in the admin uploader.
+- The adapter also auto-adds a `SESSION` KV binding (not used yet) and an `IMAGES` binding (Cloudflare Images), which makes every WebP copy (see "Uploads and image sizes").
 
 ## Not done yet
 

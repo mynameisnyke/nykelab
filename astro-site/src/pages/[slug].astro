@@ -69,7 +69,7 @@ const hasCaption = (m: Photo) => !!(m.caption || placeText(m));
 <Base
   title={page ? `${page.title} — nykelab` : "Not found — nykelab"}
   description={page ? `${page.title}: ${count} photographs by Nyke Harewood.` : "Nothing here."}
-  image={hero?.urls.main}
+  image={hero?.type === "video" ? hero.urls.poster : hero?.urls.main}
   noindex={!!page?.unlisted}>
   <Navbar surface="media" collections={nav} feature={feature ? "hexify" : undefined} />
 

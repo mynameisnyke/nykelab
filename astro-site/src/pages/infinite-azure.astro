@@ -16,7 +16,7 @@ const [feed, nav] = await Promise.all([getAzureFeed(), getNav()]);
 ---
 
 <Base title="Infinite Azure — nykelab" description="An endless scroll of photographs over the Infinite Azure loop and music.">
-  <video id="az-bg" class="az-bg" src="/m/azure/background.mp4" poster="/m/azure/background.jpg" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video>
+  <video id="az-bg" class="az-bg" src="/m/azure/background.mp4" poster="/m/azure/background.webp" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video>
   <div class="az-scrim" aria-hidden="true"></div>
 
   <Navbar surface="media" collections={nav} />

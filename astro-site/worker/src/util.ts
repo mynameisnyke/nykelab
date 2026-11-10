@@ -6,7 +6,9 @@ export const SLUG_RE = /^[a-z0-9][a-z0-9-]{0,39}$/;
 // Slugs that would collide with fixed site routes.
 export const RESERVED_SLUGS = new Set(["admin", "api", "m", "world", "about", "c", "assets"]);
 
-export const mediaUrl = (key: string) => `/m/${key}`;
+/** A stored JPEG (a clip's poster, an older browser-resized photograph) is handed out as its WebP copy, which /m makes from it on first
+ * request (worker/src/public.ts). Clips, and anything already WebP, keep their own name. */
+export const mediaUrl = (key: string) => `/m/${key.replace(/\.jpg$/, ".webp")}`;
 
 // Allowed variant widths (px). A fixed list keeps the transform endpoint from being
 // used to generate arbitrary sizes. Variants never upscale past the original.

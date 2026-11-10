@@ -167,7 +167,7 @@ test.describe("watcher end to end (dev server)", () => {
     for (const m of rows) {
       expect(m.type).toBe("video");
       expect(m.urls.main).toMatch(/^\/m\/[a-f0-9]{12}\/main\.mp4$/);
-      expect(m.urls.poster).toMatch(/^\/m\/[a-f0-9]{12}\/poster\.jpg$/);
+      expect(m.urls.poster).toMatch(/^\/m\/[a-f0-9]{12}\/poster\.webp$/); // uploaded as a JPEG, handed out as WebP
       expect([m.width, m.height]).toEqual([1920, 1080]);
     }
     // converted files and a poster each are kept next to the watch folder's output
@@ -190,9 +190,15 @@ test.describe("watcher end to end (dev server)", () => {
     expect(ranged.status()).toBe(206);
     expect(ranged.headers()["content-type"]).toContain("video/mp4");
     expect(ranged.headers()["content-range"]).toMatch(/^bytes 0-999\//);
+    // the poster was uploaded as a JPEG; the page gets a WebP copy, made on the first request and served from storage after that
     const poster = await request.get(rows[0].urls.poster!);
     expect(poster.status()).toBe(200);
-    expect(poster.headers()["content-type"]).toContain("image/jpeg");
+    expect(poster.headers()["content-type"]).toContain("image/webp");
+    expect((await poster.body()).subarray(8, 12).toString()).toBe("WEBP");
+    await expect.poll(async () => (await request.get(rows[0].urls.poster!)).headers()["etag"] ?? "").not.toBe(""); // the stored copy carries an ETag
+    const jpeg = await request.get(rows[0].urls.poster!.replace(/\.webp$/, ".jpg"));
+    expect(jpeg.headers()["content-type"]).toContain("image/jpeg"); // the upload itself is still there
+    expect((await request.get(rows[0].urls.main.replace("main.mp4", "small.webp"))).status()).toBe(404); // no JPEG beside it, nothing to copy
   });
 
   test("the page: muted inline loops that play only while on screen", async ({ page, isMobile }) => {
@@ -205,7 +211,7 @@ test.describe("watcher end to end (dev server)", () => {
       await expect(v).toHaveAttribute("playsinline", "");
       await expect(v).toHaveAttribute("loop", "");
       expect(await v.getAttribute("autoplay")).toBeNull();
-      expect(await v.getAttribute("poster")).toMatch(/poster\.jpg$/);
+      expect(await v.getAttribute("poster")).toMatch(/poster\.webp$/);
     }
     const state = (i: number) => videos.nth(i).evaluate((el: HTMLVideoElement) => ({ paused: el.paused, muted: el.muted, hasSrc: !!el.currentSrc, t: el.currentTime }));
     // hero is on screen: loads and plays, muted
