@@ -163,10 +163,15 @@ const CLIP_TRIP = {
   central_park: "central-park", // the 28 Oct 2026 shoot, graded and cut with nykelab-grade (shoots/clips/central_park)
   phone_stockholm: "stockholm", phone_norway: "norway",
   hex_series_d: "hex-series-d", // the 29 Oct 2026 Hex Series D camcorder tape, cut into scenes (review/hex-series-d/video_src) and graded with nykelab-grade
+  // Bogotá, added 9 Nov 2026: the 3-minute Monserrate take (bogota_2023/C0029) as a 10x time-lapse so the fog moves (it replaces the 8 s cut of the same
+  // take as the page's opening clip: that one is hidden in data/gallery-curation.json), and two phone videos from Photos (shoots/phone-bogota)
+  bogota_timelapse: "bogota", phone_bogota: "bogota",
 };
 /** A named place for a clip when the footage says where it is; otherwise the trip's own place. */
 function clipLandmark(s) {
   if (s.folder === "New Mexico" || s.folder === "phoenix_2021") return "Grand Canyon National Park, Arizona";
+  // the hill filmed from the city, and the cable car coming down it at night (the phone's own GPS fix is on the hill); the market street has no fix
+  if (s.folder === "bogota_timelapse" || (s.folder === "phone_bogota" && s.source === "IMG_5181.MOV")) return "Monserrate, Bogotá, Colombia";
   if (s.folder === "grand_teton_2022") return "Grand Teton National Park, Wyoming";
   if (s.folder === "yellowstone_2022") return "Yellowstone National Park, Wyoming";
   if (s.folder === "newmexico_2021" && /^C000[12]\.MP4$/.test(s.source)) return "White Sands National Park, New Mexico";
