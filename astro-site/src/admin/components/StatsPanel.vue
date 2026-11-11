@@ -1,5 +1,30 @@
 <template>
   <section class="space-y-8">
+    <!-- All-time and exact (D1 counters): shown whether or not the Analytics Engine dashboard below is set up. -->
+    <div class="max-w-xl">
+      <h3 class="h">Journal posts, all time</h3>
+      <table class="tbl">
+        <tr class="text-white/40 text-xs"><td>Post</td><td class="num">Views</td><td class="num">Visitors</td></tr>
+        <tr v-for="p in posts.posts" :key="p.path">
+          <td><a :href="p.path" target="_blank" class="hover:underline">{{ p.path.replace("/journal/", "") }}</a></td>
+          <td class="num">{{ fmt(p.views) }}</td>
+          <td class="num">{{ fmt(p.visitors) }}</td>
+        </tr>
+        <tr v-if="!posts.posts.length"><td class="text-white/40">No views counted yet</td></tr>
+        <tr class="text-white/60">
+          <td>Whole site</td>
+          <td class="num">{{ fmt(posts.site.views) }}</td>
+          <td class="num">{{ fmt(posts.site.visitors) }}</td>
+        </tr>
+      </table>
+      <p class="mt-3 text-xs text-white/40">
+        Visitors are unique per day (same network and browser), counted since the feature shipped; views go back further.
+        <button class="underline hover:text-white" :disabled="filling" @click="backfill">
+          {{ filling ? "Backfilling…" : "Backfill views from Analytics Engine" }}
+        </button>
+      </p>
+    </div>
+
     <div class="flex items-center gap-3">
       <label class="text-xs uppercase tracking-wider text-white/50">Range</label>
       <select v-model.number="days" class="field" @change="load">
@@ -77,15 +102,39 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { admin, type ApiMedia, type StatsResponse } from "../lib/api";
+import { admin, type ApiMedia, type PostViews, type StatsResponse } from "../lib/api";
 import { useToast } from "../lib/useToast";
 
 const props = defineProps<{ media: ApiMedia[] }>();
-const { fail } = useToast();
+const { show, fail } = useToast();
 
 const days = ref(7);
 const loading = ref(true);
 const stats = ref<StatsResponse | null>(null);
+const posts = ref<PostViews>({ site: { views: 0, visitors: 0 }, posts: [] });
+const filling = ref(false);
+const fmt = (n: number) => n.toLocaleString("en-US");
+
+const loadPosts = () =>
+  admin
+    .postViews()
+    .then((r) => (posts.value = r))
+    .catch(fail);
+
+async function backfill() {
+  filling.value = true;
+  try {
+    const r = await admin.backfillPostViews();
+    if (!r.configured) throw new Error("Set CF_ACCOUNT_ID and the CF_API_TOKEN secret first (see the note below).");
+    if (r.error) throw new Error(r.error);
+    await loadPosts();
+    show(`Backfilled ${r.posts?.length ?? 0} post${r.posts?.length === 1 ? "" : "s"}`);
+  } catch (err) {
+    fail(err);
+  } finally {
+    filling.value = false;
+  }
+}
 
 const byId = computed(() => Object.fromEntries(props.media.map((m) => [m.id, m])));
 const maxDaily = computed(() => Math.max(1, ...(stats.value?.daily ?? []).map((d) => d.views)));
@@ -105,7 +154,10 @@ async function load() {
     loading.value = false;
   }
 }
-onMounted(load);
+onMounted(() => {
+  void load();
+  void loadPosts();
+});
 </script>
 
 <style scoped>

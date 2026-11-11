@@ -1,6 +1,7 @@
 ---
 // A quiet, live "12,345 views" in the bottom right of every page (the total page views, bots and /admin left out).
 // Persisted across client-side navigations so it does not flicker; hidden until the first number arrives, and when counting is off.
+// The same request also fills a journal post's own count (see pages/journal/[slug].astro).
 ---
 
 <div class="views" id="views" transition:persist="views" aria-live="off">
@@ -39,10 +40,26 @@
       requestAnimationFrame(step);
     }
 
+    // A journal post shows its own count in its byline: the page leaves an empty [data-post-views] for it.
+    function showPost(slot: HTMLElement, n: number) {
+      const out = slot.querySelector(".num");
+      if (!out || n < 1) return;
+      out.textContent = `${fmt(n)} ${n === 1 ? "view" : "views"}`;
+      slot.hidden = false;
+    }
+
     async function refresh() {
+      const slot = document.querySelector<HTMLElement>("[data-post-views]");
+      const path = location.pathname;
+      const url = slot ? `/api/views?path=${encodeURIComponent(path)}` : "/api/views";
       try {
-        const { views } = (await (await fetch("/api/views", { cache: "no-store" })).json()) as { views: number | null };
+        const { views, page } = (await (await fetch(url, { cache: "no-store" })).json()) as {
+          views: number | null;
+          page?: number | null;
+        };
         if (typeof views === "number") show(views);
+        // not if the reader has moved on to another page while this was in flight
+        if (slot?.isConnected && typeof page === "number" && location.pathname === path) showPost(slot, page);
       } catch {
         /* the counter just stays as it was */
       }

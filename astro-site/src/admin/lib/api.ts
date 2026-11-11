@@ -57,6 +57,11 @@ export interface StatsResponse {
   daily?: { day: string; views: number }[];
 }
 
+export interface PostViews {
+  site: { views: number; visitors: number };
+  posts: { path: string; views: number; visitors: number }[];
+}
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -137,6 +142,12 @@ export const admin = {
     request<{ ok: true }>("/api/admin/media-order", json("PUT", { collection, ids })),
 
   stats: (days: number) => request<StatsResponse>(`/api/admin/stats?days=${days}`),
+  postViews: () => request<PostViews>("/api/admin/post-views"),
+  backfillPostViews: () =>
+    request<{ configured: boolean; error?: string; posts?: { path: string; views: number }[] }>(
+      "/api/admin/post-views/backfill",
+      { method: "POST" },
+    ),
 
   /**
    * Uploads a file of any size to R2 in chunks (Worker-brokered multipart), keeping the

@@ -33,7 +33,10 @@
     "ACCESS_TEAM_DOMAIN": "throbbing-sunset-0d23.cloudflareaccess.com",
     "ACCESS_AUD": "ce52f956a600b918ce10f711aca0f5352d44f6296aafae26a3ccedc5e151aad2",
     // Optional comma-separated allowlist of admin emails (extra check on top of Access).
-    "ADMIN_EMAILS": ""
+    "ADMIN_EMAILS": "",
+    // Lets the admin Stats tab (and the post-view backfill) read Analytics Engine; it also needs the CF_API_TOKEN secret
+    // (a token with Account Analytics: Read), set with `npx wrangler secret put CF_API_TOKEN`.
+    "CF_ACCOUNT_ID": "13a874ad93c37b99b04049c57ff4374f"
   },
   // The live domain. Cloudflare creates the DNS records and certificates for custom domains itself; www redirects to the bare
   // domain inside the Worker (worker/src/redirect.ts); the mail records on the zone are not touched. `workers_dev` keeps the
