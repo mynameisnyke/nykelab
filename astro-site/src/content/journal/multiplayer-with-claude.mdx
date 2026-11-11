@@ -1,0 +1,81 @@
+---
+title: Multiplayer with Claude
+description: What rolling out Claude Tag taught me about Slack as the place an agent lives, and what you give up to put it there.
+date: 2026-11-10
+tags: [AI, Work]
+cover: ../../assets/journal/japan-arcade.jpg
+coverAlt: Two men seen from behind, playing side by side at a row of blue linked fighting-game cabinets in a Japanese arcade. One screen shows a match in progress and another reads K.O.
+---
+
+import Figure from "../../components/Figure.astro";
+import arcade from "../../assets/journal/japan-arcade.jpg";
+import product from "../../assets/journal/claude-tag-product.jpg";
+import generations from "../../assets/journal/claude-tag-generations.jpg";
+import memory from "../../assets/journal/claude-tag-memory.jpg";
+import identity from "../../assets/journal/claude-tag-identity.jpg";
+
+<Figure src={arcade} alt="Two men seen from behind, playing side by side at a row of blue linked fighting-game cabinets in a Japanese arcade. One screen shows a match in progress and another reads K.O." caption="Linked cabinets in an arcade in Japan, June 2015. Everyone in the row is in the same game." />
+
+I've been living with Claude Tag from two sides. I rolled it out at the org I work at, and I recently went to a private Anthropic event where they demoed it. I can't share details or photos from that event, so everything here comes from what I've seen outside of it.
+
+## Meeting people where they already are
+
+What I find humbling is that a company as big as Anthropic seems to have reached the same conclusion the rest of us have. Adoption is hard for new products, and it's easier to ride a conduit people already use. In this case, Slack.
+
+I've watched the same thing happen with help desk ticketing. Getting startup employees to use a ticketing system is a fruitless endeavor when they already live in Slack. Hopping into another platform to track a conversation is a huge ask. It's why so many ticketing platforms built integrations that ingest Slack messages and make the tickets for you. So it's no shock that Anthropic landed here too.
+
+<Figure src={product} alt="The Claude Tag product page. A headline reads Tag Claude in Slack above two buttons, Add to Slack and Read documentation." caption="The pitch, from the Claude Tag product page." />
+
+## An early product
+
+This is very much an early product. If you remember, there was already a Claude app in Slack. It was retired, and Claude Tag took its place in August. The docs call Tag the second generation, and the gap between the two is wide.
+
+<Figure src={generations} alt="A table from the Claude Tag docs comparing the earlier Claude in Slack with Claude Tag across identity, sessions, memory and proactive work. The earlier app had no memory and no proactive work." caption="Anthropic's own comparison of the two generations, from the Claude Tag glossary." />
+
+## Setup: five minutes of admin work
+
+Setting up a channel has been about five minutes of admin work in my experience. Mileage may vary. There are also bundles, which are exactly what they sound like: a pre-configured set of access you can apply to other channels. Lean on those and setup gets even easier.
+
+## Control: careful by design
+
+There's a moderate level of control. An admin decides which channels Tag is allowed to work in, which is great. Most of the administration sits with whoever runs Claude for the org, and you can tell careful thought went into it. Everyone understands how scary it is to give a tool wide access to your public channels, and scarier still to let it into private ones. On guardrails, I think they got it right.
+
+But the caution turns into a shortcoming in the user experience. Take memory. It's scoped to the channel, and Claude doesn't carry what it learned in one channel into another. It can share notes across the workspace, but in my experience you have to tell it to. It doesn't happen on its own.
+
+<Figure src={memory} alt="The docs page titled What Claude Tag remembers. The first line says Claude Tag memory belongs to the channel, not to you." caption="Memory belongs to the channel. From the Claude Tag docs." />
+
+## Authentication: two flavors
+
+Access to downstream apps is likely one of the biggest challenges in building a general-purpose agent that many people can query. There seem to be two flavors here.
+
+The first is giving Claude its own connectors, and these don't work the way you'd expect. Take Datadog. In the one-on-one Claude experience, the Datadog connector authenticates through OAuth. For Claude Tag, it's an API key.
+
+I lean toward calling that a positive. You don't have to stand up a redundant account for Claude and walk it through a login. You hand over a key. But it puts more on the admin. Now you're managing API keys, and you want them scoped down correctly. That's harder to see clearly than an account whose scopes are readable in a GUI and quick to change.
+
+<Figure src={identity} alt="A diagram from the Claude Tag docs. A request moves from a Slack channel to a session sandbox, through an Agent Proxy that injects the credential, and out to systems like an issue tracker, a data warehouse and monitoring." caption="Where the key goes. The credential is attached at a proxy, not handed to the model. From the Claude Tag docs." />
+
+The second flavor is personal. Anthropic seems to have thought ahead and realized people will still want their own connectors, so Tag can also use your own OAuth connection for a task you ask for.
+
+## Observability: the biggest sacrifice
+
+In the one-on-one Claude client there's a lot of verbosity, and you can turn it up or down. In Claude Tag you have none of those options. You can't see which tools are being called. You can't see how it's thinking. Sometimes you don't even know if it's running. You prompt it and wait.
+
+Yes, the logs have all of this. But the general user can't open them, and giving everyone that access is a large compromise. Those logs hold everything, including activity from connectors only an HR team should have, which could reveal things other people shouldn't see.
+
+All of these feel like sacrifices Anthropic had to make to get adoption through Slack. When Slack is the product, you inherit what Slack can and can't show.
+
+## What you get in return
+
+AI adoption has opened the door for every department to become engineers in some capacity. People are pushing code to GitHub, writing skills and building autonomous workflows. And in my org they're hitting the same wall every engineer has hit at some point: how the heck do I move this from my local dev to production?
+
+Claude Tag abstracts most of that away. You don't have to worry about hosting infrastructure. You don't have to decide what the trigger should be, because it's baked in. It's Slack messages. I assume it's event-based underneath, keying off messages and deciding what to do with them. That's very powerful.
+
+## Slack was always the output
+
+I think of Claude Tag as somewhat of a replacement for the workflows people built in tools like Zapier. Or even better, a new tail for them.
+
+So many of the workflows I've built in the past decade come down to an input and an output, with Slack as the output. Sometimes that output is the final tell. Often it's the genesis of another workflow, where a person reads the message and carries it by hand into another platform. Claude Tag takes that toil away.
+
+The same goes for the noisy channels that pipe in alerts from infrastructure or security. There's a lot of room to put Claude Tag in them and make those alerts actionable, or at least help triage them.
+
+Claude Tag is going to let people revisit their legacy automations, think of new ways to add to them, or cut the manual work they were doing with what came out the other end.
