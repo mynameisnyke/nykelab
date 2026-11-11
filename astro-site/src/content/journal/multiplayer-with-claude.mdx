@@ -76,6 +76,24 @@ I think of Claude Tag as somewhat of a replacement for the workflows people buil
 
 So many of the workflows I've built in the past decade come down to an input and an output, with Slack as the output. Sometimes that output is the final tell. Often it's the genesis of another workflow, where a person reads the message and carries it by hand into another platform. Claude Tag takes that toil away.
 
-The same goes for the noisy channels that pipe in alerts from infrastructure or security. There's a lot of room to put Claude Tag in them and make those alerts actionable, or at least help triage them.
+## Low risk: let it run
 
-Claude Tag is going to let people revisit their legacy automations, think of new ways to add to them, or cut the manual work they were doing with what came out the other end.
+Here's a classic example. Your Salesforce records pipe into a Slack channel, and your team shares a Notion database that links back to them. Today a person reads each message and writes it into Notion.
+
+It's pretty low risk to give Claude full read and write here. It can read the message, decipher it, and lay it out in Notion with your own instructions and styling. That's a full end-to-end autonomous workflow, with no human in the loop.
+
+## High risk: keep a human at the gate
+
+But of course we all chase high risk, high reward. So take a noisy channel full of Datadog alerts that's hard to triage with limited staff. Now you don't have to scale your team to keep up with it. You can hand it to the agent.
+
+This is where you want to move with caution, and it's also where you can see there are three layers of control: the Slack channel itself, what Claude is allowed to do, and the protections inside the app it's reaching into.
+
+GitHub is the classic case. Claude can inspect your code and read it. But a good GitHub org has branch protection rules that stop anyone from committing straight to the main branch without a PR. So the human is still in the loop. There are just fewer steps left for them.
+
+Maybe that person was going to copy the Datadog output and paste it into Claude themselves. You've saved that step. You've also made it so the alert is acted on when it happens, not when somebody gets to it. Now it's just a PR to review.
+
+Hint, hint: arguably the next step is figuring out the appetite for confidence scores that let some of those PRs merge on their own.
+
+## Where this goes
+
+Claude Tag is going to let people revisit their legacy automations, think of new ways to add to them, or cut the manual work they were doing with what came out the other end. The possibilities are endless.
