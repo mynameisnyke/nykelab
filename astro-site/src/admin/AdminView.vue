@@ -46,7 +46,9 @@
           </button>
         </div>
 
+        <!-- keyed by the filter, so choosing another collection starts again from its first page of cards -->
         <MediaGrid
+          :key="filter"
           :media="visibleMedia"
           :collections="collections"
           :reorderable="!!filter"

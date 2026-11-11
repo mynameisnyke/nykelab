@@ -1,7 +1,7 @@
 <template>
   <p v-if="!media.length" class="text-sm text-white/40 py-8 text-center">Nothing here yet.</p>
   <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <li v-for="(m, i) in media" :key="m.id" class="rounded border border-white/15 overflow-hidden flex flex-col">
+    <li v-for="(m, i) in shown" :key="m.id" class="rounded border border-white/15 overflow-hidden flex flex-col">
       <div class="relative bg-white/5 aspect-[4/3]">
         <img :src="thumb(m)" class="w-full h-full object-cover" :class="{ 'opacity-40': !m.published }" loading="lazy" />
         <span v-if="m.type === 'video'" class="badge left-2 top-2">VIDEO</span>
@@ -52,10 +52,14 @@
       </div>
     </li>
   </ul>
+  <!-- More cards are added as this comes near the bottom of the window; the button is the fallback. -->
+  <div v-if="shown.length < media.length" ref="more" class="py-6 text-center">
+    <button class="btn" @click="grow">Show more ({{ shown.length }} of {{ media.length }})</button>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from "vue";
+import { computed, onBeforeUnmount, reactive, ref, watch } from "vue";
 import { admin, type AdminCollection, type ApiMedia } from "../lib/api";
 import { useToast } from "../lib/useToast";
 
@@ -68,6 +72,20 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{ (e: "changed"): void }>();
 const { show, fail } = useToast();
+
+// The library runs to thousands of items, and a card is a small form: drawing them all at once freezes the tab.
+// So a page of cards is drawn, and more are added as the end comes into view.
+const PAGE = 60;
+const limit = ref(PAGE);
+const shown = computed(() => props.media.slice(0, limit.value));
+const grow = () => (limit.value += PAGE);
+const more = ref<HTMLElement | null>(null);
+const near = new IntersectionObserver((entries) => entries.some((e) => e.isIntersecting) && grow(), { rootMargin: "1500px" });
+watch(more, (el) => {
+  near.disconnect();
+  if (el) near.observe(el);
+});
+onBeforeUnmount(() => near.disconnect());
 
 const edits = reactive<Record<string, { caption: string; place: string }>>({});
 // Last server values, so a refresh only overwrites fields the user hasn't touched.

@@ -10,7 +10,7 @@
           <td class="num">{{ fmt(p.views) }}</td>
           <td class="num">{{ fmt(p.visitors) }}</td>
         </tr>
-        <tr v-if="!posts.posts.length"><td class="text-white/40">No views counted yet</td></tr>
+        <tr v-if="!posts.posts.length"><td colspan="3" class="text-white/40">No views counted yet</td></tr>
         <tr class="text-white/60">
           <td>Whole site</td>
           <td class="num">{{ fmt(posts.site.views) }}</td>
